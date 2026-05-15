@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">MediaTracker</string>
+    <string name="discover_books">Libros</string>
+    <string name="discover_movies">Películas</string>
+    <string name="discover_search_hint">Buscar…</string>
+    <string name="discover_series">Series</string>
+    <string name="discover_top_books">Top Libros</string>
+    <string name="discover_top_movies">Top Películas</string>
+    <string name="discover_top_series">Top Series</string>
+    <string name="empty_list">No hay elementos</string>
+    <string name="error_generic">Algo salió mal</string>
+    <string name="favorite">Favorito</string>
+    <string name="home_continue">Continúa donde lo dejaste</string>
+    <string name="home_favorites">Tus Favoritos</string>
+    <string name="home_recent">Tus Últimos Guardados</string>
+    <string name="home_trending">Novedades Trending</string>
+    <string name="library_abandoned">Abandonado</string>
+    <string name="library_all">Todos</string>
+    <string name="library_completed">Completado</string>
+    <string name="library_in_progress">En progreso</string>
+    <string name="library_watchlist">Quiero ver</string>
+    <string name="loading">Cargando…</string>
+    <string name="login_button">Iniciar sesión</string>
+    <string name="login_email">Email</string>
+    <string name="login_google">Continuar con Google</string>
+    <string name="login_name">Nombre</string>
+    <string name="login_password">Contraseña</string>
+    <string name="login_subtitle">Unifica tus series, películas y libros</string>
+    <string name="login_switch_to_login">¿Ya tienes cuenta? Inicia sesión</string>
+    <string name="login_switch_to_register">¿No tienes cuenta? Regístrate</string>
+    <string name="login_title">MediaTracker</string>
+    <string name="nav_discover">Buscar</string>
+    <string name="nav_home">Inicio</string>
+    <string name="nav_library">Biblioteca</string>
+    <string name="nav_profile">Perfil</string>
+    <string name="profile_books">Libros</string>
+    <string name="profile_delete_account">Eliminar cuenta</string>
+    <string name="profile_logout">Cerrar sesión</string>
+    <string name="profile_movies">Películas</string>
+    <string name="profile_series">Series</string>
+    <string name="register_button">Crear cuenta</string>
+    <string name="retry">Reintentar</string>
+</resources>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="media_blue">#FF3F51B5</color>
+    <color name="media_blue_dark">#FF303F9F</color>
+    <color name="media_green">#FF4CAF50</color>
+    <color name="media_orange">#FFFF9800</color>
+    <color name="media_red">#FFF44336</color>
+    <color name="seed">#FF3F51B5</color>
+</resources>

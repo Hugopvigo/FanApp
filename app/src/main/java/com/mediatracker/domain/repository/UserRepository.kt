@@ -1,0 +1,17 @@
+package com.mediatracker.domain.repository
+
+import com.mediatracker.domain.model.ItemStatus
+import com.mediatracker.domain.model.MediaType
+import com.mediatracker.domain.model.UserItem
+
+interface UserRepository {
+    suspend fun getUserItems(): Result<List<UserItem>>
+    suspend fun addUserItem(
+        mediaType: MediaType,
+        apiId: String,
+        status: ItemStatus,
+    ): Result<UserItem>
+    suspend fun updateItemStatus(itemId: String, status: ItemStatus): Result<Unit>
+    suspend fun toggleFavorite(itemId: String): Result<Unit>
+    suspend fun removeUserItem(itemId: String): Result<Unit>
+}
