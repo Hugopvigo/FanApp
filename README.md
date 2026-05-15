@@ -1,4 +1,4 @@
-# 📱 MediaTracker
+# 📱 FanAPP MediaTracker
 
 > **🚧 En Desarrollo** — Este proyecto está en fase activa de construcción.
 > Todo lo que ves aquí puede cambiar, romperse, o evolucionar.
@@ -6,7 +6,7 @@
 
 ---
 
-## 🎯 ¿Qué es MediaTracker?
+## 🎯 ¿Qué es FanAPP MediaTracker?
 
 Una app Android que unifica el seguimiento de **series**, **películas** y **libros** en un solo lugar.
 
@@ -140,7 +140,7 @@ GOOGLE_BOOKS_API_KEY=tu_key
 
 <div align="center">
 
-**MediaTracker** — Unifica lo que consumes.
+**FanApp MediaTracker** — Unifica lo que consumes.
 
 🚧 En Desarrollo • MVP en construcción • 2025
 
