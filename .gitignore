@@ -1,0 +1,20 @@
+*.iml
+.gradle
+/local.properties
+/.idea
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+*.apk
+*.aab
+*.ap_
+*.aab_
+local.properties
+.env
+*.env
+google-services.json
+
+# Markdown docs (not shipped)
+*.md
