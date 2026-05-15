@@ -1,66 +1,58 @@
 [
     {
-        "merged": "com.mediatracker.app-debug-71:/mipmap-mdpi_ic_launcher_round.png.flat",
-        "source": "com.mediatracker.app-main-73:/mipmap-mdpi/ic_launcher_round.png"
+        "merged": "com.mediatracker.app-debug-60:/mipmap-hdpi_ic_launcher.png.flat",
+        "source": "com.mediatracker.app-main-62:/mipmap-hdpi/ic_launcher.png"
     },
     {
-        "merged": "/home/hugo/.gradle/daemon/8.9/com.mediatracker.app-debug-71:/drawable_ic_launcher_foreground.xml.flat",
-        "source": "/home/hugo/.gradle/daemon/8.9/com.mediatracker.app-main-73:/drawable/ic_launcher_foreground.xml"
+        "merged": "com.mediatracker.app-debug-60:/drawable-nodpi_ic_launcher_foreground.png.flat",
+        "source": "com.mediatracker.app-main-62:/drawable-nodpi/ic_launcher_foreground.png"
     },
     {
-        "merged": "com.mediatracker.app-debug-71:/mipmap-xxxhdpi_ic_launcher.png.flat",
-        "source": "com.mediatracker.app-main-73:/mipmap-xxxhdpi/ic_launcher.png"
+        "merged": "com.mediatracker.app-debug-60:/mipmap-xxxhdpi_ic_launcher_round.png.flat",
+        "source": "com.mediatracker.app-main-62:/mipmap-xxxhdpi/ic_launcher_round.png"
     },
     {
-        "merged": "com.mediatracker.app-debug-71:/mipmap-xhdpi_ic_launcher.png.flat",
-        "source": "com.mediatracker.app-main-73:/mipmap-xhdpi/ic_launcher.png"
+        "merged": "com.mediatracker.app-debug-60:/mipmap-hdpi_ic_launcher_round.png.flat",
+        "source": "com.mediatracker.app-main-62:/mipmap-hdpi/ic_launcher_round.png"
     },
     {
-        "merged": "com.mediatracker.app-debug-71:/mipmap-xxhdpi_ic_launcher.png.flat",
-        "source": "com.mediatracker.app-main-73:/mipmap-xxhdpi/ic_launcher.png"
+        "merged": "com.mediatracker.app-debug-60:/mipmap-mdpi_ic_launcher_round.png.flat",
+        "source": "com.mediatracker.app-main-62:/mipmap-mdpi/ic_launcher_round.png"
     },
     {
-        "merged": "com.mediatracker.app-debug-71:/mipmap-xhdpi_ic_launcher_round.png.flat",
-        "source": "com.mediatracker.app-main-73:/mipmap-xhdpi/ic_launcher_round.png"
+        "merged": "com.mediatracker.app-debug-60:/mipmap-xhdpi_ic_launcher.png.flat",
+        "source": "com.mediatracker.app-main-62:/mipmap-xhdpi/ic_launcher.png"
     },
     {
-        "merged": "com.mediatracker.app-debug-71:/mipmap-xxhdpi_ic_launcher_round.png.flat",
-        "source": "com.mediatracker.app-main-73:/mipmap-xxhdpi/ic_launcher_round.png"
+        "merged": "com.mediatracker.app-debug-60:/mipmap-xxxhdpi_ic_launcher.png.flat",
+        "source": "com.mediatracker.app-main-62:/mipmap-xxxhdpi/ic_launcher.png"
     },
     {
-        "merged": "/home/hugo/.gradle/daemon/8.9/com.mediatracker.app-debug-71:/mipmap-anydpi-v26_ic_launcher_round.xml.flat",
-        "source": "/home/hugo/.gradle/daemon/8.9/com.mediatracker.app-main-73:/mipmap-anydpi-v26/ic_launcher_round.xml"
+        "merged": "com.mediatracker.app-debug-60:/drawable_ic_launcher_background.xml.flat",
+        "source": "com.mediatracker.app-main-62:/drawable/ic_launcher_background.xml"
     },
     {
-        "merged": "com.mediatracker.app-debug-71:/mipmap-hdpi_ic_launcher_round.png.flat",
-        "source": "com.mediatracker.app-main-73:/mipmap-hdpi/ic_launcher_round.png"
+        "merged": "com.mediatracker.app-debug-60:/mipmap-anydpi-v26_ic_launcher_round.xml.flat",
+        "source": "com.mediatracker.app-main-62:/mipmap-anydpi-v26/ic_launcher_round.xml"
     },
     {
-        "merged": "com.mediatracker.app-debug-71:/mipmap-hdpi_ic_launcher.png.flat",
-        "source": "com.mediatracker.app-main-73:/mipmap-hdpi/ic_launcher.png"
+        "merged": "com.mediatracker.app-debug-60:/mipmap-anydpi-v26_ic_launcher.xml.flat",
+        "source": "com.mediatracker.app-main-62:/mipmap-anydpi-v26/ic_launcher.xml"
     },
     {
-        "merged": "/home/hugo/.gradle/daemon/8.9/com.mediatracker.app-debug-71:/mipmap-anydpi-v26_ic_launcher.xml.flat",
-        "source": "/home/hugo/.gradle/daemon/8.9/com.mediatracker.app-main-73:/mipmap-anydpi-v26/ic_launcher.xml"
+        "merged": "com.mediatracker.app-debug-60:/mipmap-xxhdpi_ic_launcher.png.flat",
+        "source": "com.mediatracker.app-main-62:/mipmap-xxhdpi/ic_launcher.png"
     },
     {
-        "merged": "com.mediatracker.app-debug-71:/mipmap-mdpi_ic_launcher.png.flat",
-        "source": "com.mediatracker.app-main-73:/mipmap-mdpi/ic_launcher.png"
+        "merged": "com.mediatracker.app-debug-60:/mipmap-mdpi_ic_launcher.png.flat",
+        "source": "com.mediatracker.app-main-62:/mipmap-mdpi/ic_launcher.png"
     },
     {
-        "merged": "/home/hugo/.gradle/daemon/8.9/com.mediatracker.app-debug-71:/drawable_ic_launcher_background.xml.flat",
-        "source": "/home/hugo/.gradle/daemon/8.9/com.mediatracker.app-main-73:/drawable/ic_launcher_background.xml"
+        "merged": "com.mediatracker.app-debug-60:/mipmap-xhdpi_ic_launcher_round.png.flat",
+        "source": "com.mediatracker.app-main-62:/mipmap-xhdpi/ic_launcher_round.png"
     },
     {
-        "merged": "com.mediatracker.app-debug-71:/drawable_ic_launcher_background.xml.flat",
-        "source": "com.mediatracker.app-main-73:/drawable/ic_launcher_background.xml"
-    },
-    {
-        "merged": "com.mediatracker.app-debug-71:/drawable-nodpi_ic_launcher_foreground.png.flat",
-        "source": "com.mediatracker.app-main-73:/drawable-nodpi/ic_launcher_foreground.png"
-    },
-    {
-        "merged": "com.mediatracker.app-debug-71:/mipmap-xxxhdpi_ic_launcher_round.png.flat",
-        "source": "com.mediatracker.app-main-73:/mipmap-xxxhdpi/ic_launcher_round.png"
+        "merged": "com.mediatracker.app-debug-60:/mipmap-xxhdpi_ic_launcher_round.png.flat",
+        "source": "com.mediatracker.app-main-62:/mipmap-xxhdpi/ic_launcher_round.png"
     }
 ]

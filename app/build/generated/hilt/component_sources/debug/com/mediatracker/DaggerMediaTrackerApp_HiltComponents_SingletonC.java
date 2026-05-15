@@ -13,14 +13,24 @@ import com.mediatracker.data.auth.AuthDataSource;
 import com.mediatracker.di.FirebaseModule_ProvideFirebaseAuthFactory;
 import com.mediatracker.presentation.auth.AuthViewModel;
 import com.mediatracker.presentation.auth.AuthViewModel_HiltModules;
+import com.mediatracker.presentation.auth.AuthViewModel_HiltModules_BindsModule_Binds_LazyMapKey;
+import com.mediatracker.presentation.auth.AuthViewModel_HiltModules_KeyModule_Provide_LazyMapKey;
 import com.mediatracker.presentation.discover.DiscoverViewModel;
 import com.mediatracker.presentation.discover.DiscoverViewModel_HiltModules;
+import com.mediatracker.presentation.discover.DiscoverViewModel_HiltModules_BindsModule_Binds_LazyMapKey;
+import com.mediatracker.presentation.discover.DiscoverViewModel_HiltModules_KeyModule_Provide_LazyMapKey;
 import com.mediatracker.presentation.home.HomeViewModel;
 import com.mediatracker.presentation.home.HomeViewModel_HiltModules;
+import com.mediatracker.presentation.home.HomeViewModel_HiltModules_BindsModule_Binds_LazyMapKey;
+import com.mediatracker.presentation.home.HomeViewModel_HiltModules_KeyModule_Provide_LazyMapKey;
 import com.mediatracker.presentation.library.LibraryViewModel;
 import com.mediatracker.presentation.library.LibraryViewModel_HiltModules;
+import com.mediatracker.presentation.library.LibraryViewModel_HiltModules_BindsModule_Binds_LazyMapKey;
+import com.mediatracker.presentation.library.LibraryViewModel_HiltModules_KeyModule_Provide_LazyMapKey;
 import com.mediatracker.presentation.profile.ProfileViewModel;
 import com.mediatracker.presentation.profile.ProfileViewModel_HiltModules;
+import com.mediatracker.presentation.profile.ProfileViewModel_HiltModules_BindsModule_Binds_LazyMapKey;
+import com.mediatracker.presentation.profile.ProfileViewModel_HiltModules_KeyModule_Provide_LazyMapKey;
 import dagger.hilt.android.ActivityRetainedLifecycle;
 import dagger.hilt.android.ViewModelLifecycle;
 import dagger.hilt.android.internal.builders.ActivityComponentBuilder;
@@ -37,8 +47,6 @@ import dagger.hilt.android.internal.managers.SavedStateHandleHolder;
 import dagger.hilt.android.internal.modules.ApplicationContextModule;
 import dagger.internal.DaggerGenerated;
 import dagger.internal.DoubleCheck;
-import dagger.internal.IdentifierNameString;
-import dagger.internal.KeepFieldType;
 import dagger.internal.LazyClassKeyMap;
 import dagger.internal.Preconditions;
 import dagger.internal.Provider;
@@ -56,7 +64,9 @@ import javax.annotation.processing.Generated;
     "rawtypes",
     "KotlinInternal",
     "KotlinInternalInJava",
-    "cast"
+    "cast",
+    "deprecation",
+    "nullness:initialization.field.uninitialized"
 })
 public final class DaggerMediaTrackerApp_HiltComponents_SingletonC {
   private DaggerMediaTrackerApp_HiltComponents_SingletonC() {
@@ -74,10 +84,6 @@ public final class DaggerMediaTrackerApp_HiltComponents_SingletonC {
     private Builder() {
     }
 
-    /**
-     * @deprecated This module is declared, but an instance is not used in the component. This method is a no-op. For more, see https://dagger.dev/unused-modules.
-     */
-    @Deprecated
     public Builder applicationContextModule(ApplicationContextModule applicationContextModule) {
       Preconditions.checkNotNull(applicationContextModule);
       return this;
@@ -296,7 +302,7 @@ public final class DaggerMediaTrackerApp_HiltComponents_SingletonC {
 
     private final ViewWithFragmentCImpl viewWithFragmentCImpl = this;
 
-    private ViewWithFragmentCImpl(SingletonCImpl singletonCImpl,
+    ViewWithFragmentCImpl(SingletonCImpl singletonCImpl,
         ActivityRetainedCImpl activityRetainedCImpl, ActivityCImpl activityCImpl,
         FragmentCImpl fragmentCImpl, View viewParam) {
       this.singletonCImpl = singletonCImpl;
@@ -317,9 +323,8 @@ public final class DaggerMediaTrackerApp_HiltComponents_SingletonC {
 
     private final FragmentCImpl fragmentCImpl = this;
 
-    private FragmentCImpl(SingletonCImpl singletonCImpl,
-        ActivityRetainedCImpl activityRetainedCImpl, ActivityCImpl activityCImpl,
-        Fragment fragmentParam) {
+    FragmentCImpl(SingletonCImpl singletonCImpl, ActivityRetainedCImpl activityRetainedCImpl,
+        ActivityCImpl activityCImpl, Fragment fragmentParam) {
       this.singletonCImpl = singletonCImpl;
       this.activityRetainedCImpl = activityRetainedCImpl;
       this.activityCImpl = activityCImpl;
@@ -347,7 +352,7 @@ public final class DaggerMediaTrackerApp_HiltComponents_SingletonC {
 
     private final ViewCImpl viewCImpl = this;
 
-    private ViewCImpl(SingletonCImpl singletonCImpl, ActivityRetainedCImpl activityRetainedCImpl,
+    ViewCImpl(SingletonCImpl singletonCImpl, ActivityRetainedCImpl activityRetainedCImpl,
         ActivityCImpl activityCImpl, View viewParam) {
       this.singletonCImpl = singletonCImpl;
       this.activityRetainedCImpl = activityRetainedCImpl;
@@ -364,8 +369,8 @@ public final class DaggerMediaTrackerApp_HiltComponents_SingletonC {
 
     private final ActivityCImpl activityCImpl = this;
 
-    private ActivityCImpl(SingletonCImpl singletonCImpl,
-        ActivityRetainedCImpl activityRetainedCImpl, Activity activityParam) {
+    ActivityCImpl(SingletonCImpl singletonCImpl, ActivityRetainedCImpl activityRetainedCImpl,
+        Activity activityParam) {
       this.singletonCImpl = singletonCImpl;
       this.activityRetainedCImpl = activityRetainedCImpl;
 
@@ -383,7 +388,7 @@ public final class DaggerMediaTrackerApp_HiltComponents_SingletonC {
 
     @Override
     public Map<Class<?>, Boolean> getViewModelKeys() {
-      return LazyClassKeyMap.<Boolean>of(ImmutableMap.<String, Boolean>of(LazyClassKeyProvider.com_mediatracker_presentation_auth_AuthViewModel, AuthViewModel_HiltModules.KeyModule.provide(), LazyClassKeyProvider.com_mediatracker_presentation_discover_DiscoverViewModel, DiscoverViewModel_HiltModules.KeyModule.provide(), LazyClassKeyProvider.com_mediatracker_presentation_home_HomeViewModel, HomeViewModel_HiltModules.KeyModule.provide(), LazyClassKeyProvider.com_mediatracker_presentation_library_LibraryViewModel, LibraryViewModel_HiltModules.KeyModule.provide(), LazyClassKeyProvider.com_mediatracker_presentation_profile_ProfileViewModel, ProfileViewModel_HiltModules.KeyModule.provide()));
+      return LazyClassKeyMap.<Boolean>of(ImmutableMap.<String, Boolean>of(AuthViewModel_HiltModules_KeyModule_Provide_LazyMapKey.lazyClassKeyName, AuthViewModel_HiltModules.KeyModule.provide(), DiscoverViewModel_HiltModules_KeyModule_Provide_LazyMapKey.lazyClassKeyName, DiscoverViewModel_HiltModules.KeyModule.provide(), HomeViewModel_HiltModules_KeyModule_Provide_LazyMapKey.lazyClassKeyName, HomeViewModel_HiltModules.KeyModule.provide(), LibraryViewModel_HiltModules_KeyModule_Provide_LazyMapKey.lazyClassKeyName, LibraryViewModel_HiltModules.KeyModule.provide(), ProfileViewModel_HiltModules_KeyModule_Provide_LazyMapKey.lazyClassKeyName, ProfileViewModel_HiltModules.KeyModule.provide()));
     }
 
     @Override
@@ -400,34 +405,6 @@ public final class DaggerMediaTrackerApp_HiltComponents_SingletonC {
     public ViewComponentBuilder viewComponentBuilder() {
       return new ViewCBuilder(singletonCImpl, activityRetainedCImpl, activityCImpl);
     }
-
-    @IdentifierNameString
-    private static final class LazyClassKeyProvider {
-      static String com_mediatracker_presentation_home_HomeViewModel = "com.mediatracker.presentation.home.HomeViewModel";
-
-      static String com_mediatracker_presentation_auth_AuthViewModel = "com.mediatracker.presentation.auth.AuthViewModel";
-
-      static String com_mediatracker_presentation_discover_DiscoverViewModel = "com.mediatracker.presentation.discover.DiscoverViewModel";
-
-      static String com_mediatracker_presentation_profile_ProfileViewModel = "com.mediatracker.presentation.profile.ProfileViewModel";
-
-      static String com_mediatracker_presentation_library_LibraryViewModel = "com.mediatracker.presentation.library.LibraryViewModel";
-
-      @KeepFieldType
-      HomeViewModel com_mediatracker_presentation_home_HomeViewModel2;
-
-      @KeepFieldType
-      AuthViewModel com_mediatracker_presentation_auth_AuthViewModel2;
-
-      @KeepFieldType
-      DiscoverViewModel com_mediatracker_presentation_discover_DiscoverViewModel2;
-
-      @KeepFieldType
-      ProfileViewModel com_mediatracker_presentation_profile_ProfileViewModel2;
-
-      @KeepFieldType
-      LibraryViewModel com_mediatracker_presentation_library_LibraryViewModel2;
-    }
   }
 
   private static final class ViewModelCImpl extends MediaTrackerApp_HiltComponents.ViewModelC {
@@ -437,19 +414,18 @@ public final class DaggerMediaTrackerApp_HiltComponents_SingletonC {
 
     private final ViewModelCImpl viewModelCImpl = this;
 
-    private Provider<AuthViewModel> authViewModelProvider;
+    Provider<AuthViewModel> authViewModelProvider;
 
-    private Provider<DiscoverViewModel> discoverViewModelProvider;
+    Provider<DiscoverViewModel> discoverViewModelProvider;
 
-    private Provider<HomeViewModel> homeViewModelProvider;
+    Provider<HomeViewModel> homeViewModelProvider;
 
-    private Provider<LibraryViewModel> libraryViewModelProvider;
+    Provider<LibraryViewModel> libraryViewModelProvider;
 
-    private Provider<ProfileViewModel> profileViewModelProvider;
+    Provider<ProfileViewModel> profileViewModelProvider;
 
-    private ViewModelCImpl(SingletonCImpl singletonCImpl,
-        ActivityRetainedCImpl activityRetainedCImpl, SavedStateHandle savedStateHandleParam,
-        ViewModelLifecycle viewModelLifecycleParam) {
+    ViewModelCImpl(SingletonCImpl singletonCImpl, ActivityRetainedCImpl activityRetainedCImpl,
+        SavedStateHandle savedStateHandleParam, ViewModelLifecycle viewModelLifecycleParam) {
       this.singletonCImpl = singletonCImpl;
       this.activityRetainedCImpl = activityRetainedCImpl;
 
@@ -469,40 +445,12 @@ public final class DaggerMediaTrackerApp_HiltComponents_SingletonC {
 
     @Override
     public Map<Class<?>, javax.inject.Provider<ViewModel>> getHiltViewModelMap() {
-      return LazyClassKeyMap.<javax.inject.Provider<ViewModel>>of(ImmutableMap.<String, javax.inject.Provider<ViewModel>>of(LazyClassKeyProvider.com_mediatracker_presentation_auth_AuthViewModel, ((Provider) authViewModelProvider), LazyClassKeyProvider.com_mediatracker_presentation_discover_DiscoverViewModel, ((Provider) discoverViewModelProvider), LazyClassKeyProvider.com_mediatracker_presentation_home_HomeViewModel, ((Provider) homeViewModelProvider), LazyClassKeyProvider.com_mediatracker_presentation_library_LibraryViewModel, ((Provider) libraryViewModelProvider), LazyClassKeyProvider.com_mediatracker_presentation_profile_ProfileViewModel, ((Provider) profileViewModelProvider)));
+      return LazyClassKeyMap.<javax.inject.Provider<ViewModel>>of(ImmutableMap.<String, javax.inject.Provider<ViewModel>>of(AuthViewModel_HiltModules_BindsModule_Binds_LazyMapKey.lazyClassKeyName, ((Provider) (authViewModelProvider)), DiscoverViewModel_HiltModules_BindsModule_Binds_LazyMapKey.lazyClassKeyName, ((Provider) (discoverViewModelProvider)), HomeViewModel_HiltModules_BindsModule_Binds_LazyMapKey.lazyClassKeyName, ((Provider) (homeViewModelProvider)), LibraryViewModel_HiltModules_BindsModule_Binds_LazyMapKey.lazyClassKeyName, ((Provider) (libraryViewModelProvider)), ProfileViewModel_HiltModules_BindsModule_Binds_LazyMapKey.lazyClassKeyName, ((Provider) (profileViewModelProvider))));
     }
 
     @Override
     public Map<Class<?>, Object> getHiltViewModelAssistedMap() {
       return ImmutableMap.<Class<?>, Object>of();
-    }
-
-    @IdentifierNameString
-    private static final class LazyClassKeyProvider {
-      static String com_mediatracker_presentation_library_LibraryViewModel = "com.mediatracker.presentation.library.LibraryViewModel";
-
-      static String com_mediatracker_presentation_discover_DiscoverViewModel = "com.mediatracker.presentation.discover.DiscoverViewModel";
-
-      static String com_mediatracker_presentation_auth_AuthViewModel = "com.mediatracker.presentation.auth.AuthViewModel";
-
-      static String com_mediatracker_presentation_home_HomeViewModel = "com.mediatracker.presentation.home.HomeViewModel";
-
-      static String com_mediatracker_presentation_profile_ProfileViewModel = "com.mediatracker.presentation.profile.ProfileViewModel";
-
-      @KeepFieldType
-      LibraryViewModel com_mediatracker_presentation_library_LibraryViewModel2;
-
-      @KeepFieldType
-      DiscoverViewModel com_mediatracker_presentation_discover_DiscoverViewModel2;
-
-      @KeepFieldType
-      AuthViewModel com_mediatracker_presentation_auth_AuthViewModel2;
-
-      @KeepFieldType
-      HomeViewModel com_mediatracker_presentation_home_HomeViewModel2;
-
-      @KeepFieldType
-      ProfileViewModel com_mediatracker_presentation_profile_ProfileViewModel2;
     }
 
     private static final class SwitchingProvider<T> implements Provider<T> {
@@ -522,23 +470,23 @@ public final class DaggerMediaTrackerApp_HiltComponents_SingletonC {
         this.id = id;
       }
 
-      @SuppressWarnings("unchecked")
       @Override
+      @SuppressWarnings("unchecked")
       public T get() {
         switch (id) {
-          case 0: // com.mediatracker.presentation.auth.AuthViewModel 
+          case 0: // com.mediatracker.presentation.auth.AuthViewModel
           return (T) new AuthViewModel(singletonCImpl.authDataSourceProvider.get());
 
-          case 1: // com.mediatracker.presentation.discover.DiscoverViewModel 
+          case 1: // com.mediatracker.presentation.discover.DiscoverViewModel
           return (T) new DiscoverViewModel();
 
-          case 2: // com.mediatracker.presentation.home.HomeViewModel 
+          case 2: // com.mediatracker.presentation.home.HomeViewModel
           return (T) new HomeViewModel();
 
-          case 3: // com.mediatracker.presentation.library.LibraryViewModel 
+          case 3: // com.mediatracker.presentation.library.LibraryViewModel
           return (T) new LibraryViewModel();
 
-          case 4: // com.mediatracker.presentation.profile.ProfileViewModel 
+          case 4: // com.mediatracker.presentation.profile.ProfileViewModel
           return (T) new ProfileViewModel();
 
           default: throw new AssertionError(id);
@@ -552,9 +500,9 @@ public final class DaggerMediaTrackerApp_HiltComponents_SingletonC {
 
     private final ActivityRetainedCImpl activityRetainedCImpl = this;
 
-    private Provider<ActivityRetainedLifecycle> provideActivityRetainedLifecycleProvider;
+    Provider<ActivityRetainedLifecycle> provideActivityRetainedLifecycleProvider;
 
-    private ActivityRetainedCImpl(SingletonCImpl singletonCImpl,
+    ActivityRetainedCImpl(SingletonCImpl singletonCImpl,
         SavedStateHandleHolder savedStateHandleHolderParam) {
       this.singletonCImpl = singletonCImpl;
 
@@ -591,11 +539,11 @@ public final class DaggerMediaTrackerApp_HiltComponents_SingletonC {
         this.id = id;
       }
 
-      @SuppressWarnings("unchecked")
       @Override
+      @SuppressWarnings("unchecked")
       public T get() {
         switch (id) {
-          case 0: // dagger.hilt.android.ActivityRetainedLifecycle 
+          case 0: // dagger.hilt.android.ActivityRetainedLifecycle
           return (T) ActivityRetainedComponentManager_LifecycleModule_ProvideActivityRetainedLifecycleFactory.provideActivityRetainedLifecycle();
 
           default: throw new AssertionError(id);
@@ -609,7 +557,7 @@ public final class DaggerMediaTrackerApp_HiltComponents_SingletonC {
 
     private final ServiceCImpl serviceCImpl = this;
 
-    private ServiceCImpl(SingletonCImpl singletonCImpl, Service serviceParam) {
+    ServiceCImpl(SingletonCImpl singletonCImpl, Service serviceParam) {
       this.singletonCImpl = singletonCImpl;
 
 
@@ -619,11 +567,11 @@ public final class DaggerMediaTrackerApp_HiltComponents_SingletonC {
   private static final class SingletonCImpl extends MediaTrackerApp_HiltComponents.SingletonC {
     private final SingletonCImpl singletonCImpl = this;
 
-    private Provider<FirebaseAuth> provideFirebaseAuthProvider;
+    Provider<FirebaseAuth> provideFirebaseAuthProvider;
 
-    private Provider<AuthDataSource> authDataSourceProvider;
+    Provider<AuthDataSource> authDataSourceProvider;
 
-    private SingletonCImpl() {
+    SingletonCImpl() {
 
       initialize();
 
@@ -664,14 +612,14 @@ public final class DaggerMediaTrackerApp_HiltComponents_SingletonC {
         this.id = id;
       }
 
-      @SuppressWarnings("unchecked")
       @Override
+      @SuppressWarnings("unchecked")
       public T get() {
         switch (id) {
-          case 0: // com.mediatracker.data.auth.AuthDataSource 
+          case 0: // com.mediatracker.data.auth.AuthDataSource
           return (T) new AuthDataSource(singletonCImpl.provideFirebaseAuthProvider.get());
 
-          case 1: // com.google.firebase.auth.FirebaseAuth 
+          case 1: // com.google.firebase.auth.FirebaseAuth
           return (T) FirebaseModule_ProvideFirebaseAuthFactory.provideFirebaseAuth();
 
           default: throw new AssertionError(id);

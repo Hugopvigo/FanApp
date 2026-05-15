@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "com.mediatracker.app-mergeDebugResources-69:/values-watch-v20/values-watch-v20.xml",
+            "outputFile": "com.mediatracker.app-mergeDebugResources-58:/values-watch-v20/values-watch-v20.xml",
             "map": [
                 {
-                    "source": "/home/hugo/.gradle/caches/8.9/transforms/bf02df6b64ceeb59b5e39f42fe126b8e/transformed/play-services-auth-20.7.0/res/values-watch-v20/values.xml",
+                    "source": "/home/hugo/.gradle/caches/9.5.1/transforms/85edc5d903107dc871ff9e9e40027489/transformed/play-services-auth-20.7.0/res/values-watch-v20/values.xml",
                     "from": {
                         "startLines": "4,5,6,7,8,9,10,11",
                         "startColumns": "0,0,0,0,0,0,0,0",
