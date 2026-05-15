@@ -1,4 +1,8 @@
-# 📱 FanAPP MediaTracker
+<div align="center">
+  <img src="docs/logo.png" alt="FanApp MediaTracker" width="180"/>
+  <br/>
+  <em>Unifica lo que consumes.</em>
+</div>
 
 > **🚧 En Desarrollo** — Este proyecto está en fase activa de construcción.
 > Todo lo que ves aquí puede cambiar, romperse, o evolucionar.
