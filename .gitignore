@@ -16,6 +16,7 @@ local.properties
 *.env
 google-services.json
 
-# Markdown docs (not shipped)
+# Markdown docs (not shipped) — only keep what's needed in the repo
 *.md
 !README.md
+!CHANGELOG.md
