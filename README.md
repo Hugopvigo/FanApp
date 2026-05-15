@@ -146,6 +146,8 @@ GOOGLE_BOOKS_API_KEY=tu_key
 
 **FanApp MediaTracker** — Unifica lo que consumes.
 
-🚧 En Desarrollo • MVP en construcción • 2025
+🚧 En Desarrollo • MVP en construcción • 2026
+
+Hecho por Hugo Perez-Vigo
 
 </div>
