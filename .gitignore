@@ -43,6 +43,7 @@ DerivedData/
 # Kotlin & IDE sessions
 .kotlin/
 .claude/
+.opencode/
 
 # Markdown docs (not shipped) — only keep what's needed in the repo
 *.md
