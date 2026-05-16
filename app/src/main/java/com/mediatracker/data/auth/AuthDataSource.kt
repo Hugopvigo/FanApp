@@ -1,6 +1,10 @@
 package com.mediatracker.data.auth
 
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthEmailException
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
+import com.google.firebase.auth.FirebaseAuthUserCollisionException
+import com.google.firebase.auth.FirebaseAuthWeakPasswordException
 import com.google.firebase.auth.UserProfileChangeRequest
 import kotlinx.coroutines.tasks.await
 import timber.log.Timber
@@ -38,7 +42,7 @@ class AuthDataSource @Inject constructor(
             )
         } catch (e: Exception) {
             Timber.e(e, "Login failed")
-            AuthResult(error = e.message)
+            AuthResult(error = mapAuthError(e))
         }
     }
 
@@ -56,11 +60,37 @@ class AuthDataSource @Inject constructor(
             )
         } catch (e: Exception) {
             Timber.e(e, "Register failed")
-            AuthResult(error = e.message)
+            AuthResult(error = mapAuthError(e))
         }
     }
 
     fun logout() {
         auth.signOut()
+    }
+
+    internal fun mapAuthError(e: Exception): String = when (e) {
+        is FirebaseAuthWeakPasswordException -> when (e.errorCode) {
+            "ERROR_WEAK_PASSWORD" -> "La contraseña es demasiado débil. Usa al menos 6 caracteres."
+            else -> "La contraseña no es lo suficientemente segura."
+        }
+        is FirebaseAuthInvalidCredentialsException -> when (e.errorCode) {
+            "ERROR_INVALID_EMAIL" -> "El formato del email no es válido."
+            "ERROR_WRONG_PASSWORD" -> "La contraseña es incorrecta."
+            "ERROR_USER_NOT_FOUND" -> "No existe una cuenta con este email."
+            "ERROR_INVALID_CREDENTIAL" -> "Las credenciales son inválidas."
+            else -> "Credenciales incorrectas. Revisa tu email y contraseña."
+        }
+        is FirebaseAuthUserCollisionException -> when (e.errorCode) {
+            "ERROR_EMAIL_ALREADY_IN_USE" -> "Ya existe una cuenta con este email."
+            else -> "Este email ya está registrado."
+        }
+        is FirebaseAuthEmailException -> "No se pudo verificar el email. Revisa tu bandeja de entrada."
+        else -> when {
+            e.message?.contains("network", ignoreCase = true) == true ->
+                "Sin conexión a internet. Revisa tu red."
+            e.message?.contains("blocked", ignoreCase = true) == true ->
+                "Demasiados intentos. Inténtalo más tarde."
+            else -> "Ha ocurrido un error inesperado. Inténtalo de nuevo."
+        }
     }
 }
