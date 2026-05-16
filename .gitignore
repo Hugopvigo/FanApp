@@ -23,6 +23,9 @@ local.properties
 google-services.json
 GoogleService-Info.plist
 
+# OAuth credentials
+client_secret*.json
+
 # Android signing — NEVER commit keystores or signing credentials
 *.jks
 *.keystore
