@@ -21,19 +21,23 @@ data class AuthResult(
 
 @Singleton
 class AuthDataSource @Inject constructor(
-    private val auth: FirebaseAuth,
+    private val auth: FirebaseAuth?,
 ) {
 
+    val isAvailable: Boolean
+        get() = auth != null
+
     val isLoggedIn: Boolean
-        get() = auth.currentUser != null
+        get() = auth?.currentUser != null
 
-    fun getUserEmail(): String? = auth.currentUser?.email
+    fun getUserEmail(): String? = auth?.currentUser?.email
 
-    fun getUserName(): String? = auth.currentUser?.displayName
+    fun getUserName(): String? = auth?.currentUser?.displayName
 
     suspend fun loginWithEmail(email: String, password: String): AuthResult {
+        val firebaseAuth = auth ?: return AuthResult(error = "Firebase no está configurado. Añade google-services.json.")
         return try {
-            val result = auth.signInWithEmailAndPassword(email, password).await()
+            val result = firebaseAuth.signInWithEmailAndPassword(email, password).await()
             val user = result.user
             AuthResult(
                 isLoggedIn = true,
@@ -47,12 +51,13 @@ class AuthDataSource @Inject constructor(
     }
 
     suspend fun registerWithEmail(name: String, email: String, password: String): AuthResult {
+        val firebaseAuth = auth ?: return AuthResult(error = "Firebase no está configurado. Añade google-services.json.")
         return try {
-            val result = auth.createUserWithEmailAndPassword(email, password).await()
+            val result = firebaseAuth.createUserWithEmailAndPassword(email, password).await()
             result.user?.updateProfile(
                 UserProfileChangeRequest.Builder().setDisplayName(name).build()
             )?.await()
-            val user = auth.currentUser
+            val user = firebaseAuth.currentUser
             AuthResult(
                 isLoggedIn = true,
                 userEmail = user?.email,
@@ -65,7 +70,7 @@ class AuthDataSource @Inject constructor(
     }
 
     fun logout() {
-        auth.signOut()
+        auth?.signOut()
     }
 
     internal fun mapAuthError(e: Exception): String = when (e) {
