@@ -1,11 +1,12 @@
 package com.mediatracker.presentation.navigation
 
+import com.mediatracker.domain.model.MediaType
 import kotlinx.serialization.Serializable
 
 sealed interface Route {
     @Serializable data object Login : Route
     @Serializable data object MainGraph : Route
-    @Serializable data class Detail(val mediaId: String) : Route
+    @Serializable data class Detail(val apiId: String, val mediaType: MediaType) : Route
 }
 
 sealed interface BottomNavRoute {

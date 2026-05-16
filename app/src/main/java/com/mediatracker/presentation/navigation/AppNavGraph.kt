@@ -2,8 +2,8 @@ package com.mediatracker.presentation.navigation
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.automirrored.filled.LibraryBooks
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
@@ -23,9 +23,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.toRoute
+import com.mediatracker.domain.model.MediaItem
+import com.mediatracker.domain.model.MediaType
 import com.mediatracker.presentation.auth.AuthViewModel
 import com.mediatracker.presentation.auth.LoginScreen
+import com.mediatracker.presentation.detail.DetailScreen
 import com.mediatracker.presentation.discover.DiscoverScreen
 import com.mediatracker.presentation.home.HomeScreen
 import com.mediatracker.presentation.library.LibraryScreen
@@ -82,25 +84,34 @@ private fun MainScreen(authViewModel: AuthViewModel) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
 
+    val showBottomBar = currentDestination?.hasRoute(Route.Detail::class) != true
+
     Scaffold(
         bottomBar = {
-            NavigationBar {
-                bottomNavItems.forEach { item ->
-                    val selected = currentDestination?.hasRoute(item.route::class) == true
-                    NavigationBarItem(
-                        selected = selected,
-                        onClick = {
-                            navController.navigate(item.route) {
-                                popUpTo(navController.graph.findStartDestination().id) {
-                                    saveState = true
+            if (showBottomBar) {
+                NavigationBar {
+                    bottomNavItems.forEach { item ->
+                        val selected = when (item.route) {
+                            BottomNavRoute.Home -> currentDestination?.hasRoute(BottomNavRoute.Home::class) == true
+                            BottomNavRoute.Discover -> currentDestination?.hasRoute(BottomNavRoute.Discover::class) == true
+                            BottomNavRoute.Library -> currentDestination?.hasRoute(BottomNavRoute.Library::class) == true
+                            BottomNavRoute.Profile -> currentDestination?.hasRoute(BottomNavRoute.Profile::class) == true
+                        }
+                        NavigationBarItem(
+                            selected = selected,
+                            onClick = {
+                                navController.navigate(item.route) {
+                                    popUpTo(navController.graph.findStartDestination().id) {
+                                        saveState = true
+                                    }
+                                    launchSingleTop = true
+                                    restoreState = true
                                 }
-                                launchSingleTop = true
-                                restoreState = true
-                            }
-                        },
-                        icon = { Icon(item.icon, contentDescription = item.label) },
-                        label = { Text(item.label) },
-                    )
+                            },
+                            icon = { Icon(item.icon, contentDescription = item.label) },
+                            label = { Text(item.label) },
+                        )
+                    }
                 }
             }
         },
@@ -111,8 +122,20 @@ private fun MainScreen(authViewModel: AuthViewModel) {
             modifier = Modifier.padding(padding),
         ) {
             composable<BottomNavRoute.Home> { HomeScreen() }
-            composable<BottomNavRoute.Discover> { DiscoverScreen() }
-            composable<BottomNavRoute.Library> { LibraryScreen() }
+            composable<BottomNavRoute.Discover> {
+                DiscoverScreen(
+                    onItemClick = { item ->
+                        navController.navigate(Route.Detail(item.apiId, item.mediaType))
+                    },
+                )
+            }
+            composable<BottomNavRoute.Library> {
+                LibraryScreen(
+                    onItemClick = { userItem ->
+                        navController.navigate(Route.Detail(userItem.apiId, userItem.mediaType))
+                    },
+                )
+            }
             composable<BottomNavRoute.Profile> {
                 ProfileScreen(
                     userEmail = authViewModel.state.value.userEmail,
@@ -120,6 +143,14 @@ private fun MainScreen(authViewModel: AuthViewModel) {
                     onLogout = { authViewModel.logout() },
                 )
             }
+            composable<Route.Detail> {
+                DetailScreen(
+                    onBack = { navController.popBackStack() },
+                )
+            }
         }
     }
 }
+
+private val MediaItem.apiId: String
+    get() = id.removePrefix("${mediaType.name.lowercase()}_")
