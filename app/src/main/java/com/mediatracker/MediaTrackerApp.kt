@@ -29,7 +29,7 @@ class MediaTrackerApp : Application() {
             try {
                 val options = FirebaseOptions.Builder()
                     .setApplicationId(BuildConfig.APPLICATION_ID)
-                    .setProjectId("mediatracker-fanapp")
+                    .setProjectId(BuildConfig.FIREBASE_PROJECT_ID)
                     .build()
                 FirebaseApp.initializeApp(this, options)
                 Timber.d("Firebase initialized with manual config")

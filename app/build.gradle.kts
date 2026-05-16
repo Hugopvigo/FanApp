@@ -38,6 +38,11 @@ android {
             "GOOGLE_BOOKS_API_KEY",
             "\"${localProperties.getProperty("GOOGLE_BOOKS_API_KEY", "")}\""
         )
+        buildConfigField(
+            "String",
+            "FIREBASE_PROJECT_ID",
+            "\"${localProperties.getProperty("FIREBASE_PROJECT_ID", "")}\""
+        )
     }
 
     buildTypes {
