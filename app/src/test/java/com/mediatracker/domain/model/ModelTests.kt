@@ -2,6 +2,7 @@ package com.mediatracker.domain.model
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -31,88 +32,136 @@ class ItemStatusTest {
 class MediaItemTest {
 
     @Test
-    fun `MediaItem creates with all fields`() {
+    fun `MediaItem creates with required fields`() {
         val item = MediaItem(
-            id = "123",
-            title = "Test Movie",
-            type = MediaType.MOVIE,
-            overview = "A test overview",
-            posterUrl = "https://example.com/poster.jpg",
-            backdropUrl = "https://example.com/backdrop.jpg",
-            releaseYear = 2024,
-            rating = 8.5f,
-            extraData = mapOf("genre" to "Action"),
+            id = "tv_123",
+            mediaType = MediaType.SERIES,
+            title = "Breaking Bad",
+            overview = "A chemistry teacher turns to making meth",
+            posterUrl = "https://image.tmdb.org/t/p/w500/example.jpg",
+            releaseDate = "2008-01-20",
+            rating = 9.5f,
+            genres = listOf("Drama", "Crime"),
         )
 
-        assertEquals("123", item.id)
-        assertEquals("Test Movie", item.title)
-        assertEquals(MediaType.MOVIE, item.type)
-        assertEquals("A test overview", item.overview)
-        assertEquals(2024, item.releaseYear)
-        assertEquals(8.5f, item.rating)
-        assertEquals("Action", item.extraData?.get("genre"))
+        assertEquals("tv_123", item.id)
+        assertEquals(MediaType.SERIES, item.mediaType)
+        assertEquals("Breaking Bad", item.title)
+        assertEquals("A chemistry teacher turns to making meth", item.overview)
+        assertEquals("https://image.tmdb.org/t/p/w500/example.jpg", item.posterUrl)
+        assertEquals("2008-01-20", item.releaseDate)
+        assertEquals(9.5f, item.rating)
+        assertEquals(listOf("Drama", "Crime"), item.genres)
+        assertNull(item.extraData)
+    }
+
+    @Test
+    fun `MediaItem creates with extraData`() {
+        val item = MediaItem(
+            id = "movie_456",
+            mediaType = MediaType.MOVIE,
+            title = "Inception",
+            overview = "A thief who steals corporate secrets",
+            posterUrl = "https://image.tmdb.org/t/p/w500/inception.jpg",
+            releaseDate = "2010-07-16",
+            rating = 8.8f,
+            genres = listOf("Sci-Fi", "Action"),
+            extraData = mapOf("director" to "Christopher Nolan", "runtime" to "148"),
+        )
+
+        assertEquals("movie_456", item.id)
+        assertEquals(MediaType.MOVIE, item.mediaType)
+        assertEquals("Christopher Nolan", item.extraData?.get("director"))
+        assertEquals("148", item.extraData?.get("runtime"))
     }
 }
 
 class UserItemTest {
 
     @Test
-    fun `UserItem creates with default values`() {
+    fun `UserItem creates with all fields`() {
         val item = UserItem(
-            mediaId = "123",
+            id = "item_1",
             mediaType = MediaType.SERIES,
-            status = ItemStatus.WATCHLIST,
+            apiId = "tv_1396",
+            status = ItemStatus.IN_PROGRESS,
+            favorite = true,
+            addedAt = 1700000000000L,
+            updatedAt = 1700100000000L,
         )
 
-        assertEquals("123", item.mediaId)
+        assertEquals("item_1", item.id)
         assertEquals(MediaType.SERIES, item.mediaType)
-        assertEquals(ItemStatus.WATCHLIST, item.status)
-        assertFalse(item.isFavorite)
-        assertNull(item.notes)
-        assertNull(item.currentEpisode)
-        assertNull(item.currentSeason)
+        assertEquals("tv_1396", item.apiId)
+        assertEquals(ItemStatus.IN_PROGRESS, item.status)
+        assertTrue(item.favorite)
+        assertEquals(1700000000000L, item.addedAt)
+        assertEquals(1700100000000L, item.updatedAt)
     }
 
     @Test
-    fun `UserItem creates with all fields`() {
+    fun `UserItem favorite defaults to false`() {
         val item = UserItem(
-            mediaId = "123",
-            mediaType = MediaType.SERIES,
-            status = ItemStatus.IN_PROGRESS,
-            isFavorite = true,
-            notes = "Great show!",
-            currentEpisode = 5,
-            currentSeason = 2,
+            id = "item_2",
+            mediaType = MediaType.BOOK,
+            apiId = "book_xyz",
+            status = ItemStatus.WATCHLIST,
+            favorite = false,
+            addedAt = 0L,
+            updatedAt = 0L,
         )
 
-        assertTrue(item.isFavorite)
-        assertEquals("Great show!", item.notes)
-        assertEquals(5, item.currentEpisode)
-        assertEquals(2, item.currentSeason)
+        assertFalse(item.favorite)
     }
 }
 
 class MediaItemWithUserStatusTest {
 
     @Test
-    fun `MediaItemWithUserStatus combines media and user data`() {
+    fun `MediaItemWithUserStatus combines media and user status`() {
         val media = MediaItem(
-            id = "123",
-            title = "Test",
-            type = MediaType.MOVIE,
-            rating = 7.0f,
+            id = "tv_1396",
+            mediaType = MediaType.SERIES,
+            title = "Breaking Bad",
+            overview = "A chemistry teacher turns to making meth",
+            posterUrl = "https://image.tmdb.org/t/p/w500/bb.jpg",
+            releaseDate = "2008-01-20",
+            rating = 9.5f,
+            genres = listOf("Drama"),
         )
-        val userItem = UserItem(
-            mediaId = "123",
-            mediaType = MediaType.MOVIE,
+        val userStatus = UserItem(
+            id = "item_1",
+            mediaType = MediaType.SERIES,
+            apiId = "tv_1396",
             status = ItemStatus.COMPLETED,
-            isFavorite = true,
+            favorite = true,
+            addedAt = 1700000000000L,
+            updatedAt = 1700100000000L,
         )
 
-        val combined = MediaItemWithUserStatus(media, userItem)
+        val combined = MediaItemWithUserStatus(media, userStatus)
 
-        assertEquals("Test", combined.mediaItem.title)
-        assertEquals(ItemStatus.COMPLETED, combined.userItem.status)
-        assertTrue(combined.userItem.isFavorite)
+        assertEquals("Breaking Bad", combined.media.title)
+        assertEquals(ItemStatus.COMPLETED, combined.userStatus?.status)
+        assertTrue(combined.userStatus?.favorite ?: false)
+    }
+
+    @Test
+    fun `MediaItemWithUserStatus allows null user status`() {
+        val media = MediaItem(
+            id = "movie_456",
+            mediaType = MediaType.MOVIE,
+            title = "Inception",
+            overview = "A thief who steals corporate secrets",
+            posterUrl = "https://image.tmdb.org/t/p/w500/inc.jpg",
+            releaseDate = "2010-07-16",
+            rating = 8.8f,
+            genres = listOf("Sci-Fi"),
+        )
+
+        val combined = MediaItemWithUserStatus(media, null)
+
+        assertEquals("Inception", combined.media.title)
+        assertNull(combined.userStatus)
     }
 }

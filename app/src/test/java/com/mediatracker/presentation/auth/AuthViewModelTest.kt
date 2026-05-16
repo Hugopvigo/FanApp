@@ -112,11 +112,13 @@ class AuthViewModelTest {
 
     @Test
     fun `clearError clears error state`() = runTest {
-        viewModel.clearError()
+        coEvery { authDataSource.loginWithEmail("test@test.com", "wrong") } returns
+            AuthResult(error = "Error de prueba")
+
+        viewModel.login("test@test.com", "wrong")
         advanceUntilIdle()
 
-        viewModel.login("test@test.com", "password123")
-        advanceUntilIdle()
+        assertEquals("Error de prueba", viewModel.state.value.error)
 
         viewModel.clearError()
 
