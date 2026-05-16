@@ -3,9 +3,11 @@ package com.mediatracker.domain.repository
 import com.mediatracker.domain.model.ItemStatus
 import com.mediatracker.domain.model.MediaType
 import com.mediatracker.domain.model.UserItem
+import kotlinx.coroutines.flow.Flow
 
 interface UserRepository {
-    suspend fun getUserItems(): Result<List<UserItem>>
+    fun getUserItemsFlow(): Flow<List<UserItem>>
+    suspend fun syncUserItems(): Result<Unit>
     suspend fun addUserItem(
         mediaType: MediaType,
         apiId: String,

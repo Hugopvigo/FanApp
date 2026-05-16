@@ -1,5 +1,6 @@
 package com.mediatracker.domain.model
 
-enum class MediaType {
-    SERIES, MOVIE, BOOK
-}
+import kotlinx.serialization.Serializable
+
+@Serializable
+enum class MediaType { SERIES, MOVIE, BOOK }
