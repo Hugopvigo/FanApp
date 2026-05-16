@@ -1,14 +1,11 @@
 package com.mediatracker.presentation.navigation
 
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.LibraryBooks
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -32,6 +29,15 @@ import com.mediatracker.presentation.discover.DiscoverScreen
 import com.mediatracker.presentation.home.HomeScreen
 import com.mediatracker.presentation.library.LibraryScreen
 import com.mediatracker.presentation.profile.ProfileScreen
+import com.mediatracker.presentation.theme.AppTheme
+import com.mediatracker.presentation.theme.LocalAppTheme
+import com.mediatracker.presentation.theme.ThemeScreen
+import com.mediatracker.presentation.theme.fanAppColors
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.LibraryBooks
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Search
 
 private data class BottomNavItem(
     val label: String,
@@ -40,14 +46,16 @@ private data class BottomNavItem(
 )
 
 private val bottomNavItems = listOf(
-    BottomNavItem("Inicio", Icons.Default.Home, BottomNavRoute.Home),
-    BottomNavItem("Buscar", Icons.Default.Search, BottomNavRoute.Discover),
-    BottomNavItem("Biblioteca", Icons.AutoMirrored.Filled.LibraryBooks, BottomNavRoute.Library),
-    BottomNavItem("Perfil", Icons.Default.Person, BottomNavRoute.Profile),
+    BottomNavItem("Home", Icons.Default.Home, BottomNavRoute.Home),
+    BottomNavItem("Discover", Icons.Default.Search, BottomNavRoute.Discover),
+    BottomNavItem("Library", Icons.AutoMirrored.Filled.LibraryBooks, BottomNavRoute.Library),
+    BottomNavItem("Profile", Icons.Default.Person, BottomNavRoute.Profile),
 )
 
 @Composable
-fun AppNavGraph() {
+fun AppNavGraph(
+    onThemeChange: (AppTheme) -> Unit = {},
+) {
     val rootNavController = rememberNavController()
     val authViewModel: AuthViewModel = viewModel()
     val uiState by authViewModel.state.collectAsStateWithLifecycle()
@@ -73,29 +81,39 @@ fun AppNavGraph() {
         }
 
         composable<Route.MainGraph> {
-            MainScreen(authViewModel = authViewModel)
+            MainScreen(
+                authViewModel = authViewModel,
+                onThemeChange = onThemeChange,
+            )
         }
     }
 }
 
 @Composable
-private fun MainScreen(authViewModel: AuthViewModel) {
+private fun MainScreen(
+    authViewModel: AuthViewModel,
+    onThemeChange: (AppTheme) -> Unit,
+) {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
+    val fanColors = MaterialTheme.fanAppColors
 
-    val showBottomBar = currentDestination?.hasRoute(Route.Detail::class) != true
+    val showBottomBar = currentDestination?.hasRoute(Route.Detail::class) != true &&
+        currentDestination?.hasRoute(Route.Theme::class) != true
 
     Scaffold(
         bottomBar = {
             if (showBottomBar) {
-                NavigationBar {
+                NavigationBar(
+                    containerColor = fanColors.navBarBg,
+                ) {
                     bottomNavItems.forEach { item ->
                         val selected = when (item.route) {
-                            BottomNavRoute.Home -> currentDestination?.hasRoute(BottomNavRoute.Home::class) == true
+                            BottomNavRoute.Home     -> currentDestination?.hasRoute(BottomNavRoute.Home::class) == true
                             BottomNavRoute.Discover -> currentDestination?.hasRoute(BottomNavRoute.Discover::class) == true
-                            BottomNavRoute.Library -> currentDestination?.hasRoute(BottomNavRoute.Library::class) == true
-                            BottomNavRoute.Profile -> currentDestination?.hasRoute(BottomNavRoute.Profile::class) == true
+                            BottomNavRoute.Library  -> currentDestination?.hasRoute(BottomNavRoute.Library::class) == true
+                            BottomNavRoute.Profile  -> currentDestination?.hasRoute(BottomNavRoute.Profile::class) == true
                         }
                         NavigationBarItem(
                             selected = selected,
@@ -109,7 +127,14 @@ private fun MainScreen(authViewModel: AuthViewModel) {
                                 }
                             },
                             icon = { Icon(item.icon, contentDescription = item.label) },
-                            label = { Text(item.label) },
+                            label = { Text(item.label, style = MaterialTheme.typography.labelSmall) },
+                            colors = NavigationBarItemDefaults.colors(
+                                selectedIconColor = MaterialTheme.colorScheme.primary,
+                                selectedTextColor = MaterialTheme.colorScheme.primary,
+                                indicatorColor = MaterialTheme.colorScheme.primaryContainer,
+                                unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            ),
                         )
                     }
                 }
@@ -141,10 +166,21 @@ private fun MainScreen(authViewModel: AuthViewModel) {
                     userEmail = authViewModel.state.value.userEmail,
                     userName = authViewModel.state.value.userName,
                     onLogout = { authViewModel.logout() },
+                    onNavigateToTheme = { navController.navigate(Route.Theme) },
                 )
             }
             composable<Route.Detail> {
                 DetailScreen(
+                    onBack = { navController.popBackStack() },
+                )
+            }
+            composable<Route.Theme> {
+                ThemeScreen(
+                    currentTheme = LocalAppTheme.current,
+                    onThemeSelected = { theme ->
+                        onThemeChange(theme)
+                        navController.popBackStack()
+                    },
                     onBack = { navController.popBackStack() },
                 )
             }
