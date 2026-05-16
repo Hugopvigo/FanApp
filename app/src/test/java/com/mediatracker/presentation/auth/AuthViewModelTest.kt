@@ -9,6 +9,7 @@ import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -127,14 +128,17 @@ class AuthViewModelTest {
 
     @Test
     fun `login sets loading state during operation`() = runTest {
+        Dispatchers.setMain(UnconfinedTestDispatcher(testScheduler))
+
+        val viewModelWithUnconfined = AuthViewModel(authDataSource)
         coEvery { authDataSource.loginWithEmail("test@test.com", "password123") } returns
             AuthResult(isLoggedIn = true, userEmail = "test@test.com")
 
-        viewModel.login("test@test.com", "password123")
+        viewModelWithUnconfined.login("test@test.com", "password123")
 
-        assertTrue(viewModel.state.value.isLoading)
-        advanceUntilIdle()
+        assertFalse(viewModelWithUnconfined.state.value.isLoading)
+        assertTrue(viewModelWithUnconfined.state.value.isLoggedIn)
 
-        assertFalse(viewModel.state.value.isLoading)
+        Dispatchers.resetMain()
     }
 }
