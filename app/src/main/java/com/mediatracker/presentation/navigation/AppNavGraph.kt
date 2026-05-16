@@ -68,12 +68,6 @@ fun AppNavGraph(
     ) {
         composable<Route.Login> {
             LoginScreen(
-                isLoading = uiState.isLoading,
-                error = uiState.error,
-                isLoggedIn = uiState.isLoggedIn,
-                onLogin = { email, password -> authViewModel.login(email, password) },
-                onRegister = { name, email, password -> authViewModel.register(name, email, password) },
-                onErrorDismiss = { authViewModel.clearError() },
                 onLoginSuccess = {
                     rootNavController.navigate(Route.MainGraph) {
                         popUpTo<Route.Login> { inclusive = true }
