@@ -19,9 +19,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.mediatracker.R
 import com.mediatracker.domain.model.MediaItem
 import com.mediatracker.domain.model.MediaType
 import com.mediatracker.presentation.components.EmptyState
@@ -40,7 +42,7 @@ fun DiscoverScreen(
 
     Column(modifier = Modifier.fillMaxSize()) {
         Text(
-            text = "Descubrir",
+            text = stringResource(R.string.discover_title),
             style = MaterialTheme.typography.headlineMedium,
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
         )
@@ -62,12 +64,12 @@ fun DiscoverScreen(
 
         when {
             state.isLoading -> LoadingState()
-            state.error != null && state.searchResults.isEmpty() -> ErrorState(state.error ?: "Error desconocido")
-            state.searchQuery.isNotBlank() && state.searchResults.isEmpty() -> EmptyState("Sin resultados")
+            state.error != null && state.searchResults.isEmpty() -> ErrorState(state.error ?: stringResource(R.string.error_unknown))
+            state.searchQuery.isNotBlank() && state.searchResults.isEmpty() -> EmptyState(stringResource(R.string.no_results))
             state.searchQuery.isBlank() -> {
                 Column {
                     Text(
-                        text = "Top Trending",
+                        text = stringResource(R.string.discover_top_trending),
                         style = MaterialTheme.typography.titleMedium,
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                     )
@@ -111,9 +113,9 @@ private fun TabSelector(
     ) {
         MediaType.entries.forEach { type ->
             val label = when (type) {
-                MediaType.SERIES -> "Series"
-                MediaType.MOVIE -> "Películas"
-                MediaType.BOOK -> "Libros"
+                MediaType.SERIES -> stringResource(R.string.discover_series)
+                MediaType.MOVIE -> stringResource(R.string.discover_movies)
+                MediaType.BOOK -> stringResource(R.string.discover_books)
             }
             FilterChip(
                 selected = selectedTab == type,

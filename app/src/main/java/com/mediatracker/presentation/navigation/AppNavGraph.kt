@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hasRoute
@@ -20,6 +21,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.mediatracker.R
 import com.mediatracker.domain.model.MediaItem
 import com.mediatracker.domain.model.MediaType
 import com.mediatracker.presentation.auth.AuthViewModel
@@ -40,16 +42,16 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 
 private data class BottomNavItem(
-    val label: String,
+    val labelRes: Int,
     val icon: ImageVector,
     val route: BottomNavRoute,
 )
 
 private val bottomNavItems = listOf(
-    BottomNavItem("Home", Icons.Default.Home, BottomNavRoute.Home),
-    BottomNavItem("Discover", Icons.Default.Search, BottomNavRoute.Discover),
-    BottomNavItem("Library", Icons.AutoMirrored.Filled.LibraryBooks, BottomNavRoute.Library),
-    BottomNavItem("Profile", Icons.Default.Person, BottomNavRoute.Profile),
+    BottomNavItem(R.string.nav_home, Icons.Default.Home, BottomNavRoute.Home),
+    BottomNavItem(R.string.nav_discover, Icons.Default.Search, BottomNavRoute.Discover),
+    BottomNavItem(R.string.nav_library, Icons.AutoMirrored.Filled.LibraryBooks, BottomNavRoute.Library),
+    BottomNavItem(R.string.nav_profile, Icons.Default.Person, BottomNavRoute.Profile),
 )
 
 @Composable
@@ -126,8 +128,8 @@ private fun MainScreen(
                                     restoreState = true
                                 }
                             },
-                            icon = { Icon(item.icon, contentDescription = item.label) },
-                            label = { Text(item.label, style = MaterialTheme.typography.labelSmall) },
+                            icon = { Icon(item.icon, contentDescription = stringResource(item.labelRes)) },
+                            label = { Text(stringResource(item.labelRes), style = MaterialTheme.typography.labelSmall) },
                             colors = NavigationBarItemDefaults.colors(
                                 selectedIconColor = MaterialTheme.colorScheme.primary,
                                 selectedTextColor = MaterialTheme.colorScheme.primary,
@@ -146,7 +148,13 @@ private fun MainScreen(
             startDestination = BottomNavRoute.Home,
             modifier = Modifier.padding(padding),
         ) {
-            composable<BottomNavRoute.Home> { HomeScreen() }
+            composable<BottomNavRoute.Home> {
+                HomeScreen(
+                    onItemClick = { item ->
+                        navController.navigate(Route.Detail(item.apiId, item.mediaType))
+                    },
+                )
+            }
             composable<BottomNavRoute.Discover> {
                 DiscoverScreen(
                     onItemClick = { item ->

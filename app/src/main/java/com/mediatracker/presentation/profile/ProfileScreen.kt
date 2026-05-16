@@ -26,9 +26,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.mediatracker.R
 import com.mediatracker.presentation.theme.LocalAppTheme
 import com.mediatracker.presentation.theme.fanAppColors
 
@@ -100,7 +102,7 @@ fun ProfileScreen(
                 .padding(horizontal = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(10.dp),
         ) {
-            listOf("🎬" to "Series", "🎥" to "Pelis", "📖" to "Libros").forEach { (icon, label) ->
+            listOf("🎬" to R.string.profile_series, "🎥" to R.string.profile_movies_short, "📖" to R.string.profile_books).forEach { (icon, labelRes) ->
                 Box(
                     modifier = Modifier
                         .weight(1f)
@@ -117,7 +119,7 @@ fun ProfileScreen(
                             color = MaterialTheme.colorScheme.onSurface,
                         )
                         Text(
-                            text = label,
+                            text = stringResource(labelRes),
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
@@ -130,7 +132,7 @@ fun ProfileScreen(
 
         // ── Settings ──────────────────────────────────────────────────────
         Text(
-            text = "Ajustes",
+            text = stringResource(R.string.profile_settings),
             style = MaterialTheme.typography.titleLarge,
             color = MaterialTheme.colorScheme.onBackground,
             modifier = Modifier.padding(horizontal = 20.dp, vertical = 4.dp),
@@ -139,14 +141,14 @@ fun ProfileScreen(
 
         SettingRow(
             icon = "🎨",
-            label = "Tema",
+            label = stringResource(R.string.profile_theme),
             value = appTheme.name,
             highlight = true,
             onClick = onNavigateToTheme,
         )
-        SettingRow(icon = "🌐", label = "Idioma", value = "Español")
-        SettingRow(icon = "🔔", label = "Notificaciones", value = "Activadas")
-        SettingRow(icon = "🔒", label = "Privacidad")
+        SettingRow(icon = "🌐", label = stringResource(R.string.profile_language), value = stringResource(R.string.profile_language_value))
+        SettingRow(icon = "🔔", label = stringResource(R.string.profile_notifications), value = stringResource(R.string.profile_notif_enabled))
+        SettingRow(icon = "🔒", label = stringResource(R.string.profile_privacy))
 
         Spacer(Modifier.height(24.dp))
 
@@ -160,7 +162,7 @@ fun ProfileScreen(
                 contentColor = MaterialTheme.colorScheme.error,
             ),
         ) {
-            Text("↩  Cerrar sesión", fontWeight = FontWeight.SemiBold)
+            Text("↩  ${stringResource(R.string.profile_logout)}", fontWeight = FontWeight.SemiBold)
         }
 
         Spacer(Modifier.height(32.dp))

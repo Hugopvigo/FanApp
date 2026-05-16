@@ -19,9 +19,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.mediatracker.R
 import com.mediatracker.domain.model.ItemStatus
 import com.mediatracker.domain.model.MediaType
 import com.mediatracker.domain.model.UserItem
@@ -37,7 +39,7 @@ fun LibraryScreen(
 
     Column(modifier = Modifier.fillMaxSize()) {
         Text(
-            text = "Biblioteca",
+            text = stringResource(R.string.library_title),
             style = MaterialTheme.typography.headlineMedium,
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
         )
@@ -50,7 +52,16 @@ fun LibraryScreen(
                 Tab(
                     selected = state.selectedStatus == status,
                     onClick = { viewModel.onStatusSelected(status) },
-                    text = { Text(status.label) },
+                    text = {
+                        Text(
+                            when (status) {
+                                ItemStatus.WATCHLIST -> stringResource(R.string.library_watchlist)
+                                ItemStatus.IN_PROGRESS -> stringResource(R.string.library_in_progress)
+                                ItemStatus.COMPLETED -> stringResource(R.string.library_completed)
+                                ItemStatus.ABANDONED -> stringResource(R.string.library_abandoned)
+                            }
+                        )
+                    },
                 )
             }
         }
@@ -66,10 +77,10 @@ fun LibraryScreen(
             state.isLoading -> LoadingState()
             state.items.isEmpty() -> EmptyState(
                 message = when (state.selectedStatus) {
-                    ItemStatus.WATCHLIST -> "No tienes nada en tu lista"
-                    ItemStatus.IN_PROGRESS -> "No tienes nada en progreso"
-                    ItemStatus.COMPLETED -> "No has completado nada aún"
-                    ItemStatus.ABANDONED -> "No has abandonado nada"
+                    ItemStatus.WATCHLIST -> stringResource(R.string.library_empty_watchlist)
+                    ItemStatus.IN_PROGRESS -> stringResource(R.string.library_empty_in_progress)
+                    ItemStatus.COMPLETED -> stringResource(R.string.library_empty_completed)
+                    ItemStatus.ABANDONED -> stringResource(R.string.library_empty_abandoned)
                 }
             )
             else -> {
@@ -103,13 +114,13 @@ private fun MediaTypeFilterRow(
         FilterChip(
             selected = selectedMediaType == null,
             onClick = { onMediaTypeSelected(null) },
-            label = { Text("Todos") },
+            label = { Text(stringResource(R.string.library_all)) },
         )
         MediaType.entries.forEach { type ->
             val label = when (type) {
-                MediaType.SERIES -> "Series"
-                MediaType.MOVIE -> "Películas"
-                MediaType.BOOK -> "Libros"
+                MediaType.SERIES -> stringResource(R.string.discover_series)
+                MediaType.MOVIE -> stringResource(R.string.discover_movies)
+                MediaType.BOOK -> stringResource(R.string.discover_books)
             }
             FilterChip(
                 selected = selectedMediaType == type,
@@ -120,10 +131,4 @@ private fun MediaTypeFilterRow(
     }
 }
 
-private val ItemStatus.label: String
-    get() = when (this) {
-        ItemStatus.WATCHLIST -> "Quiero ver"
-        ItemStatus.IN_PROGRESS -> "En progreso"
-        ItemStatus.COMPLETED -> "Completado"
-        ItemStatus.ABANDONED -> "Abandonado"
-    }
+

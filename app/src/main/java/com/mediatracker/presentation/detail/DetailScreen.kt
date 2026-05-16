@@ -27,11 +27,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
+import com.mediatracker.R
 import com.mediatracker.domain.model.ItemStatus
 import com.mediatracker.domain.model.MediaType
 import com.mediatracker.presentation.components.ErrorState
@@ -50,10 +52,10 @@ fun DetailScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(state.item?.title ?: "Detalle") },
+                title = { Text(state.item?.title ?: stringResource(R.string.detail_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 },
             )
@@ -61,7 +63,7 @@ fun DetailScreen(
     ) { padding ->
         when {
             state.isLoading -> LoadingState(modifier = Modifier.padding(padding))
-            state.error != null -> ErrorState(state.error ?: "Error desconocido", modifier = Modifier.padding(padding))
+            state.error != null -> ErrorState(state.error ?: stringResource(R.string.error_unknown), modifier = Modifier.padding(padding))
             state.item != null -> DetailContent(
                 state = state,
                 onStatusSelected = viewModel::onStatusSelected,
@@ -160,7 +162,7 @@ private fun DetailContent(
             }
             if (userItem != null) {
                 OutlinedButton(onClick = onRemoveFromList) {
-                    Text("Quitar")
+                    Text(stringResource(R.string.detail_remove))
                 }
             }
         }
@@ -181,13 +183,13 @@ private fun ExtraInfo(extra: Map<String, String>, mediaType: MediaType) {
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
         extra.forEach { (key, value) ->
             val label = when (key) {
-                "numberOfSeasons" -> "Temporadas"
-                "numberOfEpisodes" -> "Episodios"
-                "creators" -> "Creadores"
-                "runtime" -> "Duración"
-                "authors" -> "Autor"
-                "publisher" -> "Editorial"
-                "pageCount" -> "Páginas"
+                "numberOfSeasons" -> stringResource(R.string.detail_seasons)
+                "numberOfEpisodes" -> stringResource(R.string.detail_episodes)
+                "creators" -> stringResource(R.string.detail_creators)
+                "runtime" -> stringResource(R.string.detail_runtime)
+                "authors" -> stringResource(R.string.detail_author)
+                "publisher" -> stringResource(R.string.detail_publisher)
+                "pageCount" -> stringResource(R.string.detail_pages)
                 else -> key
             }
             val displayValue = when (key) {

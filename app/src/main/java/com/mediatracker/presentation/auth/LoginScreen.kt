@@ -1,5 +1,6 @@
 package com.mediatracker.presentation.auth
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -96,35 +97,17 @@ fun LoginScreen(
         ) {
             Spacer(Modifier.height(52.dp))
 
-            // ── Logo card ─────────────────────────────────────────────────
-            Box(
-                modifier = Modifier
-                    .size(120.dp)
-                    .clip(RoundedCornerShape(30.dp))
-                    .background(accentBrush),
-                contentAlignment = Alignment.Center,
-            ) {
-                Text("📖", fontSize = 52.sp)
-                Text(
-                    text = "🎬",
-                    fontSize = 26.sp,
-                    modifier = Modifier
-                        .align(Alignment.TopStart)
-                        .padding(12.dp),
-                )
-                Text(
-                    text = "🎥",
-                    fontSize = 24.sp,
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .padding(12.dp),
-                )
-            }
+            // ── Logo ────────────────────────────────────────────────────────
+            Image(
+                painter = painterResource(R.drawable.logo),
+                contentDescription = stringResource(R.string.app_name),
+                modifier = Modifier.size(140.dp),
+            )
 
             Spacer(Modifier.height(28.dp))
 
             Text(
-                text = if (isRegisterMode) "Crea tu cuenta" else "Tu universo,\nen un solo lugar",
+                text = if (isRegisterMode) stringResource(R.string.login_create_account) else stringResource(R.string.login_subtitle),
                 style = MaterialTheme.typography.headlineMedium,
                 color = MaterialTheme.colorScheme.onBackground,
                 textAlign = TextAlign.Center,
@@ -133,7 +116,7 @@ fun LoginScreen(
             Spacer(Modifier.height(8.dp))
 
             Text(
-                text = "Series, películas y libros — guarda, sigue\ny vuelve a lo que amas.",
+                text = stringResource(R.string.login_description),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
@@ -247,7 +230,7 @@ fun LoginScreen(
                 ) {
                     HorizontalDivider(modifier = Modifier.weight(1f))
                     Text(
-                        text = "  o  ",
+                        text = stringResource(R.string.login_or),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )

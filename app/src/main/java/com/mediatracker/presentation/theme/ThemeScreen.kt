@@ -33,9 +33,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.mediatracker.R
 
 private data class ThemeOption(
     val theme: AppTheme,
@@ -108,13 +110,13 @@ fun ThemeScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "Tema",
+                        text = stringResource(R.string.profile_theme),
                         style = MaterialTheme.typography.headlineSmall,
                     )
                 },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -137,7 +139,7 @@ fun ThemeScreen(
         ) {
             item {
                 Text(
-                    text = "Elige cómo se ve tu FanApp. Puedes cambiarlo cuando quieras desde ajustes.",
+                    text = stringResource(R.string.theme_description),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -204,7 +206,7 @@ private fun ThemeCard(
                             color = MaterialTheme.colorScheme.primary,
                         ) {
                             Text(
-                                text = "ACTIVO",
+                                text = stringResource(R.string.theme_active),
                                 modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onPrimary,
@@ -318,13 +320,13 @@ private fun AutoSwitchRow() {
         Text("🌙", fontSize = 20.sp)
         Column(modifier = Modifier.weight(1f)) {
             Text(
-                text = "Cambiar con el sistema",
+                text = stringResource(R.string.theme_auto),
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface,
             )
             Text(
-                text = "Usa Light de día y Dark de noche",
+                text = stringResource(R.string.theme_auto_subtitle),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
