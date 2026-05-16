@@ -26,9 +26,9 @@ Olvídate de tener 3 apps distintas. Todo tu contenido, un solo sitio.
 ## 🧭 Pantallas
 
 ```
-┌──────────────────────────────────────────────────────┐
-│   🏠 Home    🔍 Discover    📚 Library    👤 Profile  │
-└──────────────────────────────────────────────────────┘
+┌───────────────────────────────────────────────────────┐
+│   🏠 Home    🔍 Discover    📚 Library    👤 Profile    │
+└───────────────────────────────────────────────────────┘
 ```
 
 | Pantalla | Qué hace |
@@ -155,6 +155,6 @@ GOOGLE_BOOKS_API_KEY=tu_key
 
 🚧 En Desarrollo • MVP en construcción • 2026
 
-Hecho por Hugo Perez-Vigo
+Hecho por Hugo Perez-Vigo @hugopvigo
 
 </div>
