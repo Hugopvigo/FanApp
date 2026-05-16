@@ -106,11 +106,12 @@ fun ProfileScreen(
                 .padding(horizontal = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(10.dp),
         ) {
-            listOf(
-                "🎬" to R.string.profile_series to (stats.seriesInProgress + stats.seriesCompleted),
-                "🎥" to R.string.profile_movies to (stats.moviesInProgress + stats.moviesCompleted),
-                "📖" to R.string.profile_books to (stats.booksInProgress + stats.booksCompleted),
-            ).forEach { ((icon, labelRes), count) ->
+            val statItems = listOf(
+                Triple("🎬", R.string.profile_series, stats.seriesInProgress + stats.seriesCompleted),
+                Triple("🎥", R.string.profile_movies, stats.moviesInProgress + stats.moviesCompleted),
+                Triple("📖", R.string.profile_books, stats.booksInProgress + stats.booksCompleted),
+            )
+            statItems.forEach { (icon, labelRes, count) ->
                 Box(
                     modifier = Modifier
                         .weight(1f)

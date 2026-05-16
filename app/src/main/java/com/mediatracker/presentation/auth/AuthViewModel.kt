@@ -69,31 +69,33 @@ class AuthViewModel @Inject constructor(
     }
 
     fun login() {
-        val state = _state.value
-        val emailError = validateEmail(state.email)
-        val passwordError = validatePassword(state.password, isRegister = false)
+        val s = _state.value
+        val emailError = validateEmail(s.email)
+        val passwordError = validatePassword(s.password, isRegister = false)
         if (emailError != null || passwordError != null) {
             _state.update { it.copy(emailError = emailError, passwordError = passwordError) }
             return
         }
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true, error = null) }
-            authDataSource.loginWithEmail(state.email, state.password)
+            val result = authDataSource.loginWithEmail(s.email, s.password)
+            _state.update { it.copy(isLoading = false, error = result.error) }
         }
     }
 
     fun register() {
-        val state = _state.value
-        val emailError = validateEmail(state.email)
-        val passwordError = validatePassword(state.password, isRegister = true)
-        val nameError = validateName(state.name)
+        val s = _state.value
+        val emailError = validateEmail(s.email)
+        val passwordError = validatePassword(s.password, isRegister = true)
+        val nameError = validateName(s.name)
         if (emailError != null || passwordError != null || nameError != null) {
             _state.update { it.copy(emailError = emailError, passwordError = passwordError, nameError = nameError) }
             return
         }
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true, error = null) }
-            authDataSource.registerWithEmail(state.name, state.email, state.password)
+            val result = authDataSource.registerWithEmail(s.name, s.email, s.password)
+            _state.update { it.copy(isLoading = false, error = result.error) }
         }
     }
 

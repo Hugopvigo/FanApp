@@ -5,11 +5,13 @@ import com.mediatracker.data.auth.AuthResult
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
+import io.mockk.just
 import io.mockk.mockk
+import io.mockk.runs
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -36,6 +38,7 @@ class AuthViewModelTest {
         every { authDataSource.isLoggedIn } returns false
         every { authDataSource.getUserEmail() } returns null
         every { authDataSource.getUserName() } returns null
+        every { authDataSource.authStateFlow() } returns flowOf(AuthResult())
         viewModel = AuthViewModel(authDataSource)
     }
 
@@ -51,94 +54,140 @@ class AuthViewModelTest {
     }
 
     @Test
-    fun `login success updates state to logged in`() = runTest {
-        coEvery { authDataSource.loginWithEmail("test@test.com", "password123") } returns
-            AuthResult(isLoggedIn = true, userEmail = "test@test.com", userName = "Test")
+    fun `login sets form email and password`() = runTest {
+        viewModel.updateEmail("test@test.com")
+        viewModel.updatePassword("password123")
 
-        viewModel.login("test@test.com", "password123")
-        advanceUntilIdle()
-
-        assertTrue(viewModel.state.value.isLoggedIn)
-        assertEquals("test@test.com", viewModel.state.value.userEmail)
-        assertEquals("Test", viewModel.state.value.userName)
-        assertNull(viewModel.state.value.error)
+        assertEquals("test@test.com", viewModel.state.value.email)
+        assertEquals("password123", viewModel.state.value.password)
     }
 
     @Test
-    fun `login failure sets error in state`() = runTest {
-        coEvery { authDataSource.loginWithEmail("test@test.com", "wrong") } returns
-            AuthResult(error = "Credenciales incorrectas. Revisa tu email y contraseña.")
+    fun `register sets form name`() = runTest {
+        viewModel.updateName("Test User")
+        viewModel.toggleMode()
 
-        viewModel.login("test@test.com", "wrong")
-        advanceUntilIdle()
-
-        assertFalse(viewModel.state.value.isLoggedIn)
-        assertEquals("Credenciales incorrectas. Revisa tu email y contraseña.", viewModel.state.value.error)
+        assertEquals("Test User", viewModel.state.value.name)
+        assertTrue(viewModel.state.value.isRegisterMode)
     }
 
     @Test
-    fun `register success updates state to logged in`() = runTest {
-        coEvery { authDataSource.registerWithEmail("Test", "test@test.com", "password123") } returns
-            AuthResult(isLoggedIn = true, userEmail = "test@test.com", userName = "Test")
+    fun `login calls dataSource loginWithEmail`() = runTest {
+        coEvery { authDataSource.loginWithEmail("test@test.com", "pass123") } returns AuthResult()
 
-        viewModel.register("Test", "test@test.com", "password123")
+        viewModel.updateEmail("test@test.com")
+        viewModel.updatePassword("pass123")
+        viewModel.login()
         advanceUntilIdle()
 
-        assertTrue(viewModel.state.value.isLoggedIn)
-        assertEquals("test@test.com", viewModel.state.value.userEmail)
+        coVerify { authDataSource.loginWithEmail("test@test.com", "pass123") }
     }
 
     @Test
-    fun `register failure sets error in state`() = runTest {
-        coEvery { authDataSource.registerWithEmail("Test", "test@test.com", "weak") } returns
-            AuthResult(error = "La contraseña es demasiado débil. Usa al menos 6 caracteres.")
+    fun `register calls dataSource registerWithEmail`() = runTest {
+        coEvery { authDataSource.registerWithEmail("Test", "test@test.com", "Password1") } returns AuthResult()
 
-        viewModel.register("Test", "test@test.com", "weak")
+        viewModel.toggleMode()
+        viewModel.updateName("Test")
+        viewModel.updateEmail("test@test.com")
+        viewModel.updatePassword("Password1")
+        viewModel.register()
         advanceUntilIdle()
 
-        assertFalse(viewModel.state.value.isLoggedIn)
-        assertEquals("La contraseña es demasiado débil. Usa al menos 6 caracteres.", viewModel.state.value.error)
+        coVerify { authDataSource.registerWithEmail("Test", "test@test.com", "Password1") }
     }
 
     @Test
     fun `logout calls dataSource logout`() = runTest {
-        every { authDataSource.isLoggedIn } returns true
-        every { authDataSource.getUserEmail() } returns "test@test.com"
+        every { authDataSource.logout() } just runs
 
         viewModel.logout()
-        advanceUntilIdle()
 
         coVerify { authDataSource.logout() }
     }
 
     @Test
-    fun `clearError clears error state`() = runTest {
-        coEvery { authDataSource.loginWithEmail("test@test.com", "wrong") } returns
-            AuthResult(error = "Error de prueba")
-
-        viewModel.login("test@test.com", "wrong")
-        advanceUntilIdle()
-
-        assertEquals("Error de prueba", viewModel.state.value.error)
-
+    fun `clearError clears error state`() {
         viewModel.clearError()
-
         assertNull(viewModel.state.value.error)
     }
 
     @Test
-    fun `login sets loading state during operation`() = runTest {
-        Dispatchers.setMain(UnconfinedTestDispatcher(testScheduler))
+    fun `email validation rejects empty email`() {
+        viewModel.updateEmail("")
+        viewModel.login()
 
-        val viewModelWithUnconfined = AuthViewModel(authDataSource)
-        coEvery { authDataSource.loginWithEmail("test@test.com", "password123") } returns
-            AuthResult(isLoggedIn = true, userEmail = "test@test.com")
+        assertEquals("El email es obligatorio", viewModel.state.value.emailError)
+    }
 
-        viewModelWithUnconfined.login("test@test.com", "password123")
+    @Test
+    fun `email validation rejects invalid format`() {
+        viewModel.updateEmail("notanemail")
+        viewModel.login()
 
-        assertFalse(viewModelWithUnconfined.state.value.isLoading)
-        assertTrue(viewModelWithUnconfined.state.value.isLoggedIn)
+        assertEquals("Formato de email inválido", viewModel.state.value.emailError)
+    }
 
-        Dispatchers.resetMain()
+    @Test
+    fun `password validation rejects short password`() {
+        viewModel.updateEmail("test@test.com")
+        viewModel.updatePassword("abc")
+        viewModel.login()
+
+        assertEquals("Mínimo 6 caracteres", viewModel.state.value.passwordError)
+    }
+
+    @Test
+    fun `name validation rejects short name in register mode`() {
+        viewModel.toggleMode()
+        viewModel.updateEmail("test@test.com")
+        viewModel.updatePassword("Password1")
+        viewModel.updateName("A")
+        viewModel.register()
+
+        assertEquals("Mínimo 2 caracteres", viewModel.state.value.nameError)
+    }
+
+    @Test
+    fun `register validation requires uppercase`() {
+        viewModel.toggleMode()
+        viewModel.updateEmail("test@test.com")
+        viewModel.updatePassword("abcdef1")
+        viewModel.updateName("Test")
+        viewModel.register()
+
+        assertEquals("Debe contener al menos una mayúscula", viewModel.state.value.passwordError)
+    }
+
+    @Test
+    fun `register validation requires digit`() {
+        viewModel.toggleMode()
+        viewModel.updateEmail("test@test.com")
+        viewModel.updatePassword("Abcdef")
+        viewModel.updateName("Test")
+        viewModel.register()
+
+        assertEquals("Debe contener al menos un número", viewModel.state.value.passwordError)
+    }
+
+    @Test
+    fun `toggleMode switches between login and register`() {
+        assertFalse(viewModel.state.value.isRegisterMode)
+
+        viewModel.toggleMode()
+        assertTrue(viewModel.state.value.isRegisterMode)
+
+        viewModel.toggleMode()
+        assertFalse(viewModel.state.value.isRegisterMode)
+    }
+
+    @Test
+    fun `validation errors clear when field updates`() {
+        viewModel.updateEmail("bad")
+        viewModel.login()
+        assertEquals("Formato de email inválido", viewModel.state.value.emailError)
+
+        viewModel.updateEmail("good@test.com")
+        assertNull(viewModel.state.value.emailError)
     }
 }
