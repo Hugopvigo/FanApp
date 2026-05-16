@@ -17,6 +17,13 @@ data class AuthUiState(
     val error: String? = null,
     val userEmail: String? = null,
     val userName: String? = null,
+    val email: String = "",
+    val password: String = "",
+    val name: String = "",
+    val isRegisterMode: Boolean = false,
+    val emailError: String? = null,
+    val passwordError: String? = null,
+    val nameError: String? = null,
 )
 
 @HiltViewModel
@@ -28,53 +35,94 @@ class AuthViewModel @Inject constructor(
     val state: StateFlow<AuthUiState> = _state.asStateFlow()
 
     init {
-        _state.update {
-            it.copy(
-                isLoggedIn = authDataSource.isLoggedIn,
-                userEmail = authDataSource.getUserEmail(),
-                userName = authDataSource.getUserName(),
-            )
-        }
+        observeAuthState()
     }
 
-    fun login(email: String, password: String) {
+    private fun observeAuthState() {
         viewModelScope.launch {
-            _state.update { it.copy(isLoading = true, error = null) }
-            val result = authDataSource.loginWithEmail(email, password)
-            _state.update {
-                it.copy(
-                    isLoading = false,
-                    isLoggedIn = result.isLoggedIn,
-                    error = result.error,
-                    userEmail = result.userEmail,
-                    userName = result.userName,
-                )
+            authDataSource.authStateFlow().collect { result ->
+                _state.update {
+                    it.copy(
+                        isLoggedIn = result.isLoggedIn,
+                        userEmail = result.userEmail,
+                        userName = result.userName,
+                    )
+                }
             }
         }
     }
 
-    fun register(name: String, email: String, password: String) {
+    fun updateEmail(email: String) {
+        _state.update { it.copy(email = email, emailError = null, error = null) }
+    }
+
+    fun updatePassword(password: String) {
+        _state.update { it.copy(password = password, passwordError = null, error = null) }
+    }
+
+    fun updateName(name: String) {
+        _state.update { it.copy(name = name, nameError = null, error = null) }
+    }
+
+    fun toggleMode() {
+        _state.update { it.copy(isRegisterMode = !it.isRegisterMode, error = null) }
+    }
+
+    fun login() {
+        val state = _state.value
+        val emailError = validateEmail(state.email)
+        val passwordError = validatePassword(state.password, isRegister = false)
+        if (emailError != null || passwordError != null) {
+            _state.update { it.copy(emailError = emailError, passwordError = passwordError) }
+            return
+        }
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true, error = null) }
-            val result = authDataSource.registerWithEmail(name, email, password)
-            _state.update {
-                it.copy(
-                    isLoading = false,
-                    isLoggedIn = result.isLoggedIn,
-                    error = result.error,
-                    userEmail = result.userEmail,
-                    userName = result.userName,
-                )
-            }
+            authDataSource.loginWithEmail(state.email, state.password)
+        }
+    }
+
+    fun register() {
+        val state = _state.value
+        val emailError = validateEmail(state.email)
+        val passwordError = validatePassword(state.password, isRegister = true)
+        val nameError = validateName(state.name)
+        if (emailError != null || passwordError != null || nameError != null) {
+            _state.update { it.copy(emailError = emailError, passwordError = passwordError, nameError = nameError) }
+            return
+        }
+        viewModelScope.launch {
+            _state.update { it.copy(isLoading = true, error = null) }
+            authDataSource.registerWithEmail(state.name, state.email, state.password)
         }
     }
 
     fun logout() {
         authDataSource.logout()
-        _state.update { AuthUiState(isLoggedIn = false) }
     }
 
     fun clearError() {
         _state.update { it.copy(error = null) }
+    }
+
+    private fun validateEmail(email: String): String? {
+        if (email.isBlank()) return "El email es obligatorio"
+        val emailRegex = Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")
+        return if (!emailRegex.matches(email.trim())) "Formato de email inválido" else null
+    }
+
+    private fun validatePassword(password: String, isRegister: Boolean): String? {
+        if (password.isBlank()) return "La contraseña es obligatoria"
+        if (password.length < 6) return "Mínimo 6 caracteres"
+        if (isRegister) {
+            if (!password.any { it.isUpperCase() }) return "Debe contener al menos una mayúscula"
+            if (!password.any { it.isDigit() }) return "Debe contener al menos un número"
+        }
+        return null
+    }
+
+    private fun validateName(name: String): String? {
+        if (name.isBlank()) return "El nombre es obligatorio"
+        return if (name.trim().length < 2) "Mínimo 2 caracteres" else null
     }
 }

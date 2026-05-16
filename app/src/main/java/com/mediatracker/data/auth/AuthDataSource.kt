@@ -6,6 +6,9 @@ import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException
 import com.google.firebase.auth.UserProfileChangeRequest
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 import timber.log.Timber
 import javax.inject.Inject
@@ -33,6 +36,21 @@ class AuthDataSource @Inject constructor(
     fun getUserEmail(): String? = auth?.currentUser?.email
 
     fun getUserName(): String? = auth?.currentUser?.displayName
+
+    fun authStateFlow(): Flow<AuthResult> = callbackFlow {
+        val listener = FirebaseAuth.AuthStateListener { firebaseAuth ->
+            val user = firebaseAuth.currentUser
+            trySend(
+                AuthResult(
+                    isLoggedIn = user != null,
+                    userEmail = user?.email,
+                    userName = user?.displayName,
+                )
+            )
+        }
+        auth?.addAuthStateListener(listener)
+        awaitClose { auth?.removeAuthStateListener(listener) }
+    }
 
     suspend fun loginWithEmail(email: String, password: String): AuthResult {
         val firebaseAuth = auth ?: return AuthResult(error = "Firebase no está configurado. Añade google-services.json.")

@@ -38,9 +38,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -55,32 +53,26 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mediatracker.R
 import com.mediatracker.presentation.theme.fanAppColors
 
 @Composable
 fun LoginScreen(
-    isLoading: Boolean,
-    error: String?,
-    isLoggedIn: Boolean,
-    onLogin: (String, String) -> Unit,
-    onRegister: (String, String, String) -> Unit,
-    onErrorDismiss: () -> Unit,
     onLoginSuccess: () -> Unit,
+    viewModel: AuthViewModel = hiltViewModel(),
 ) {
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var name by remember { mutableStateOf("") }
-    var isRegisterMode by remember { mutableStateOf(false) }
+    val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     val fanColors = MaterialTheme.fanAppColors
     val accentBrush = Brush.linearGradient(fanColors.gradientAccent)
 
-    LaunchedEffect(error) {
-        error?.let { snackbarHostState.showSnackbar(it) }
+    LaunchedEffect(state.error) {
+        state.error?.let { snackbarHostState.showSnackbar(it) }
     }
-    LaunchedEffect(isLoggedIn) {
-        if (isLoggedIn) onLoginSuccess()
+    LaunchedEffect(state.isLoggedIn) {
+        if (state.isLoggedIn) onLoginSuccess()
     }
 
     Box(
@@ -97,7 +89,6 @@ fun LoginScreen(
         ) {
             Spacer(Modifier.height(52.dp))
 
-            // ── Logo ────────────────────────────────────────────────────────
             Image(
                 painter = painterResource(R.drawable.logo),
                 contentDescription = stringResource(R.string.app_name),
@@ -107,7 +98,7 @@ fun LoginScreen(
             Spacer(Modifier.height(28.dp))
 
             Text(
-                text = if (isRegisterMode) stringResource(R.string.login_create_account) else stringResource(R.string.login_subtitle),
+                text = if (state.isRegisterMode) stringResource(R.string.login_create_account) else stringResource(R.string.login_subtitle),
                 style = MaterialTheme.typography.headlineMedium,
                 color = MaterialTheme.colorScheme.onBackground,
                 textAlign = TextAlign.Center,
@@ -124,7 +115,6 @@ fun LoginScreen(
 
             Spacer(Modifier.height(40.dp))
 
-            // ── Form fields ───────────────────────────────────────────────
             val fieldColors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = MaterialTheme.colorScheme.primary,
                 focusedLabelColor = MaterialTheme.colorScheme.primary,
@@ -132,10 +122,10 @@ fun LoginScreen(
             )
             val fieldShape = RoundedCornerShape(14.dp)
 
-            if (isRegisterMode) {
+            if (state.isRegisterMode) {
                 OutlinedTextField(
-                    value = name,
-                    onValueChange = { name = it },
+                    value = state.name,
+                    onValueChange = viewModel::updateName,
                     label = { Text(stringResource(R.string.login_name)) },
                     leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
                     singleLine = true,
@@ -143,13 +133,15 @@ fun LoginScreen(
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                     colors = fieldColors,
                     shape = fieldShape,
+                    isError = state.nameError != null,
+                    supportingText = state.nameError?.let { { Text(it, color = MaterialTheme.colorScheme.error) } },
                 )
                 Spacer(Modifier.height(12.dp))
             }
 
             OutlinedTextField(
-                value = email,
-                onValueChange = { email = it },
+                value = state.email,
+                onValueChange = viewModel::updateEmail,
                 label = { Text(stringResource(R.string.login_email)) },
                 leadingIcon = { Icon(Icons.Default.Email, contentDescription = null) },
                 singleLine = true,
@@ -160,13 +152,15 @@ fun LoginScreen(
                 ),
                 colors = fieldColors,
                 shape = fieldShape,
+                isError = state.emailError != null,
+                supportingText = state.emailError?.let { { Text(it, color = MaterialTheme.colorScheme.error) } },
             )
 
             Spacer(Modifier.height(12.dp))
 
             OutlinedTextField(
-                value = password,
-                onValueChange = { password = it },
+                value = state.password,
+                onValueChange = viewModel::updatePassword,
                 label = { Text(stringResource(R.string.login_password)) },
                 leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null) },
                 singleLine = true,
@@ -178,21 +172,23 @@ fun LoginScreen(
                 ),
                 keyboardActions = KeyboardActions(
                     onDone = {
-                        if (isRegisterMode) onRegister(name, email, password)
-                        else onLogin(email, password)
+                        if (state.isRegisterMode) viewModel.register()
+                        else viewModel.login()
                     },
                 ),
                 colors = fieldColors,
                 shape = fieldShape,
+                isError = state.passwordError != null,
+                supportingText = state.passwordError?.let { { Text(it, color = MaterialTheme.colorScheme.error) } },
             )
 
             Spacer(Modifier.height(28.dp))
 
-            // ── CTAs ──────────────────────────────────────────────────────
-            if (isLoading) {
+            val hasErrors = state.emailError != null || state.passwordError != null || state.nameError != null
+
+            if (state.isLoading) {
                 CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
             } else {
-                // Primary gradient button
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -203,9 +199,10 @@ fun LoginScreen(
                 ) {
                     Button(
                         onClick = {
-                            if (isRegisterMode) onRegister(name, email, password)
-                            else onLogin(email, password)
+                            if (state.isRegisterMode) viewModel.register()
+                            else viewModel.login()
                         },
+                        enabled = !hasErrors,
                         modifier = Modifier.fillMaxSize(),
                         shape = RoundedCornerShape(16.dp),
                         colors = ButtonDefaults.buttonColors(
@@ -214,7 +211,7 @@ fun LoginScreen(
                         ),
                     ) {
                         Text(
-                            text = if (isRegisterMode) stringResource(R.string.register_button)
+                            text = if (state.isRegisterMode) stringResource(R.string.register_button)
                             else stringResource(R.string.login_button),
                             style = MaterialTheme.typography.labelLarge.copy(fontSize = 15.sp),
                             fontWeight = FontWeight.Bold,
@@ -262,9 +259,9 @@ fun LoginScreen(
 
                 Spacer(Modifier.height(20.dp))
 
-                TextButton(onClick = { isRegisterMode = !isRegisterMode }) {
+                TextButton(onClick = { viewModel.toggleMode() }) {
                     Text(
-                        text = if (isRegisterMode) stringResource(R.string.login_switch_to_login)
+                        text = if (state.isRegisterMode) stringResource(R.string.login_switch_to_login)
                         else stringResource(R.string.login_switch_to_register),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.primary,
