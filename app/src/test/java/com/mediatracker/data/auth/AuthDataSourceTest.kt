@@ -54,8 +54,10 @@ class AuthDataSourceTest {
     }
 
     @Test
-    fun `mapAuthError returns weak password message for FirebaseAuthWeakPasswordException`() {
-        val exception = FirebaseAuthWeakPasswordException("ERROR_WEAK_PASSWORD", "test", "test")
+    fun `mapAuthError returns weak password message`() {
+        val exception: FirebaseAuthWeakPasswordException = mockk {
+            every { errorCode } returns "ERROR_WEAK_PASSWORD"
+        }
 
         val result = dataSource.mapAuthError(exception)
 
@@ -63,8 +65,10 @@ class AuthDataSourceTest {
     }
 
     @Test
-    fun `mapAuthError returns invalid email message for FirebaseAuthInvalidCredentialsException`() {
-        val exception = FirebaseAuthInvalidCredentialsException("ERROR_INVALID_EMAIL", "test")
+    fun `mapAuthError returns invalid email message`() {
+        val exception: FirebaseAuthInvalidCredentialsException = mockk {
+            every { errorCode } returns "ERROR_INVALID_EMAIL"
+        }
 
         val result = dataSource.mapAuthError(exception)
 
@@ -72,8 +76,10 @@ class AuthDataSourceTest {
     }
 
     @Test
-    fun `mapAuthError returns wrong password message for FirebaseAuthInvalidCredentialsException`() {
-        val exception = FirebaseAuthInvalidCredentialsException("ERROR_WRONG_PASSWORD", "test")
+    fun `mapAuthError returns wrong password message`() {
+        val exception: FirebaseAuthInvalidCredentialsException = mockk {
+            every { errorCode } returns "ERROR_WRONG_PASSWORD"
+        }
 
         val result = dataSource.mapAuthError(exception)
 
@@ -81,8 +87,10 @@ class AuthDataSourceTest {
     }
 
     @Test
-    fun `mapAuthError returns user not found message for FirebaseAuthInvalidCredentialsException`() {
-        val exception = FirebaseAuthInvalidCredentialsException("ERROR_USER_NOT_FOUND", "test")
+    fun `mapAuthError returns user not found message`() {
+        val exception: FirebaseAuthInvalidCredentialsException = mockk {
+            every { errorCode } returns "ERROR_USER_NOT_FOUND"
+        }
 
         val result = dataSource.mapAuthError(exception)
 
@@ -90,8 +98,21 @@ class AuthDataSourceTest {
     }
 
     @Test
-    fun `mapAuthError returns email already in use for FirebaseAuthUserCollisionException`() {
-        val exception = FirebaseAuthUserCollisionException("ERROR_EMAIL_ALREADY_IN_USE", "test")
+    fun `mapAuthError returns invalid credentials fallback message`() {
+        val exception: FirebaseAuthInvalidCredentialsException = mockk {
+            every { errorCode } returns "ERROR_OTHER"
+        }
+
+        val result = dataSource.mapAuthError(exception)
+
+        assertEquals("Credenciales incorrectas. Revisa tu email y contraseña.", result)
+    }
+
+    @Test
+    fun `mapAuthError returns email already in use`() {
+        val exception: FirebaseAuthUserCollisionException = mockk {
+            every { errorCode } returns "ERROR_EMAIL_ALREADY_IN_USE"
+        }
 
         val result = dataSource.mapAuthError(exception)
 
