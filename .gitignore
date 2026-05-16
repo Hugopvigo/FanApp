@@ -1,20 +1,45 @@
+# Android
 *.iml
 .gradle
-/local.properties
 /.idea
 .DS_Store
-/build
+**/build/
 /captures
 .externalNativeBuild
 .cxx
+
+# Build outputs
 *.apk
 *.aab
 *.ap_
 *.aab_
+
+# Secrets & local config
 local.properties
 .env
 *.env
+
+# Firebase
 google-services.json
+GoogleService-Info.plist
+
+# Android signing — NEVER commit keystores or signing credentials
+*.jks
+*.keystore
+keystore.properties
+release.properties
+
+# iOS / CocoaPods (futuro)
+Pods/
+*.xcworkspace/xcuserdata/
+DerivedData/
+*.p12
+*.mobileprovision
+*.ipa
+
+# Kotlin & IDE sessions
+.kotlin/
+.claude/
 
 # Markdown docs (not shipped) — only keep what's needed in the repo
 *.md
