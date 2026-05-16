@@ -121,10 +121,17 @@ Cada serie, película o libro puede estar en un estado. Y puedes marcarlo como f
 ## 🔑 Estado actual
 
 ```
-████████░░░░░░░░░░░░  25% — Sprint 1: Setup + Auth
+████████████████░░░░  75% — Sprint 3 completado · Sprint 4 en progreso
 ```
 
-Estamos construyendo la base. Si quieres seguir el progreso, mira los commits y los ficheros del proyecto.
+| Sprint | Estado |
+|--------|--------|
+| Sprint 1 — Setup + Auth | ✅ Completado |
+| Sprint 2 — Upgrade de Versiones | ✅ Completado |
+| Sprint 3 — APIs + Data Layer + Library | ✅ Completado |
+| Sprint 4 — Temas + Home + Pulido | ⏳ En progreso |
+
+Para seguir el progreso en detalle, consulta `CHANGELOG.md` y los archivos `Sprint*.md`.
 
 ---
 

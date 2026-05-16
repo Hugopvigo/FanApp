@@ -1,6 +1,88 @@
 # Changelog
 
-## Sprint 1 — Setup + Auth (2025-05-15)
+## Sprint 3 — APIs + Data Layer + Búsqueda + Library (2026-05-15–16)
+
+### 🌐 APIs externas
+- TMDB API: Retrofit interface + DTOs (`@Serializable`) + Mapper → `MediaItem`
+  - Endpoints: search TV/movie, trending TV/movie, TV detail, movie detail
+- Google Books API: Retrofit interface + DTOs + Mapper → `MediaItem`
+  - Endpoints: search books, popular books, book detail
+- `NetworkModule`: OkHttpClient (logging + API key interceptor) + 2 instancias Retrofit + `Json(ignoreUnknownKeys=true)`
+
+### 🗃️ Base de datos local (Room)
+- `Entities.kt`: `MediaItemEntity` + `UserItemEntity`
+- `MediaItemDao.kt` + `UserItemDao.kt`
+- `AppDatabase.kt` (versión 1)
+- `EntityMappers.kt`: Entity ↔ Domain model
+- `DatabaseModule.kt` implementado
+
+### ☁️ Firestore
+- `FirestoreDataSource.kt`: CRUD completo de `UserItem` en `/users/{userId}/items/{itemId}`
+
+### 🏗️ Repositorios
+- `MediaRepositoryImpl.kt`: search y trending con caché Room (TTL: trending 1h, búsqueda 30min, detalle 24h)
+- `UserRepositoryImpl.kt`: offline-first (Room inmediato + sync Firestore en background)
+- `RepositoryModule.kt` implementado
+
+### 🧠 Use Cases
+- `SearchMediaUseCase`, `GetTrendingUseCase`, `GetMediaDetailUseCase`
+- `GetUserItemsUseCase`, `AddUserItemUseCase`, `UpdateItemStatusUseCase`
+- `ToggleFavoriteUseCase`, `RemoveUserItemUseCase`, `GetUserStatsUseCase`
+- `SyncUserItemsUseCase` (sincronización explícita Firestore → Room)
+
+### 🖥️ Pantallas
+- `DiscoverScreen`: 3 tabs (Series / Películas / Libros) con SearchBar + trending
+- `DetailScreen`: póster, sinopsis, rating, selector de estado, toggle favorito, info extra
+- `LibraryScreen`: tabs por estado + filtro por tipo + grid de items
+- `LibraryItemCard`: card compacta para items del usuario en Library
+
+### 🧩 Componentes reutilizables
+- `MediaCard`, `MediaRow`, `SearchBar`, `StatusChip`, `FavoriteToggle`, `LoadingState`
+
+### 🧭 Navegación
+- `Route.Detail` actualizada: `Detail(apiId: String, mediaType: MediaType)`
+
+### ✅ Build
+- `./gradlew assembleDebug` — BUILD SUCCESSFUL
+
+---
+
+## Sprint 2 — Upgrade de Versiones (2026-05-15)
+
+### 📦 Versiones actualizadas
+
+| Dep | Antes | Después |
+|-----|-------|---------|
+| Gradle | 8.9 | 9.5.1 |
+| AGP | 8.5.2 | 9.2.1 |
+| Kotlin | 2.0.0 | 2.3.21 |
+| Retrofit | 2.11.0 | 3.0.0 |
+| OkHttp | 4.12.0 | 5.3.2 |
+| Compose BOM | 2024.06.00 | 2026.05.00 |
+| Room | 2.6.1 | 2.8.4 |
+| Hilt | 2.51.1 | 2.59.2 |
+| Firebase BOM | 33.1.2 | 34.13.0 |
+| KSP | 2.0.0-1.0.22 | 2.3.8 |
+| Navigation | 2.8.3 | 2.9.8 |
+| Lifecycle | 2.8.3 | 2.10.0 |
+| Coroutines | 1.8.1 | 1.11.0 |
+
+### 🔧 Cambios adicionales
+- Plugin `kotlin-android` eliminado (built-in en AGP 9.0+)
+- Bloque `kotlinOptions` eliminado (deprecated en AGP 9.x)
+- Moshi eliminado → Retrofit 3 usa `kotlinx.serialization` built-in
+- Firebase `-ktx` artifacts unificados en BOM 34.x (non-ktx)
+- `compileSdk` y `targetSdk` subidos de 34 → 36
+- Mejora de manejo de errores en `AuthDataSource` (mapeo de excepciones Firebase)
+- Integración de colores custom (`MediaBlue`, `MediaOrange`, etc.) en `MaterialTheme`
+- Tests unitarios base: `AuthDataSourceTest`, `AuthViewModelTest`, tests de modelos
+
+### ✅ Build
+- `./gradlew assembleDebug` — BUILD SUCCESSFUL
+
+---
+
+## Sprint 1 — Setup + Auth (2026-05-15)
 
 ### 🏗️ Proyecto
 - Creación del proyecto Android con Clean Architecture
@@ -44,12 +126,6 @@ com.mediatracker/
 │   └── profile/     → ProfileScreen (placeholder)
 └── core/            → Utilidades
 ```
-
-### 🔧 Entorno
-- Android SDK 34 instalado localmente
-- Gradle 8.9 + Wrapper
-- `local.properties` con ruta SDK
-- `google-services.json` pendiente de añadir
 
 ### ✅ Build
 - `./gradlew assembleDebug` — BUILD SUCCESSFUL (sin warnings)
