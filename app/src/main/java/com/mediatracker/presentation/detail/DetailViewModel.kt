@@ -41,9 +41,11 @@ class DetailViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val apiId: String = savedStateHandle["apiId"] ?: ""
-    private val mediaType: MediaType = savedStateHandle.get<String>("mediaType")?.let {
-        runCatching { MediaType.valueOf(it) }.getOrNull()
-    } ?: MediaType.SERIES
+    private val mediaType: MediaType = runCatching {
+        savedStateHandle.get<MediaType>("mediaType") ?: MediaType.SERIES
+    }.recoverCatching {
+        savedStateHandle.get<String>("mediaType")?.let { MediaType.valueOf(it) } ?: MediaType.SERIES
+    }.getOrDefault(MediaType.SERIES)
 
     private val compositeId: String = "${mediaType.name.lowercase()}_$apiId"
 
