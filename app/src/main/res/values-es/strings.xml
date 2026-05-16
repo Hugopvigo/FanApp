@@ -10,7 +10,10 @@
 
     <!-- Login -->
     <string name="login_title">FanApp</string>
-    <string name="login_subtitle">Unifica tus series, películas y libros</string>
+    <string name="login_subtitle">Tu universo en un solo lugar</string>
+    <string name="login_description">Series, películas y libros — guarda, sigue\ny vuelve a lo que amas.</string>
+    <string name="login_create_account">Crea tu cuenta</string>
+    <string name="login_or">o</string>
     <string name="login_email">Email</string>
     <string name="login_password">Contraseña</string>
     <string name="login_name">Nombre</string>
@@ -21,12 +24,15 @@
     <string name="login_switch_to_login">¿Ya tienes cuenta? Inicia sesión</string>
 
     <!-- Home -->
+    <string name="home_title">Inicio</string>
+    <string name="home_subtitle">Continúa donde lo dejaste, novedades, favoritos...</string>
     <string name="home_continue">Continúa donde lo dejaste</string>
     <string name="home_trending">Novedades Trending</string>
     <string name="home_favorites">Tus Favoritos</string>
     <string name="home_recent">Tus Últimos Guardados</string>
 
     <!-- Discover -->
+    <string name="discover_title">Descubrir</string>
     <string name="discover_series">Series</string>
     <string name="discover_movies">Películas</string>
     <string name="discover_books">Libros</string>
@@ -34,25 +40,59 @@
     <string name="discover_top_series">Top Series</string>
     <string name="discover_top_movies">Top Películas</string>
     <string name="discover_top_books">Top Libros</string>
+    <string name="discover_top_trending">Top Trending</string>
 
     <!-- Library -->
+    <string name="library_title">Biblioteca</string>
     <string name="library_watchlist">Quiero ver</string>
     <string name="library_in_progress">En progreso</string>
     <string name="library_completed">Completado</string>
     <string name="library_abandoned">Abandonado</string>
     <string name="library_all">Todos</string>
+    <string name="library_empty_watchlist">No tienes nada en tu lista</string>
+    <string name="library_empty_in_progress">No tienes nada en progreso</string>
+    <string name="library_empty_completed">No has completado nada aún</string>
+    <string name="library_empty_abandoned">No has abandonado nada</string>
 
     <!-- Profile -->
     <string name="profile_series">Series</string>
     <string name="profile_movies">Películas</string>
+    <string name="profile_movies_short">Pelis</string>
     <string name="profile_books">Libros</string>
+    <string name="profile_settings">Ajustes</string>
+    <string name="profile_theme">Tema</string>
+    <string name="profile_language">Idioma</string>
+    <string name="profile_language_value">Español</string>
+    <string name="profile_notifications">Notificaciones</string>
+    <string name="profile_notif_enabled">Activadas</string>
+    <string name="profile_privacy">Privacidad</string>
     <string name="profile_logout">Cerrar sesión</string>
     <string name="profile_delete_account">Eliminar cuenta</string>
 
+    <!-- Detail -->
+    <string name="detail_title">Detalle</string>
+    <string name="detail_remove">Quitar</string>
+    <string name="detail_seasons">Temporadas</string>
+    <string name="detail_episodes">Episodios</string>
+    <string name="detail_creators">Creadores</string>
+    <string name="detail_runtime">Duración</string>
+    <string name="detail_author">Autor</string>
+    <string name="detail_publisher">Editorial</string>
+    <string name="detail_pages">Páginas</string>
+
     <!-- Common -->
+    <string name="back">Volver</string>
     <string name="loading">Cargando…</string>
     <string name="error_generic">Algo salió mal</string>
+    <string name="error_unknown">Error desconocido</string>
+    <string name="no_results">Sin resultados</string>
     <string name="retry">Reintentar</string>
     <string name="empty_list">No hay elementos</string>
     <string name="favorite">Favorito</string>
+
+    <!-- Theme -->
+    <string name="theme_description">Elige cómo se ve tu FanApp. Puedes cambiarlo cuando quieras desde ajustes.</string>
+    <string name="theme_active">ACTIVO</string>
+    <string name="theme_auto">Cambiar con el sistema</string>
+    <string name="theme_auto_subtitle">Usa Light de día y Dark de noche</string>
 </resources>
