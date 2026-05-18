@@ -15,9 +15,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.mediatracker.R
 import com.mediatracker.domain.model.ItemStatus
 import com.mediatracker.presentation.theme.FanAppColors
 import com.mediatracker.presentation.theme.fanAppColors
@@ -58,7 +60,7 @@ fun StatusChip(
         ) {
             Text(text = status.statusIcon, fontSize = 11.sp)
             Text(
-                text = status.displayLabel,
+                text = status.label(),
                 style = MaterialTheme.typography.labelMedium,
                 fontWeight = FontWeight.Bold,
                 color = if (selected) statusColor else MaterialTheme.colorScheme.onSurfaceVariant,
@@ -88,7 +90,7 @@ fun StatusBadge(
         ) {
             Text(text = status.statusIcon, fontSize = 9.sp)
             Text(
-                text = status.displayLabel,
+                text = status.label(),
                 style = MaterialTheme.typography.labelSmall,
                 fontWeight = FontWeight.SemiBold,
                 color = statusColor,
@@ -97,13 +99,13 @@ fun StatusBadge(
     }
 }
 
-val ItemStatus.displayLabel: String
-    get() = when (this) {
-        ItemStatus.WATCHLIST    -> "Quiero ver"
-        ItemStatus.IN_PROGRESS  -> "En progreso"
-        ItemStatus.COMPLETED    -> "Completado"
-        ItemStatus.ABANDONED    -> "Abandonado"
-    }
+@Composable
+fun ItemStatus.label(): String = when (this) {
+    ItemStatus.WATCHLIST    -> stringResource(R.string.status_watchlist)
+    ItemStatus.IN_PROGRESS  -> stringResource(R.string.status_in_progress)
+    ItemStatus.COMPLETED    -> stringResource(R.string.status_completed)
+    ItemStatus.ABANDONED    -> stringResource(R.string.status_abandoned)
+}
 
 val ItemStatus.statusIcon: String
     get() = when (this) {

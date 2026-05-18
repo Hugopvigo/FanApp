@@ -95,4 +95,15 @@
     <string name="theme_active">ACTIVO</string>
     <string name="theme_auto">Cambiar con el sistema</string>
     <string name="theme_auto_subtitle">Usa Light de día y Dark de noche</string>
+
+    <!-- Status labels (chips, badges) -->
+    <string name="status_watchlist">Quiero ver</string>
+    <string name="status_in_progress">En progreso</string>
+    <string name="status_completed">Completado</string>
+    <string name="status_abandoned">Abandonado</string>
+
+    <!-- Media type labels -->
+    <string name="media_type_series">🎬 Serie</string>
+    <string name="media_type_movie">🎥 Película</string>
+    <string name="media_type_book">📖 Libro</string>
 </resources>

@@ -6,6 +6,11 @@
 - `GoogleBooksApi.kt`: query por defecto cambiada de `*` a `subject:fiction+subject:bestseller`
 - `MediaRepositoryImpl.kt`: queries curatoras rotativas por día (5 géneros: ficción, fantasía, romance, thriller, no ficción)
 
+### T9 — Externalizar strings hardcodeados
+- `values/strings.xml` + `values-es/strings.xml`: añadidos `status_*` (4 estados) y `media_type_*` (3 tipos)
+- `StatusChip.kt`: `displayLabel: String` reemplazado por `@Composable fun label()` con `stringResource()`
+- `LibraryItemCard.kt`: etiquetas de tipo de medio usan `stringResource(R.string.media_type_*)`
+
 ### T3 — Iconos en tabs de Library
 - `StatusChip.kt`: añadida extension `tabIcon: ImageVector` en `ItemStatus` (Bookmark, PlayCircle, CheckCircle, Cancel)
 - `LibraryScreen.kt`: tabs usan `icon` + `text` con Material Icons Outlined (16dp)

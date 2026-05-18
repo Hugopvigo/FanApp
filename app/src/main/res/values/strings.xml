@@ -95,4 +95,15 @@
     <string name="theme_active">ACTIVE</string>
     <string name="theme_auto">Follow system</string>
     <string name="theme_auto_subtitle">Use Light during the day and Dark at night</string>
+
+    <!-- Status labels (chips, badges) -->
+    <string name="status_watchlist">Watchlist</string>
+    <string name="status_in_progress">In Progress</string>
+    <string name="status_completed">Completed</string>
+    <string name="status_abandoned">Abandoned</string>
+
+    <!-- Media type labels -->
+    <string name="media_type_series">🎬 Series</string>
+    <string name="media_type_movie">🎥 Movie</string>
+    <string name="media_type_book">📖 Book</string>
 </resources>

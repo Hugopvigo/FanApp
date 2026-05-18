@@ -19,6 +19,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import androidx.compose.ui.res.stringResource
+import com.mediatracker.R
 import com.mediatracker.domain.model.MediaType
 import com.mediatracker.domain.model.UserItem
 import com.mediatracker.presentation.components.GradientPoster
@@ -63,9 +65,9 @@ fun LibraryItemCard(
         Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
             Text(
                 text = when (userItem.mediaType) {
-                    MediaType.SERIES -> "🎬 Serie"
-                    MediaType.MOVIE -> "🎥 Película"
-                    MediaType.BOOK -> "📖 Libro"
+                    MediaType.SERIES -> stringResource(R.string.media_type_series)
+                    MediaType.MOVIE -> stringResource(R.string.media_type_movie)
+                    MediaType.BOOK -> stringResource(R.string.media_type_book)
                 },
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
