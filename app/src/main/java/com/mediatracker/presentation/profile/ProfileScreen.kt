@@ -12,15 +12,28 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -36,6 +49,8 @@ import com.mediatracker.R
 import com.mediatracker.presentation.theme.LocalAppTheme
 import com.mediatracker.presentation.theme.fanAppColors
 
+private val AVATARS = listOf("🦊", "🐼", "🐸", "🦁", "🐯", "🐺", "🦋", "🌟", "🎭", "🦄", "🐉", "🎪")
+
 @Composable
 fun ProfileScreen(
     onLogout: () -> Unit,
@@ -47,7 +62,10 @@ fun ProfileScreen(
     val stats by viewModel.stats.collectAsStateWithLifecycle()
     val userName by viewModel.userName.collectAsStateWithLifecycle()
     val userEmail by viewModel.userEmail.collectAsStateWithLifecycle()
-    val displayName = userName?.takeIf { it.isNotBlank() } ?: "Usuario"
+    val avatarId by viewModel.avatarId.collectAsStateWithLifecycle()
+    val showEditNameDialog by viewModel.showEditNameDialog.collectAsStateWithLifecycle()
+    val showAvatarDialog by viewModel.showAvatarDialog.collectAsStateWithLifecycle()
+    val displayName = userName?.takeIf { it.isNotBlank() }?.capitalizeWords() ?: "Usuario"
     val initial = displayName.first().uppercaseChar().toString()
 
     Column(
@@ -69,26 +87,53 @@ fun ProfileScreen(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(14.dp),
             ) {
+                // Avatar (tappable)
                 Box(
                     modifier = Modifier
                         .size(64.dp)
                         .clip(RoundedCornerShape(20.dp))
-                        .background(Color.White.copy(alpha = 0.92f)),
+                        .background(Color.White.copy(alpha = 0.92f))
+                        .clickable { viewModel.openAvatarDialog() },
                     contentAlignment = Alignment.Center,
                 ) {
-                    Text(
-                        text = initial,
-                        style = MaterialTheme.typography.headlineMedium,
-                        color = MaterialTheme.colorScheme.primary,
-                        fontWeight = FontWeight.Bold,
-                    )
+                    if (avatarId != null) {
+                        Text(
+                            text = avatarId!!,
+                            fontSize = 32.sp,
+                        )
+                    } else {
+                        Text(
+                            text = initial,
+                            style = MaterialTheme.typography.headlineMedium,
+                            color = MaterialTheme.colorScheme.primary,
+                            fontWeight = FontWeight.Bold,
+                        )
+                    }
                 }
-                Column {
-                    Text(
-                        text = displayName,
-                        style = MaterialTheme.typography.headlineSmall,
-                        color = Color.White,
-                    )
+
+                Column(modifier = Modifier.weight(1f)) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    ) {
+                        Text(
+                            text = displayName,
+                            style = MaterialTheme.typography.headlineSmall,
+                            color = Color.White,
+                            modifier = Modifier.weight(1f, fill = false),
+                        )
+                        IconButton(
+                            onClick = { viewModel.openEditNameDialog() },
+                            modifier = Modifier.size(28.dp),
+                        ) {
+                            Icon(
+                                imageVector = Icons.Outlined.Edit,
+                                contentDescription = stringResource(R.string.profile_edit_name),
+                                tint = Color.White.copy(alpha = 0.8f),
+                                modifier = Modifier.size(16.dp),
+                            )
+                        }
+                    }
                     Text(
                         text = userEmail ?: "",
                         style = MaterialTheme.typography.bodySmall,
@@ -121,7 +166,7 @@ fun ProfileScreen(
                     contentAlignment = Alignment.Center,
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(icon, fontSize = 18.sp)
+                        Text(icon, fontSize = 24.sp)
                         Text(
                             text = count.toString(),
                             style = MaterialTheme.typography.headlineSmall,
@@ -176,6 +221,73 @@ fun ProfileScreen(
 
         Spacer(Modifier.height(32.dp))
     }
+
+    // ── Edit Name Dialog ──────────────────────────────────────────────────
+    if (showEditNameDialog) {
+        var nameText by rememberSaveable { mutableStateOf(userName ?: "") }
+        AlertDialog(
+            onDismissRequest = { viewModel.closeEditNameDialog() },
+            title = { Text(stringResource(R.string.profile_edit_name)) },
+            text = {
+                OutlinedTextField(
+                    value = nameText,
+                    onValueChange = { nameText = it },
+                    label = { Text(stringResource(R.string.profile_edit_name_hint)) },
+                    singleLine = true,
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = { viewModel.updateUserName(nameText) },
+                    enabled = nameText.isNotBlank(),
+                ) {
+                    Text(stringResource(R.string.profile_save))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { viewModel.closeEditNameDialog() }) {
+                    Text(stringResource(R.string.profile_cancel))
+                }
+            },
+        )
+    }
+
+    // ── Avatar Picker Dialog ──────────────────────────────────────────────
+    if (showAvatarDialog) {
+        AlertDialog(
+            onDismissRequest = { viewModel.closeAvatarDialog() },
+            title = { Text(stringResource(R.string.profile_choose_avatar)) },
+            text = {
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(4),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    items(AVATARS) { emoji ->
+                        Box(
+                            modifier = Modifier
+                                .size(56.dp)
+                                .clip(RoundedCornerShape(12.dp))
+                                .background(
+                                    if (emoji == avatarId) MaterialTheme.colorScheme.primaryContainer
+                                    else MaterialTheme.colorScheme.surfaceVariant
+                                )
+                                .clickable { viewModel.updateAvatar(emoji) },
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            Text(emoji, fontSize = 28.sp)
+                        }
+                    }
+                }
+            },
+            confirmButton = {},
+            dismissButton = {
+                TextButton(onClick = { viewModel.closeAvatarDialog() }) {
+                    Text(stringResource(R.string.profile_cancel))
+                }
+            },
+        )
+    }
 }
 
 @Composable
@@ -223,10 +335,15 @@ private fun SettingRow(
         }
         if (onClick != null) {
             Text(
-                text = "\u203A",
+                text = "›",
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
     }
 }
+
+private fun String.capitalizeWords(): String =
+    split(" ").joinToString(" ") { word ->
+        word.lowercase().replaceFirstChar { it.uppercase() }
+    }

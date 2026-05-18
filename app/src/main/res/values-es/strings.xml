@@ -96,6 +96,13 @@
     <string name="theme_auto">Cambiar con el sistema</string>
     <string name="theme_auto_subtitle">Usa Light de día y Dark de noche</string>
 
+    <!-- Profile edit -->
+    <string name="profile_edit_name">Editar nombre</string>
+    <string name="profile_edit_name_hint">Tu nombre</string>
+    <string name="profile_choose_avatar">Elige avatar</string>
+    <string name="profile_save">Guardar</string>
+    <string name="profile_cancel">Cancelar</string>
+
     <!-- Status labels (chips, badges) -->
     <string name="status_watchlist">Quiero ver</string>
     <string name="status_in_progress">En progreso</string>

@@ -87,6 +87,12 @@ class AuthDataSource @Inject constructor(
         }
     }
 
+    suspend fun updateUserName(name: String): Result<Unit> = runCatching {
+        val user = auth?.currentUser ?: throw IllegalStateException("No user logged in")
+        val request = UserProfileChangeRequest.Builder().setDisplayName(name).build()
+        user.updateProfile(request).await()
+    }
+
     fun logout() {
         auth?.signOut()
     }

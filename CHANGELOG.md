@@ -6,6 +6,13 @@
 - `GoogleBooksApi.kt`: query por defecto cambiada de `*` a `subject:fiction+subject:bestseller`
 - `MediaRepositoryImpl.kt`: queries curatoras rotativas por día (5 géneros: ficción, fantasía, romance, thriller, no ficción)
 
+### T4 — Perfil editable
+- `AuthDataSource.kt`: añadido `updateUserName()` via `updateProfile()` de Firebase
+- `FirestoreDataSource.kt`: añadidos `getAvatarId()` y `updateAvatarId()` en `/users/{uid}` (merge)
+- `ProfileViewModel.kt`: inyecta `FirestoreDataSource`; expone `avatarId`, `showEditNameDialog`, `showAvatarDialog`, `isUpdating`; acciones `updateUserName()`, `updateAvatar()`, `open/closeEditNameDialog()`, `open/closeAvatarDialog()`
+- `ProfileScreen.kt`: avatar tappable que abre grid de 12 emojis; botón lápiz junto al nombre abre `AlertDialog` con `OutlinedTextField`; `capitalizeWords()` en `displayName`; iconos de stats 18sp → 24sp
+- Strings EN/ES: `profile_edit_name`, `profile_edit_name_hint`, `profile_choose_avatar`, `profile_save`, `profile_cancel`
+
 ### T10 — ProfileScreen reactivo
 - `ProfileViewModel.kt`: inyecta `AuthDataSource`, expone `userName` y `userEmail` como `StateFlow` via `authStateFlow()` con valor inicial inmediato
 - `ProfileScreen.kt`: elimina parámetros `userEmail`/`userName`, los colecta del ViewModel con `collectAsStateWithLifecycle()`

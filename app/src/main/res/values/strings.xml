@@ -96,6 +96,13 @@
     <string name="theme_auto">Follow system</string>
     <string name="theme_auto_subtitle">Use Light during the day and Dark at night</string>
 
+    <!-- Profile edit -->
+    <string name="profile_edit_name">Edit Name</string>
+    <string name="profile_edit_name_hint">Your name</string>
+    <string name="profile_choose_avatar">Choose Avatar</string>
+    <string name="profile_save">Save</string>
+    <string name="profile_cancel">Cancel</string>
+
     <!-- Status labels (chips, badges) -->
     <string name="status_watchlist">Watchlist</string>
     <string name="status_in_progress">In Progress</string>

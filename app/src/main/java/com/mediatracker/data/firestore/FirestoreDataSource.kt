@@ -105,4 +105,16 @@ class FirestoreDataSource @Inject constructor(
         val path = "/users/$uid/items"
         db.collection(path).document(itemId).delete().await()
     }
+
+    suspend fun getAvatarId(): Result<String?> = runCatching {
+        val db = firestore ?: throw IllegalStateException("Firestore not configured")
+        val uid = authProvider.userId ?: throw IllegalStateException("User not logged in")
+        db.document("/users/$uid").get().await().getString("avatarId")
+    }
+
+    suspend fun updateAvatarId(avatarId: String): Result<Unit> = runCatching {
+        val db = firestore ?: throw IllegalStateException("Firestore not configured")
+        val uid = authProvider.userId ?: throw IllegalStateException("User not logged in")
+        db.document("/users/$uid").set(mapOf("avatarId" to avatarId), com.google.firebase.firestore.SetOptions.merge()).await()
+    }
 }
