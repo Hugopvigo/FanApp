@@ -12,6 +12,8 @@ class AddUserItemUseCase @Inject constructor(
     suspend operator fun invoke(
         mediaType: MediaType,
         apiId: String,
+        title: String,
+        posterUrl: String?,
         status: ItemStatus = ItemStatus.WATCHLIST,
-    ): Result<UserItem> = userRepository.addUserItem(mediaType, apiId, status)
+    ): Result<UserItem> = userRepository.addUserItem(mediaType, apiId, title, posterUrl, status)
 }

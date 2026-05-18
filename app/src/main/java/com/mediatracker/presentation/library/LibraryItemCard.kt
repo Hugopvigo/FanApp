@@ -28,7 +28,6 @@ fun LibraryItemCard(
     userItem: UserItem,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    posterUrl: String? = null,
 ) {
     Column(
         modifier = modifier
@@ -36,10 +35,10 @@ fun LibraryItemCard(
             .clickable(onClick = onClick),
         verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
-        if (!posterUrl.isNullOrBlank()) {
+        if (!userItem.posterUrl.isNullOrBlank()) {
             AsyncImage(
-                model = posterUrl,
-                contentDescription = userItem.apiId,
+                model = userItem.posterUrl,
+                contentDescription = userItem.title,
                 modifier = Modifier
                     .size(width = 120.dp, height = 180.dp)
                     .clip(MaterialTheme.shapes.medium),
@@ -47,14 +46,14 @@ fun LibraryItemCard(
             )
         } else {
             GradientPoster(
-                title = userItem.apiId,
+                title = userItem.title,
                 kind = userItem.mediaType,
                 modifier = Modifier.size(width = 120.dp, height = 180.dp),
             )
         }
 
         Text(
-            text = userItem.apiId,
+            text = userItem.title,
             style = MaterialTheme.typography.bodySmall,
             fontWeight = FontWeight.SemiBold,
             maxLines = 2,

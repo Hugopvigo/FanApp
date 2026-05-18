@@ -4,6 +4,8 @@ data class UserItem(
     val id: String,
     val mediaType: MediaType,
     val apiId: String,
+    val title: String,
+    val posterUrl: String?,
     val status: ItemStatus,
     val favorite: Boolean,
     val addedAt: Long,

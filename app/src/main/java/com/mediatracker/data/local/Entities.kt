@@ -23,6 +23,8 @@ data class UserItemEntity(
     @PrimaryKey val id: String,
     val mediaType: String,
     val apiId: String,
+    val title: String,
+    val posterUrl: String?,
     val status: String,
     val favorite: Boolean,
     val addedAt: Long,

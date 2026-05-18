@@ -83,7 +83,14 @@ class DetailViewModel @Inject constructor(
         viewModelScope.launch {
             _state.update { it.copy(isUpdating = true) }
             if (currentUserItem == null) {
-                addUserItemUseCase(mediaType, apiId, status)
+                val item = _state.value.item
+                addUserItemUseCase(
+                    mediaType = mediaType,
+                    apiId = apiId,
+                    title = item?.title ?: "",
+                    posterUrl = item?.posterUrl,
+                    status = status,
+                )
             } else {
                 updateItemStatusUseCase(currentUserItem.id, status)
             }

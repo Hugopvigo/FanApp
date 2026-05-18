@@ -11,6 +11,8 @@ interface UserRepository {
     suspend fun addUserItem(
         mediaType: MediaType,
         apiId: String,
+        title: String,
+        posterUrl: String?,
         status: ItemStatus,
     ): Result<UserItem>
     suspend fun updateItemStatus(itemId: String, status: ItemStatus): Result<Unit>

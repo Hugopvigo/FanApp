@@ -25,10 +25,13 @@ class FirestoreDataSource @Inject constructor(
         val snapshot = db.collection(path).get().await()
         snapshot.documents.mapNotNull { doc ->
             try {
+                val apiId = doc.getString("apiId") ?: ""
                 UserItem(
                     id = doc.id,
                     mediaType = MediaType.valueOf(doc.getString("mediaType") ?: "SERIES"),
-                    apiId = doc.getString("apiId") ?: "",
+                    apiId = apiId,
+                    title = doc.getString("title")?.ifBlank { null } ?: apiId,
+                    posterUrl = doc.getString("posterUrl"),
                     status = ItemStatus.valueOf(doc.getString("status") ?: "WATCHLIST"),
                     favorite = doc.getBoolean("favorite") ?: false,
                     addedAt = doc.getLong("addedAt") ?: 0L,
@@ -44,25 +47,31 @@ class FirestoreDataSource @Inject constructor(
     suspend fun addItem(
         mediaType: MediaType,
         apiId: String,
+        title: String,
+        posterUrl: String?,
         status: ItemStatus,
     ): Result<UserItem> = runCatching {
         val db = firestore ?: throw IllegalStateException("Firestore not configured")
         val uid = authProvider.userId ?: throw IllegalStateException("User not logged in")
         val path = "/users/$uid/items"
         val now = System.currentTimeMillis()
-        val data = mapOf(
+        val data = mutableMapOf(
             "mediaType" to mediaType.name,
             "apiId" to apiId,
+            "title" to title,
             "status" to status.name,
             "favorite" to false,
             "addedAt" to now,
             "updatedAt" to now,
         )
+        if (posterUrl != null) data["posterUrl"] = posterUrl
         val docRef = db.collection(path).add(data).await()
         UserItem(
             id = docRef.id,
             mediaType = mediaType,
             apiId = apiId,
+            title = title,
+            posterUrl = posterUrl,
             status = status,
             favorite = false,
             addedAt = now,

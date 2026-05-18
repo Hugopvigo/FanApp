@@ -37,9 +37,11 @@ class UserRepositoryImpl @Inject constructor(
     override suspend fun addUserItem(
         mediaType: MediaType,
         apiId: String,
+        title: String,
+        posterUrl: String?,
         status: ItemStatus,
     ): Result<UserItem> = runCatching {
-        val userItem = firestoreDataSource.addItem(mediaType, apiId, status).getOrThrow()
+        val userItem = firestoreDataSource.addItem(mediaType, apiId, title, posterUrl, status).getOrThrow()
         userItemDao.insert(userItem.toEntity())
         userItem
     }.onFailure { Timber.e(it, "Add user item failed") }

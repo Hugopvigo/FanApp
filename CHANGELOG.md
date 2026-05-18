@@ -1,5 +1,24 @@
 # Changelog
 
+## Sprint 5 — Bugs, Mejoras y Pendientes (2026-05-18–…)
+
+### T1 — Fix Google Books Trending
+- `GoogleBooksApi.kt`: query por defecto cambiada de `*` a `subject:fiction+subject:bestseller`
+- `MediaRepositoryImpl.kt`: queries curatoras rotativas por día (5 géneros: ficción, fantasía, romance, thriller, no ficción)
+
+### T2 — Fix Library portadas/títulos
+- `UserItem.kt`: añadidos campos `title: String` y `posterUrl: String?`
+- `UserItemEntity`: añadidas columnas `title` y `posterUrl`
+- `AppDatabase.kt`: versión 1→2, migración `MIGRATION_1_2` (ALTER TABLE con DEFAULT)
+- `DatabaseModule.kt`: registrada la migración
+- `EntityMappers.kt`: mappers actualizados; fallback `title = apiId` para items pre-Sprint5
+- `UserRepository` + `UserRepositoryImpl` + `AddUserItemUseCase`: propagan `title`/`posterUrl`
+- `FirestoreDataSource.kt`: guarda y lee `title`/`posterUrl` en Firestore
+- `DetailViewModel.kt`: pasa `title`/`posterUrl` del `MediaItem` al añadir a lista
+- `LibraryItemCard.kt`: muestra `userItem.title` y `userItem.posterUrl` (parámetro externo eliminado)
+
+---
+
 ## Sprint 3 — APIs + Data Layer + Búsqueda + Library (2026-05-15–16)
 
 ### 🌐 APIs externas

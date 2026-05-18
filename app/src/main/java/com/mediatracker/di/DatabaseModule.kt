@@ -23,7 +23,7 @@ object DatabaseModule {
             context,
             AppDatabase::class.java,
             "mediatracker.db",
-        ).build()
+        ).addMigrations(AppDatabase.MIGRATION_1_2).build()
 
     @Provides
     fun provideMediaItemDao(database: AppDatabase): MediaItemDao =
