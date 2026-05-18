@@ -24,6 +24,19 @@ class MediaRepositoryImpl @Inject constructor(
 
     companion object {
         private const val TTL_DETAIL_MS = 24 * 60 * 60 * 1000L
+
+        private val BOOKS_TRENDING_QUERIES = listOf(
+            "subject:fiction+subject:bestseller",
+            "subject:fantasy+subject:adventure",
+            "subject:romance+subject:contemporary",
+            "subject:thriller+subject:mystery",
+            "subject:nonfiction+subject:popular",
+        )
+
+        private fun trendingBooksQuery(): String {
+            val dayOfYear = java.util.Calendar.getInstance().get(java.util.Calendar.DAY_OF_YEAR)
+            return BOOKS_TRENDING_QUERIES[dayOfYear % BOOKS_TRENDING_QUERIES.size]
+        }
     }
 
     override suspend fun search(query: String, mediaType: MediaType): Result<List<MediaItem>> =
@@ -44,6 +57,7 @@ class MediaRepositoryImpl @Inject constructor(
                 MediaType.SERIES -> tmdbApi.getTrendingTv().results.map { it.toMediaItem(MediaType.SERIES) }
                 MediaType.MOVIE -> tmdbApi.getTrendingMovies().results.map { it.toMediaItem(MediaType.MOVIE) }
                 MediaType.BOOK -> googleBooksApi.getPopularBooks(
+                    query = trendingBooksQuery(),
                     key = BuildConfig.GOOGLE_BOOKS_API_KEY,
                 ).items.map { it.toMediaItem() }
             }.also { items -> cacheItems(items) }
