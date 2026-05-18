@@ -55,6 +55,7 @@ private val AVATARS = listOf("🦊", "🐼", "🐸", "🦁", "🐯", "🐺", "�
 fun ProfileScreen(
     onLogout: () -> Unit,
     onNavigateToTheme: () -> Unit = {},
+    onNavigateToChangePassword: () -> Unit = {},
     viewModel: ProfileViewModel = hiltViewModel(),
 ) {
     val fanColors = MaterialTheme.fanAppColors
@@ -203,6 +204,7 @@ fun ProfileScreen(
         SettingRow(icon = "🌐", label = stringResource(R.string.profile_language), value = stringResource(R.string.profile_language_value))
         SettingRow(icon = "🔔", label = stringResource(R.string.profile_notifications), value = stringResource(R.string.profile_notif_enabled))
         SettingRow(icon = "🔒", label = stringResource(R.string.profile_privacy))
+        SettingRow(icon = "🔑", label = stringResource(R.string.change_password), onClick = onNavigateToChangePassword)
 
         Spacer(Modifier.height(24.dp))
 

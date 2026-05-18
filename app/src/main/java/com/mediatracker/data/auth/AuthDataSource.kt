@@ -87,6 +87,20 @@ class AuthDataSource @Inject constructor(
         }
     }
 
+    suspend fun sendPasswordReset(email: String): Result<Unit> = runCatching {
+        val firebaseAuth = auth ?: throw IllegalStateException("Firebase no está configurado.")
+        firebaseAuth.sendPasswordResetEmail(email.trim()).await()
+    }
+
+    suspend fun changePassword(currentPassword: String, newPassword: String): Result<Unit> = runCatching {
+        val firebaseAuth = auth ?: throw IllegalStateException("Firebase no está configurado.")
+        val user = firebaseAuth.currentUser ?: throw IllegalStateException("No hay sesión activa.")
+        val email = user.email ?: throw IllegalStateException("El usuario no tiene email.")
+        val credential = com.google.firebase.auth.EmailAuthProvider.getCredential(email, currentPassword)
+        user.reauthenticate(credential).await()
+        user.updatePassword(newPassword).await()
+    }
+
     suspend fun updateUserName(name: String): Result<Unit> = runCatching {
         val user = auth?.currentUser ?: throw IllegalStateException("No user logged in")
         val request = UserProfileChangeRequest.Builder().setDisplayName(name).build()

@@ -68,8 +68,15 @@ fun LoginScreen(
     val fanColors = MaterialTheme.fanAppColors
     val accentBrush = Brush.linearGradient(fanColors.gradientAccent)
 
+    val resetSentMessage = stringResource(R.string.forgot_password_sent)
     LaunchedEffect(state.error) {
         state.error?.let { snackbarHostState.showSnackbar(it) }
+    }
+    LaunchedEffect(state.passwordResetSent) {
+        if (state.passwordResetSent) {
+            snackbarHostState.showSnackbar(resetSentMessage)
+            viewModel.clearPasswordResetSent()
+        }
     }
     LaunchedEffect(state.isLoggedIn) {
         if (state.isLoggedIn) onLoginSuccess()
@@ -182,7 +189,22 @@ fun LoginScreen(
                 supportingText = state.passwordError?.let { { Text(it, color = MaterialTheme.colorScheme.error) } },
             )
 
-            Spacer(Modifier.height(28.dp))
+            if (!state.isRegisterMode) {
+                TextButton(
+                    onClick = { viewModel.sendPasswordReset() },
+                    modifier = Modifier.align(Alignment.End),
+                ) {
+                    Text(
+                        text = stringResource(R.string.forgot_password),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.primary,
+                    )
+                }
+            } else {
+                Spacer(Modifier.height(8.dp))
+            }
+
+            Spacer(Modifier.height(16.dp))
 
             val hasErrors = state.emailError != null || state.passwordError != null || state.nameError != null
 

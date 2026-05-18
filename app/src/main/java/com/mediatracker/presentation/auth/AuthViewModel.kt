@@ -24,6 +24,7 @@ data class AuthUiState(
     val emailError: String? = null,
     val passwordError: String? = null,
     val nameError: String? = null,
+    val passwordResetSent: Boolean = false,
 )
 
 @HiltViewModel
@@ -101,6 +102,24 @@ class AuthViewModel @Inject constructor(
 
     fun logout() {
         authDataSource.logout()
+    }
+
+    fun sendPasswordReset() {
+        val email = _state.value.email.trim()
+        if (email.isBlank()) {
+            _state.update { it.copy(emailError = "Introduce tu email primero") }
+            return
+        }
+        viewModelScope.launch {
+            _state.update { it.copy(isLoading = true) }
+            authDataSource.sendPasswordReset(email)
+                .onSuccess { _state.update { it.copy(isLoading = false, passwordResetSent = true) } }
+                .onFailure { e -> _state.update { it.copy(isLoading = false, error = e.message) } }
+        }
+    }
+
+    fun clearPasswordResetSent() {
+        _state.update { it.copy(passwordResetSent = false) }
     }
 
     fun clearError() {

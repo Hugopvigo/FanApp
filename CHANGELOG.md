@@ -6,6 +6,17 @@
 - `GoogleBooksApi.kt`: query por defecto cambiada de `*` a `subject:fiction+subject:bestseller`
 - `MediaRepositoryImpl.kt`: queries curatoras rotativas por día (5 géneros: ficción, fantasía, romance, thriller, no ficción)
 
+### T7 — Cambio de contraseña
+- `AuthDataSource.kt`: añadidos `sendPasswordReset(email)` y `changePassword(currentPassword, newPassword)` (re-auth + updatePassword)
+- `AuthViewModel.kt`: añadido `sendPasswordReset()`, estado `passwordResetSent`, `clearPasswordResetSent()`
+- `LoginScreen.kt`: link "¿Olvidaste tu contraseña?" bajo el campo password (solo en modo login); snackbar de confirmación
+- `ChangePasswordViewModel.kt`: nuevo ViewModel con validación de los 3 campos y manejo de errores de Firebase
+- `ChangePasswordScreen.kt`: nueva pantalla con TopAppBar, 3 campos de contraseña y feedback via snackbar
+- `Route.kt`: añadido `Route.ChangePassword`
+- `AppNavGraph.kt`: ruta registrada, navegación desde Profile
+- `ProfileScreen.kt`: fila "🔑 Cambiar contraseña" clickable, nuevo parámetro `onNavigateToChangePassword`
+- Strings EN/ES: `forgot_password`, `forgot_password_sent`, `change_password*` (6 strings)
+
 ### T4 — Perfil editable
 - `AuthDataSource.kt`: añadido `updateUserName()` via `updateProfile()` de Firebase
 - `FirestoreDataSource.kt`: añadidos `getAvatarId()` y `updateAvatarId()` en `/users/{uid}` (merge)

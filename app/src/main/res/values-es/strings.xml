@@ -96,6 +96,16 @@
     <string name="theme_auto">Cambiar con el sistema</string>
     <string name="theme_auto_subtitle">Usa Light de día y Dark de noche</string>
 
+    <!-- Forgot / change password -->
+    <string name="forgot_password">¿Olvidaste tu contraseña?</string>
+    <string name="forgot_password_sent">Revisa tu email para restablecer la contraseña</string>
+    <string name="change_password">Cambiar contraseña</string>
+    <string name="change_password_current">Contraseña actual</string>
+    <string name="change_password_new">Nueva contraseña</string>
+    <string name="change_password_confirm">Confirmar nueva contraseña</string>
+    <string name="change_password_mismatch">Las contraseñas no coinciden</string>
+    <string name="change_password_success">Contraseña cambiada con éxito</string>
+
     <!-- Profile edit -->
     <string name="profile_edit_name">Editar nombre</string>
     <string name="profile_edit_name_hint">Tu nombre</string>

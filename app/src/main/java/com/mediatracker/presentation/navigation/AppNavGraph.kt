@@ -30,6 +30,7 @@ import com.mediatracker.presentation.detail.DetailScreen
 import com.mediatracker.presentation.discover.DiscoverScreen
 import com.mediatracker.presentation.home.HomeScreen
 import com.mediatracker.presentation.library.LibraryScreen
+import com.mediatracker.presentation.profile.ChangePasswordScreen
 import com.mediatracker.presentation.profile.ProfileScreen
 import com.mediatracker.presentation.theme.AppTheme
 import com.mediatracker.presentation.theme.LocalAppTheme
@@ -167,6 +168,7 @@ private fun MainScreen(
                 ProfileScreen(
                     onLogout = { authViewModel.logout() },
                     onNavigateToTheme = { navController.navigate(Route.Theme) },
+                    onNavigateToChangePassword = { navController.navigate(Route.ChangePassword) },
                 )
             }
             composable<Route.Detail> {
@@ -183,6 +185,9 @@ private fun MainScreen(
                     },
                     onBack = { navController.popBackStack() },
                 )
+            }
+            composable<Route.ChangePassword> {
+                ChangePasswordScreen(onBack = { navController.popBackStack() })
             }
         }
     }

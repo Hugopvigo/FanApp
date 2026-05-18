@@ -8,6 +8,7 @@ sealed interface Route {
     @Serializable data object MainGraph : Route
     @Serializable data class Detail(val apiId: String, val mediaType: MediaType) : Route
     @Serializable data object Theme : Route
+    @Serializable data object ChangePassword : Route
 }
 
 sealed interface BottomNavRoute {

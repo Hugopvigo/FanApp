@@ -96,6 +96,16 @@
     <string name="theme_auto">Follow system</string>
     <string name="theme_auto_subtitle">Use Light during the day and Dark at night</string>
 
+    <!-- Forgot / change password -->
+    <string name="forgot_password">Forgot password?</string>
+    <string name="forgot_password_sent">Check your email for a reset link</string>
+    <string name="change_password">Change Password</string>
+    <string name="change_password_current">Current password</string>
+    <string name="change_password_new">New password</string>
+    <string name="change_password_confirm">Confirm new password</string>
+    <string name="change_password_mismatch">Passwords don\'t match</string>
+    <string name="change_password_success">Password changed successfully</string>
+
     <!-- Profile edit -->
     <string name="profile_edit_name">Edit Name</string>
     <string name="profile_edit_name_hint">Your name</string>
