@@ -6,6 +6,10 @@
 - `GoogleBooksApi.kt`: query por defecto cambiada de `*` a `subject:fiction+subject:bestseller`
 - `MediaRepositoryImpl.kt`: queries curatoras rotativas por día (5 géneros: ficción, fantasía, romance, thriller, no ficción)
 
+### T3 — Iconos en tabs de Library
+- `StatusChip.kt`: añadida extension `tabIcon: ImageVector` en `ItemStatus` (Bookmark, PlayCircle, CheckCircle, Cancel)
+- `LibraryScreen.kt`: tabs usan `icon` + `text` con Material Icons Outlined (16dp)
+
 ### T2 — Fix Library portadas/títulos
 - `UserItem.kt`: añadidos campos `title: String` y `posterUrl: String?`
 - `UserItemEntity`: añadidas columnas `title` y `posterUrl`

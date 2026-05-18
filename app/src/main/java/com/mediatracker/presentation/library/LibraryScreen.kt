@@ -11,11 +11,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PrimaryScrollableTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
+import com.mediatracker.presentation.components.tabIcon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -52,6 +55,13 @@ fun LibraryScreen(
                 Tab(
                     selected = state.selectedStatus == status,
                     onClick = { viewModel.onStatusSelected(status) },
+                    icon = {
+                        Icon(
+                            imageVector = status.tabIcon,
+                            contentDescription = null,
+                            modifier = Modifier.size(16.dp),
+                        )
+                    },
                     text = {
                         Text(
                             when (status) {

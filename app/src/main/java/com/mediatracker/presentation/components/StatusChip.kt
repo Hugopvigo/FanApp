@@ -113,6 +113,14 @@ val ItemStatus.statusIcon: String
         ItemStatus.ABANDONED    -> "❌"
     }
 
+val ItemStatus.tabIcon: androidx.compose.ui.graphics.vector.ImageVector
+    get() = when (this) {
+        ItemStatus.WATCHLIST    -> androidx.compose.material.icons.Icons.Outlined.Bookmark
+        ItemStatus.IN_PROGRESS  -> androidx.compose.material.icons.Icons.Outlined.PlayCircle
+        ItemStatus.COMPLETED    -> androidx.compose.material.icons.Icons.Outlined.CheckCircle
+        ItemStatus.ABANDONED    -> androidx.compose.material.icons.Icons.Outlined.Cancel
+    }
+
 fun ItemStatus.fanColor(fanColors: FanAppColors): Color = when (this) {
     ItemStatus.WATCHLIST    -> fanColors.statusWant
     ItemStatus.IN_PROGRESS  -> fanColors.statusProgress
