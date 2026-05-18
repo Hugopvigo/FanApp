@@ -26,11 +26,11 @@ class MediaRepositoryImpl @Inject constructor(
         private const val TTL_DETAIL_MS = 24 * 60 * 60 * 1000L
 
         private val BOOKS_TRENDING_QUERIES = listOf(
-            "subject:fiction+subject:bestseller",
-            "subject:fantasy+subject:adventure",
-            "subject:romance+subject:contemporary",
-            "subject:thriller+subject:mystery",
-            "subject:nonfiction+subject:popular",
+            "subject:fiction",
+            "subject:fantasy",
+            "subject:romance",
+            "subject:thriller",
+            "subject:biography",
         )
 
         private fun trendingBooksQuery(): String {

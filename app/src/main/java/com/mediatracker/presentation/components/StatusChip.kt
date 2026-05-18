@@ -13,8 +13,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Bookmark
+import androidx.compose.material.icons.outlined.Cancel
+import androidx.compose.material.icons.outlined.CheckCircle
+import androidx.compose.material.icons.outlined.PlayCircle
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -115,12 +121,12 @@ val ItemStatus.statusIcon: String
         ItemStatus.ABANDONED    -> "❌"
     }
 
-val ItemStatus.tabIcon: androidx.compose.ui.graphics.vector.ImageVector
+val ItemStatus.tabIcon: ImageVector
     get() = when (this) {
-        ItemStatus.WATCHLIST    -> androidx.compose.material.icons.Icons.Outlined.Bookmark
-        ItemStatus.IN_PROGRESS  -> androidx.compose.material.icons.Icons.Outlined.PlayCircle
-        ItemStatus.COMPLETED    -> androidx.compose.material.icons.Icons.Outlined.CheckCircle
-        ItemStatus.ABANDONED    -> androidx.compose.material.icons.Icons.Outlined.Cancel
+        ItemStatus.WATCHLIST    -> Icons.Outlined.Bookmark
+        ItemStatus.IN_PROGRESS  -> Icons.Outlined.PlayCircle
+        ItemStatus.COMPLETED    -> Icons.Outlined.CheckCircle
+        ItemStatus.ABANDONED    -> Icons.Outlined.Cancel
     }
 
 fun ItemStatus.fanColor(fanColors: FanAppColors): Color = when (this) {

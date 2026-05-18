@@ -17,9 +17,8 @@ interface GoogleBooksApi {
 
     @GET("volumes")
     suspend fun getPopularBooks(
-        @Query("q") query: String = "subject:fiction+subject:bestseller",
+        @Query("q") query: String = "subject:fiction",
         @Query("orderBy") orderBy: String = "relevance",
-        @Query("langRestrict") langRestrict: String = "es",
         @Query("maxResults") maxResults: Int = 20,
         @Query("key") key: String = "",
     ): BooksSearchResponse
