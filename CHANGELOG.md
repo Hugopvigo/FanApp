@@ -6,6 +6,11 @@
 - `GoogleBooksApi.kt`: query por defecto cambiada de `*` a `subject:fiction+subject:bestseller`
 - `MediaRepositoryImpl.kt`: queries curatoras rotativas por día (5 géneros: ficción, fantasía, romance, thriller, no ficción)
 
+### T10 — ProfileScreen reactivo
+- `ProfileViewModel.kt`: inyecta `AuthDataSource`, expone `userName` y `userEmail` como `StateFlow` via `authStateFlow()` con valor inicial inmediato
+- `ProfileScreen.kt`: elimina parámetros `userEmail`/`userName`, los colecta del ViewModel con `collectAsStateWithLifecycle()`
+- `AppNavGraph.kt`: elimina `.value` imperativo, ya no pasa datos de auth a ProfileScreen
+
 ### T9 — Externalizar strings hardcodeados
 - `values/strings.xml` + `values-es/strings.xml`: añadidos `status_*` (4 estados) y `media_type_*` (3 tipos)
 - `StatusChip.kt`: `displayLabel: String` reemplazado por `@Composable fun label()` con `stringResource()`

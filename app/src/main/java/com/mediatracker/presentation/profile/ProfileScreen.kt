@@ -38,8 +38,6 @@ import com.mediatracker.presentation.theme.fanAppColors
 
 @Composable
 fun ProfileScreen(
-    userEmail: String?,
-    userName: String?,
     onLogout: () -> Unit,
     onNavigateToTheme: () -> Unit = {},
     viewModel: ProfileViewModel = hiltViewModel(),
@@ -47,6 +45,8 @@ fun ProfileScreen(
     val fanColors = MaterialTheme.fanAppColors
     val appTheme = LocalAppTheme.current
     val stats by viewModel.stats.collectAsStateWithLifecycle()
+    val userName by viewModel.userName.collectAsStateWithLifecycle()
+    val userEmail by viewModel.userEmail.collectAsStateWithLifecycle()
     val displayName = userName?.takeIf { it.isNotBlank() } ?: "Usuario"
     val initial = displayName.first().uppercaseChar().toString()
 

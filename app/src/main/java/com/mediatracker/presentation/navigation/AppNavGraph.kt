@@ -165,8 +165,6 @@ private fun MainScreen(
             }
             composable<BottomNavRoute.Profile> {
                 ProfileScreen(
-                    userEmail = authViewModel.state.value.userEmail,
-                    userName = authViewModel.state.value.userName,
                     onLogout = { authViewModel.logout() },
                     onNavigateToTheme = { navController.navigate(Route.Theme) },
                 )
