@@ -38,6 +38,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mediatracker.R
+import androidx.compose.ui.tooling.preview.Preview
 
 private data class ThemeOption(
     val theme: AppTheme,
@@ -332,5 +333,17 @@ private fun AutoSwitchRow() {
             )
         }
         Switch(checked = false, onCheckedChange = {})
+    }
+}
+
+@Preview(showBackground = true, heightDp = 600)
+@Composable
+private fun ThemeScreenPreview() {
+    MediaTrackerTheme(appTheme = AppTheme.Fantasy) {
+        ThemeScreen(
+            currentTheme = AppTheme.Fantasy,
+            onThemeSelected = {},
+            onBack = {},
+        )
     }
 }

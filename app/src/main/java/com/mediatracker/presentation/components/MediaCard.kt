@@ -30,6 +30,9 @@ import coil.compose.AsyncImage
 import com.mediatracker.domain.model.MediaItem
 import com.mediatracker.domain.model.MediaType
 import com.mediatracker.presentation.theme.DisplayFontFamily
+import com.mediatracker.presentation.theme.AppTheme
+import com.mediatracker.presentation.theme.MediaTrackerTheme
+import androidx.compose.ui.tooling.preview.Preview
 
 private val POSTER_GRADIENTS = listOf(
     listOf(Color(0xFFFFB3D1), Color(0xFFF06292)),
@@ -194,5 +197,38 @@ fun MediaCard(
                 fontWeight = FontWeight.Bold,
             )
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun MediaCardPreview() {
+    MediaTrackerTheme(appTheme = AppTheme.Fantasy) {
+        MediaCard(
+            item = MediaItem(
+                id = "preview_1",
+                mediaType = MediaType.MOVIE,
+                title = "Interestellar",
+                overview = "Un viaje interestelar para salvar la humanidad.",
+                posterUrl = "",
+                releaseDate = "2014",
+                rating = 4.8f,
+                genres = listOf("Sci-Fi", "Drama"),
+            ),
+            onClick = {},
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun GradientPosterPreview() {
+    MediaTrackerTheme(appTheme = AppTheme.Fantasy) {
+        GradientPoster(
+            title = "El Señor de los Anillos",
+            kind = MediaType.BOOK,
+            rating = 4.9f,
+            modifier = Modifier.size(width = 120.dp, height = 180.dp),
+        )
     }
 }

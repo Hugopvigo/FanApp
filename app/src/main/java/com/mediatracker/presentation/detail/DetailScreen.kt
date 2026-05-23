@@ -35,11 +35,16 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.mediatracker.R
 import com.mediatracker.domain.model.ItemStatus
+import com.mediatracker.domain.model.MediaItem
 import com.mediatracker.domain.model.MediaType
+import com.mediatracker.domain.model.UserItem
 import com.mediatracker.presentation.components.ErrorState
 import com.mediatracker.presentation.components.FavoriteToggle
 import com.mediatracker.presentation.components.LoadingState
 import com.mediatracker.presentation.components.StatusChip
+import com.mediatracker.presentation.theme.AppTheme
+import com.mediatracker.presentation.theme.MediaTrackerTheme
+import androidx.compose.ui.tooling.preview.Preview
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -175,6 +180,43 @@ private fun DetailContent(
                 enabled = userItem.status != ItemStatus.ABANDONED,
             )
         }
+    }
+}
+
+@Preview(showBackground = true, heightDp = 600)
+@Composable
+private fun DetailContentPreview() {
+    MediaTrackerTheme(appTheme = AppTheme.Fantasy) {
+        DetailContent(
+            state = DetailUiState(
+                item = MediaItem(
+                    id = "preview_d1",
+                    mediaType = MediaType.MOVIE,
+                    title = "Inception",
+                    overview = "Un ladrón especializado en extraer secretos del subconsciente a través de los sueños recibe la tarea de implantar una idea en la mente de un CEO.",
+                    posterUrl = "",
+                    releaseDate = "2010-07-16",
+                    rating = 8.8f,
+                    genres = listOf("Acción", "Sci-Fi", "Thriller"),
+                    extraData = mapOf("runtime" to "148", "creators" to "Christopher Nolan"),
+                ),
+                userItem = UserItem(
+                    id = "preview_u1",
+                    mediaType = MediaType.MOVIE,
+                    apiId = "mv_1",
+                    title = "Inception",
+                    posterUrl = null,
+                    status = ItemStatus.COMPLETED,
+                    favorite = true,
+                    addedAt = 0L,
+                    updatedAt = 0L,
+                ),
+                isLoading = false,
+            ),
+            onStatusSelected = {},
+            onRemoveFromList = {},
+            onToggleFavorite = {},
+        )
     }
 }
 

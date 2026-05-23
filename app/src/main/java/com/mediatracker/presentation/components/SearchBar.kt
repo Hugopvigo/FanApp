@@ -19,6 +19,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
+import androidx.compose.ui.tooling.preview.Preview
+import com.mediatracker.presentation.theme.MediaTrackerTheme
 
 @Composable
 fun SearchBar(
@@ -51,4 +53,16 @@ fun SearchBar(
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
         keyboardActions = KeyboardActions(onSearch = { onQueryChange(localQuery) }),
     )
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun SearchBarPreview() {
+    MediaTrackerTheme {
+        SearchBar(
+            query = "Breaking Bad",
+            onQueryChange = {},
+            placeholder = "Buscar series, películas o libros...",
+        )
+    }
 }

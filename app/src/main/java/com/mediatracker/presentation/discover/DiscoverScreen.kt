@@ -32,6 +32,9 @@ import com.mediatracker.presentation.components.LoadingState
 import com.mediatracker.presentation.components.MediaCard
 import com.mediatracker.presentation.components.MediaRow
 import com.mediatracker.presentation.components.SearchBar
+import com.mediatracker.presentation.theme.AppTheme
+import com.mediatracker.presentation.theme.MediaTrackerTheme
+import androidx.compose.ui.tooling.preview.Preview
 
 @Composable
 fun DiscoverScreen(
@@ -39,7 +42,21 @@ fun DiscoverScreen(
     viewModel: DiscoverViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    DiscoverScreenContent(
+        state = state,
+        onItemClick = onItemClick,
+        onSearchQueryChange = viewModel::onSearchQueryChanged,
+        onTabSelected = viewModel::onTabSelected,
+    )
+}
 
+@Composable
+private fun DiscoverScreenContent(
+    state: DiscoverUiState,
+    onItemClick: (MediaItem) -> Unit,
+    onSearchQueryChange: (String) -> Unit,
+    onTabSelected: (MediaType) -> Unit,
+) {
     Column(modifier = Modifier.fillMaxSize()) {
         Text(
             text = stringResource(R.string.discover_title),
@@ -49,7 +66,7 @@ fun DiscoverScreen(
 
         SearchBar(
             query = state.searchQuery,
-            onQueryChange = viewModel::onSearchQueryChanged,
+            onQueryChange = onSearchQueryChange,
             modifier = Modifier.padding(horizontal = 16.dp),
         )
 
@@ -57,7 +74,7 @@ fun DiscoverScreen(
 
         TabSelector(
             selectedTab = state.selectedTab,
-            onTabSelected = viewModel::onTabSelected,
+            onTabSelected = onTabSelected,
         )
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -99,6 +116,48 @@ fun DiscoverScreen(
                 }
             }
         }
+    }
+}
+
+@Preview(showBackground = true, heightDp = 300)
+@Composable
+private fun DiscoverScreenPreview() {
+    MediaTrackerTheme(appTheme = AppTheme.Fantasy) {
+        DiscoverScreenContent(
+            state = DiscoverUiState(
+                selectedTab = MediaType.SERIES,
+                trending = listOf(
+                    MediaItem("t1", MediaType.SERIES, "Stranger Things", "", "", "2016", 8.7f, listOf("Fantasy")),
+                    MediaItem("t2", MediaType.MOVIE, "Inception", "", "", "2010", 8.8f, listOf("Sci-Fi")),
+                ),
+                isLoadingTrending = false,
+            ),
+            onItemClick = {},
+            onSearchQueryChange = {},
+            onTabSelected = {},
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun DiscoverScreenSearchPreview() {
+    MediaTrackerTheme(appTheme = AppTheme.Fantasy) {
+        DiscoverScreenContent(
+            state = DiscoverUiState(
+                selectedTab = MediaType.BOOK,
+                searchQuery = "Harry Potter",
+                searchResults = listOf(
+                    MediaItem("b1", MediaType.BOOK, "Harry Potter y la piedra filosofal", "", "", "1997", 4.5f, listOf("Fantasy")),
+                    MediaItem("b2", MediaType.BOOK, "Harry Potter y la cámara secreta", "", "", "1998", 4.4f, listOf("Fantasy")),
+                    MediaItem("b3", MediaType.BOOK, "Harry Potter y el prisionero de Azkaban", "", "", "1999", 4.6f, listOf("Fantasy")),
+                ),
+                isLoading = false,
+            ),
+            onItemClick = {},
+            onSearchQueryChange = {},
+            onTabSelected = {},
+        )
     }
 }
 

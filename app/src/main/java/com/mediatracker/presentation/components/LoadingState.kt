@@ -17,6 +17,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -28,6 +29,14 @@ fun LoadingState(
         contentAlignment = Alignment.Center,
     ) {
         CircularProgressIndicator()
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun LoadingStatePreview() {
+    com.mediatracker.presentation.theme.MediaTrackerTheme {
+        LoadingState()
     }
 }
 
@@ -56,6 +65,14 @@ fun ErrorState(
     }
 }
 
+@Preview(showBackground = true)
+@Composable
+private fun ErrorStatePreview() {
+    com.mediatracker.presentation.theme.MediaTrackerTheme {
+        ErrorState(message = "Error al conectar con el servidor")
+    }
+}
+
 @Composable
 fun EmptyState(
     message: String,
@@ -78,5 +95,13 @@ fun EmptyState(
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun EmptyStatePreview() {
+    com.mediatracker.presentation.theme.MediaTrackerTheme {
+        EmptyState(message = "No hay resultados")
     }
 }

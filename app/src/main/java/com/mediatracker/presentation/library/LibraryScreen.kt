@@ -28,10 +28,14 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mediatracker.R
 import com.mediatracker.domain.model.ItemStatus
+import com.mediatracker.domain.model.MediaItem
 import com.mediatracker.domain.model.MediaType
 import com.mediatracker.domain.model.UserItem
 import com.mediatracker.presentation.components.EmptyState
 import com.mediatracker.presentation.components.LoadingState
+import com.mediatracker.presentation.theme.AppTheme
+import com.mediatracker.presentation.theme.MediaTrackerTheme
+import androidx.compose.ui.tooling.preview.Preview
 
 @Composable
 fun LibraryScreen(
@@ -39,7 +43,21 @@ fun LibraryScreen(
     viewModel: LibraryViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    LibraryScreenContent(
+        state = state,
+        onItemClick = onItemClick,
+        onStatusSelected = viewModel::onStatusSelected,
+        onMediaTypeSelected = viewModel::onMediaTypeSelected,
+    )
+}
 
+@Composable
+private fun LibraryScreenContent(
+    state: LibraryUiState,
+    onItemClick: (UserItem) -> Unit,
+    onStatusSelected: (ItemStatus) -> Unit,
+    onMediaTypeSelected: (MediaType?) -> Unit,
+) {
     Column(modifier = Modifier.fillMaxSize()) {
         Text(
             text = stringResource(R.string.library_title),
@@ -54,7 +72,7 @@ fun LibraryScreen(
             ItemStatus.entries.forEach { status ->
                 Tab(
                     selected = state.selectedStatus == status,
-                    onClick = { viewModel.onStatusSelected(status) },
+                    onClick = { onStatusSelected(status) },
                     icon = {
                         Icon(
                             imageVector = status.tabIcon,
@@ -78,7 +96,7 @@ fun LibraryScreen(
 
         MediaTypeFilterRow(
             selectedMediaType = state.selectedMediaType,
-            onMediaTypeSelected = viewModel::onMediaTypeSelected,
+            onMediaTypeSelected = onMediaTypeSelected,
         )
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -142,3 +160,47 @@ private fun MediaTypeFilterRow(
 }
 
 
+@Preview(showBackground = true, heightDp = 400)
+@Composable
+private fun LibraryScreenContentPreview() {
+    val now = System.currentTimeMillis()
+    val sampleItems = listOf(
+        UserItem("u1", MediaType.SERIES, "tv_1", "Breaking Bad", null, ItemStatus.IN_PROGRESS, true, now, now),
+        UserItem("u2", MediaType.MOVIE, "mv_1", "Inception", null, ItemStatus.WATCHLIST, false, now, now),
+        UserItem("u3", MediaType.BOOK, "bk_1", "1984", null, ItemStatus.COMPLETED, false, now, now),
+        UserItem("u4", MediaType.SERIES, "tv_2", "Stranger Things", null, ItemStatus.COMPLETED, true, now, now),
+        UserItem("u5", MediaType.MOVIE, "mv_2", "The Matrix", null, ItemStatus.ABANDONED, false, now, now),
+        UserItem("u6", MediaType.BOOK, "bk_2", "Dune", null, ItemStatus.WATCHLIST, false, now, now),
+    )
+    MediaTrackerTheme(appTheme = AppTheme.Fantasy) {
+        LibraryScreenContent(
+            state = LibraryUiState(
+                selectedStatus = ItemStatus.WATCHLIST,
+                selectedMediaType = null,
+                items = sampleItems,
+                isLoading = false,
+            ),
+            onItemClick = {},
+            onStatusSelected = {},
+            onMediaTypeSelected = {},
+        )
+    }
+}
+
+@Preview(showBackground = true, heightDp = 400)
+@Composable
+private fun LibraryScreenEmptyPreview() {
+    MediaTrackerTheme(appTheme = AppTheme.Fantasy) {
+        LibraryScreenContent(
+            state = LibraryUiState(
+                selectedStatus = ItemStatus.COMPLETED,
+                selectedMediaType = MediaType.MOVIE,
+                items = emptyList(),
+                isLoading = false,
+            ),
+            onItemClick = {},
+            onStatusSelected = {},
+            onMediaTypeSelected = {},
+        )
+    }
+}

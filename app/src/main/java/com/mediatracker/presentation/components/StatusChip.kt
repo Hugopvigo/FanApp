@@ -5,7 +5,9 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
@@ -25,7 +27,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.tooling.preview.Preview
 import com.mediatracker.R
+import com.mediatracker.presentation.theme.MediaTrackerTheme
 import com.mediatracker.domain.model.ItemStatus
 import com.mediatracker.presentation.theme.FanAppColors
 import com.mediatracker.presentation.theme.fanAppColors
@@ -134,4 +138,33 @@ fun ItemStatus.fanColor(fanColors: FanAppColors): Color = when (this) {
     ItemStatus.IN_PROGRESS  -> fanColors.statusProgress
     ItemStatus.COMPLETED    -> fanColors.statusDone
     ItemStatus.ABANDONED    -> fanColors.statusDropped
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun StatusChipPreview() {
+    MediaTrackerTheme {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            StatusChip(status = ItemStatus.WATCHLIST, selected = true, onClick = {})
+            StatusChip(status = ItemStatus.IN_PROGRESS, selected = false, onClick = {})
+            StatusChip(status = ItemStatus.COMPLETED, selected = false, onClick = {})
+            StatusChip(status = ItemStatus.ABANDONED, selected = false, onClick = {})
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun StatusBadgePreview() {
+    MediaTrackerTheme {
+        Column(modifier = Modifier.padding(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            StatusBadge(status = ItemStatus.WATCHLIST)
+            StatusBadge(status = ItemStatus.IN_PROGRESS)
+            StatusBadge(status = ItemStatus.COMPLETED)
+            StatusBadge(status = ItemStatus.ABANDONED)
+        }
+    }
 }
