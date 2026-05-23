@@ -123,4 +123,32 @@
     <string name="media_type_series">🎬 Serie</string>
     <string name="media_type_movie">🎥 Película</string>
     <string name="media_type_book">📖 Libro</string>
+
+    <!-- Notifications -->
+    <string name="notifications_title">Notificaciones</string>
+    <string name="notifications_description">Elige qué notificaciones quieres recibir. Puedes cambiarlo cuando quieras.</string>
+    <string name="notifications_push">Notificaciones push</string>
+    <string name="notifications_push_subtitle">Activa o desactiva todas las notificaciones</string>
+    <string name="notifications_new_releases">Nuevos estrenos</string>
+    <string name="notifications_new_releases_subtitle">Recibe avisos cuando una serie o película que sigues tiene un nuevo estreno</string>
+    <string name="notifications_recommendations">Recomendaciones</string>
+    <string name="notifications_recommendations_subtitle">Sugerencias basadas en tus gustos y tu lista</string>
+    <string name="notifications_weekly_summary">Resumen semanal</string>
+    <string name="notifications_weekly_summary_subtitle">Un resumen semanal de lo que viste, leíste y descubriste</string>
+
+    <!-- Privacy -->
+    <string name="privacy_title">Privacidad</string>
+    <string name="privacy_description">Nos importa tu privacidad. Aquí tienes un resumen de cómo manejamos tus datos.</string>
+    <string name="privacy_data_title">Datos de autenticación</string>
+    <string name="privacy_data_subtitle">Solo guardamos tu email y nombre de usuario vía Firebase Auth. Nunca compartimos tus credenciales.</string>
+    <string name="privacy_cloud_title">Sincronización en la nube</string>
+    <string name="privacy_cloud_subtitle">Tu biblioteca y favoritos se sincronizan en Firestore para que puedas acceder desde cualquier dispositivo.</string>
+    <string name="privacy_local_title">Caché local</string>
+    <string name="privacy_local_subtitle">Los resultados de búsqueda y tendencias se guardan en tu dispositivo para una carga más rápida. Estos datos nunca se envían a ningún sitio.</string>
+    <string name="privacy_third_party_title">Servicios de terceros</string>
+    <string name="privacy_third_party_subtitle">Usamos las APIs de TMDB y Google Books para obtener información. Estos servicios pueden registrar peticiones anónimas.</string>
+    <string name="privacy_actions_title">Acciones</string>
+    <string name="privacy_delete_dialog_title">¿Eliminar cuenta?</string>
+    <string name="privacy_delete_dialog_message">Esta acción es permanente y no se puede deshacer. Todos tus datos — biblioteca, favoritos y perfil — serán eliminados.</string>
+    <string name="privacy_delete_confirm">Eliminar</string>
 </resources>

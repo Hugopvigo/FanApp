@@ -1,0 +1,175 @@
+package com.mediatracker.presentation.profile
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.mediatracker.R
+import androidx.compose.ui.tooling.preview.Preview
+import com.mediatracker.presentation.theme.AppTheme
+import com.mediatracker.presentation.theme.MediaTrackerTheme
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun NotificationsScreen(
+    onBack: () -> Unit,
+) {
+    var pushEnabled by rememberSaveable { mutableStateOf(true) }
+    var newReleasesEnabled by rememberSaveable { mutableStateOf(true) }
+    var recommendationsEnabled by rememberSaveable { mutableStateOf(false) }
+    var weeklySummaryEnabled by rememberSaveable { mutableStateOf(false) }
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text(stringResource(R.string.notifications_title)) },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background,
+                    titleContentColor = MaterialTheme.colorScheme.onBackground,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onBackground,
+                ),
+            )
+        },
+        containerColor = MaterialTheme.colorScheme.background,
+    ) { padding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .padding(horizontal = 20.dp)
+                .verticalScroll(rememberScrollState()),
+        ) {
+            Text(
+                text = stringResource(R.string.notifications_description),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+
+            Spacer(Modifier.height(20.dp))
+
+            NotificationSwitchRow(
+                emoji = "🔔",
+                title = stringResource(R.string.notifications_push),
+                subtitle = stringResource(R.string.notifications_push_subtitle),
+                checked = pushEnabled,
+                onCheckedChange = { pushEnabled = it },
+            )
+
+            Spacer(Modifier.height(12.dp))
+
+            NotificationSwitchRow(
+                emoji = "🆕",
+                title = stringResource(R.string.notifications_new_releases),
+                subtitle = stringResource(R.string.notifications_new_releases_subtitle),
+                checked = newReleasesEnabled,
+                onCheckedChange = { newReleasesEnabled = it },
+                enabled = pushEnabled,
+            )
+
+            Spacer(Modifier.height(12.dp))
+
+            NotificationSwitchRow(
+                emoji = "💡",
+                title = stringResource(R.string.notifications_recommendations),
+                subtitle = stringResource(R.string.notifications_recommendations_subtitle),
+                checked = recommendationsEnabled,
+                onCheckedChange = { recommendationsEnabled = it },
+                enabled = pushEnabled,
+            )
+
+            Spacer(Modifier.height(12.dp))
+
+            NotificationSwitchRow(
+                emoji = "📊",
+                title = stringResource(R.string.notifications_weekly_summary),
+                subtitle = stringResource(R.string.notifications_weekly_summary_subtitle),
+                checked = weeklySummaryEnabled,
+                onCheckedChange = { weeklySummaryEnabled = it },
+                enabled = pushEnabled,
+            )
+
+            Spacer(Modifier.height(32.dp))
+        }
+    }
+}
+
+@Composable
+private fun NotificationSwitchRow(
+    emoji: String,
+    title: String,
+    subtitle: String,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+    enabled: Boolean = true,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        Text(emoji, fontSize = 22.sp)
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.SemiBold,
+                color = if (enabled) MaterialTheme.colorScheme.onSurface
+                else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
+            )
+            Text(
+                text = subtitle,
+                style = MaterialTheme.typography.bodySmall,
+                color = if (enabled) MaterialTheme.colorScheme.onSurfaceVariant
+                else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.38f),
+            )
+        }
+        Switch(
+            checked = if (enabled) checked else false,
+            onCheckedChange = onCheckedChange,
+            enabled = enabled,
+        )
+    }
+}
+
+@Preview(showBackground = true, heightDp = 500)
+@Composable
+private fun NotificationsScreenPreview() {
+    MediaTrackerTheme(appTheme = AppTheme.Fantasy) {
+        NotificationsScreen(onBack = {})
+    }
+}

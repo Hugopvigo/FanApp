@@ -123,4 +123,32 @@
     <string name="media_type_series">🎬 Series</string>
     <string name="media_type_movie">🎥 Movie</string>
     <string name="media_type_book">📖 Book</string>
+
+    <!-- Notifications -->
+    <string name="notifications_title">Notifications</string>
+    <string name="notifications_description">Choose which notifications you want to receive. You can change this anytime.</string>
+    <string name="notifications_push">Push notifications</string>
+    <string name="notifications_push_subtitle">Enable or disable all notifications</string>
+    <string name="notifications_new_releases">New releases</string>
+    <string name="notifications_new_releases_subtitle">Get notified when a series or movie you follow has a new season or release</string>
+    <string name="notifications_recommendations">Recommendations</string>
+    <string name="notifications_recommendations_subtitle">Receive suggestions based on your tastes and watchlist</string>
+    <string name="notifications_weekly_summary">Weekly summary</string>
+    <string name="notifications_weekly_summary_subtitle">A weekly recap of what you watched, read and discovered</string>
+
+    <!-- Privacy -->
+    <string name="privacy_title">Privacy</string>
+    <string name="privacy_description">We care about your privacy. Here\'s a summary of how we handle your data.</string>
+    <string name="privacy_data_title">Authentication data</string>
+    <string name="privacy_data_subtitle">We only store your email and display name via Firebase Auth. We never share your credentials.</string>
+    <string name="privacy_cloud_title">Cloud sync</string>
+    <string name="privacy_cloud_subtitle">Your library and favorites are synced to Firestore so you can access them from any device.</string>
+    <string name="privacy_local_title">Local cache</string>
+    <string name="privacy_local_subtitle">Search results and trending items are cached locally on your device for faster loading. This data is never sent anywhere.</string>
+    <string name="privacy_third_party_title">Third-party services</string>
+    <string name="privacy_third_party_subtitle">We use TMDB and Google Books APIs to fetch media info. These services may log anonymous API requests.</string>
+    <string name="privacy_actions_title">Actions</string>
+    <string name="privacy_delete_dialog_title">Delete account?</string>
+    <string name="privacy_delete_dialog_message">This action is permanent and cannot be undone. All your data — library, favorites, and profile — will be deleted.</string>
+    <string name="privacy_delete_confirm">Delete</string>
 </resources>

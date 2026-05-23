@@ -31,6 +31,8 @@ import com.mediatracker.presentation.discover.DiscoverScreen
 import com.mediatracker.presentation.home.HomeScreen
 import com.mediatracker.presentation.library.LibraryScreen
 import com.mediatracker.presentation.profile.ChangePasswordScreen
+import com.mediatracker.presentation.profile.NotificationsScreen
+import com.mediatracker.presentation.profile.PrivacyScreen
 import com.mediatracker.presentation.profile.ProfileScreen
 import com.mediatracker.presentation.theme.AppTheme
 import com.mediatracker.presentation.theme.LocalAppTheme
@@ -97,7 +99,10 @@ private fun MainScreen(
     val fanColors = MaterialTheme.fanAppColors
 
     val showBottomBar = currentDestination?.hasRoute(Route.Detail::class) != true &&
-        currentDestination?.hasRoute(Route.Theme::class) != true
+        currentDestination?.hasRoute(Route.Theme::class) != true &&
+        currentDestination?.hasRoute(Route.Notifications::class) != true &&
+        currentDestination?.hasRoute(Route.Privacy::class) != true &&
+        currentDestination?.hasRoute(Route.ChangePassword::class) != true
 
     Scaffold(
         bottomBar = {
@@ -165,11 +170,13 @@ private fun MainScreen(
                 )
             }
             composable<BottomNavRoute.Profile> {
-                ProfileScreen(
-                    onLogout = { authViewModel.logout() },
-                    onNavigateToTheme = { navController.navigate(Route.Theme) },
-                    onNavigateToChangePassword = { navController.navigate(Route.ChangePassword) },
-                )
+            ProfileScreen(
+                onLogout = { authViewModel.logout() },
+                onNavigateToTheme = { navController.navigate(Route.Theme) },
+                onNavigateToChangePassword = { navController.navigate(Route.ChangePassword) },
+                onNavigateToNotifications = { navController.navigate(Route.Notifications) },
+                onNavigateToPrivacy = { navController.navigate(Route.Privacy) },
+            )
             }
             composable<Route.Detail> {
                 DetailScreen(
@@ -188,6 +195,15 @@ private fun MainScreen(
             }
             composable<Route.ChangePassword> {
                 ChangePasswordScreen(onBack = { navController.popBackStack() })
+            }
+            composable<Route.Notifications> {
+                NotificationsScreen(onBack = { navController.popBackStack() })
+            }
+            composable<Route.Privacy> {
+                PrivacyScreen(
+                    onBack = { navController.popBackStack() },
+                    onDeleteAccount = { authViewModel.logout() },
+                )
             }
         }
     }

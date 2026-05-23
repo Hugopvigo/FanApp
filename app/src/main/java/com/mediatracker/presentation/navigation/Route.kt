@@ -9,6 +9,8 @@ sealed interface Route {
     @Serializable data class Detail(val apiId: String, val mediaType: MediaType) : Route
     @Serializable data object Theme : Route
     @Serializable data object ChangePassword : Route
+    @Serializable data object Notifications : Route
+    @Serializable data object Privacy : Route
 }
 
 sealed interface BottomNavRoute {

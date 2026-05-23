@@ -56,6 +56,8 @@ fun ProfileScreen(
     onLogout: () -> Unit,
     onNavigateToTheme: () -> Unit = {},
     onNavigateToChangePassword: () -> Unit = {},
+    onNavigateToNotifications: () -> Unit = {},
+    onNavigateToPrivacy: () -> Unit = {},
     viewModel: ProfileViewModel = hiltViewModel(),
 ) {
     val fanColors = MaterialTheme.fanAppColors
@@ -202,8 +204,8 @@ fun ProfileScreen(
             onClick = onNavigateToTheme,
         )
         SettingRow(icon = "🌐", label = stringResource(R.string.profile_language), value = stringResource(R.string.profile_language_value))
-        SettingRow(icon = "🔔", label = stringResource(R.string.profile_notifications), value = stringResource(R.string.profile_notif_enabled))
-        SettingRow(icon = "🔒", label = stringResource(R.string.profile_privacy))
+        SettingRow(icon = "🔔", label = stringResource(R.string.profile_notifications), value = stringResource(R.string.profile_notif_enabled), onClick = onNavigateToNotifications)
+        SettingRow(icon = "🔒", label = stringResource(R.string.profile_privacy), onClick = onNavigateToPrivacy)
         SettingRow(icon = "🔑", label = stringResource(R.string.change_password), onClick = onNavigateToChangePassword)
 
         Spacer(Modifier.height(24.dp))
