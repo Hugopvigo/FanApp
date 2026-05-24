@@ -2,9 +2,18 @@
 
 ## Sprint 5 — Bugs, Mejoras y Pendientes (2026-05-18–…)
 
-### T1 — Fix Google Books Trending
+### T1 — Fix Google Books Trending + API improvements
 - `GoogleBooksApi.kt`: query por defecto cambiada de `*` a `subject:fiction+subject:bestseller`
 - `MediaRepositoryImpl.kt`: queries curatoras rotativas por día (5 géneros: ficción, fantasía, romance, thriller, no ficción)
+
+### T1b — Google Books API quality improvements
+- `GoogleBooksApi.kt`: nuevos parámetros `printType=books`, `filter=partial` (trending), `projection=lite` (search) / `full` (detail), `orderBy=newest` (trending); `langRestrict` movido de default a parámetro requerido
+- `BooksMapper.kt`: `normalizeRating()` — rating Google Books (0-5) multiplicado por 2 para UI 0-10; `filterQualityBooks()` — filtro cliente-side que descarta resultados sin portada y anteriores a `minYear`; `extractPublicationYear()` — parsea año de `publishedDate`
+- `GoogleBooksSearchHelper.kt` (nuevo): `buildGoogleBooksQuery()` — búsqueda inteligente con detección de ISBN (usa `isbn:`), nombres de autor (usa búsqueda exacta entrecomillada) y queries generales; `getBookSearchLang()` — langRestrict dinámico desde locale del dispositivo con fallback a "es"
+- `GoogleBooksRateLimiter.kt` (nuevo): interceptor OkHttp con rate limiting (mínimo 2s entre requests) + retry ante 429 con backoff exponencial (2s→4s→8s, 3 intentos)
+- `NetworkModule.kt`: `GoogleBooksRateLimiter` añadido al OkHttp de Books
+- `MediaRepositoryImpl.kt`: `MIN_BOOK_PUBLICATION_YEAR=2015` filtra libros antiguos; 7 géneros rotativos (añadidos sci-fi, mystery); usa `buildGoogleBooksQuery()` y `getBookSearchLang()`
+- `proguard-rules.pro`: reglas keep para `kotlinx.serialization` (evita crashes en release con DTOs @Serializable)
 
 ### T7 — Cambio de contraseña
 - `AuthDataSource.kt`: añadidos `sendPasswordReset(email)` y `changePassword(currentPassword, newPassword)` (re-auth + updatePassword)
@@ -48,6 +57,13 @@
 - `FirestoreDataSource.kt`: guarda y lee `title`/`posterUrl` en Firestore
 - `DetailViewModel.kt`: pasa `title`/`posterUrl` del `MediaItem` al añadir a lista
 - `LibraryItemCard.kt`: muestra `userItem.title` y `userItem.posterUrl` (parámetro externo eliminado)
+
+### T2b — Fix Library thumbnails (5 bugs)
+- `DetailViewModel.kt`: `currentItem` capturado fuera del coroutine (`onStatusSelected`) — elimina race condition que causaba `posterUrl=null` al añadir item rápido
+- `LibraryItemCard.kt`: `AsyncImage` reemplazado por `SubcomposeAsyncImage` con `error { GradientPoster(...) }` — si la imagen falla al cargar (red, CDN, 403), muestra el gradiente en lugar de espacio en blanco
+- `FirestoreDataSource.kt`: guardado de posterUrl cambia de `!= null` a `!isNullOrBlank()` — strings vacías ya no se persisten en Firestore
+- `UserRepositoryImpl.kt`: inyectado `MediaItemDao` para backfill; `getUserItemsFlow()` recupera `posterUrl` desde `media_items` si `UserItem.posterUrl` es null/vacío; `syncUserItems()` preserva posterUrl existente en Room si Firestore trae null
+- Los items anteriores a Sprint 5 se recuperan automáticamente al abrir la biblioteca (backfill desde cache de media_items)
 
 ---
 
