@@ -24,7 +24,6 @@ interface GoogleBooksApi {
         @Query("maxResults") maxResults: Int = 20,
         @Query("langRestrict") langRestrict: String,
         @Query("printType") printType: String = "books",
-        @Query("filter") filter: String = "partial",
         @Query("key") key: String = "",
     ): BooksSearchResponse
 

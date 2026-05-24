@@ -42,7 +42,7 @@ class MediaRepositoryImpl @Inject constructor(
         private val BOOKS_TRENDING_QUERIES = listOf(
             "subject:fiction",
             "subject:fantasy",
-            "subject:science+fiction",
+            "subject:\"science fiction\"",
             "subject:romance",
             "subject:thriller",
             "subject:mystery",
