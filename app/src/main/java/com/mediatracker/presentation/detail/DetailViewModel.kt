@@ -80,15 +80,15 @@ class DetailViewModel @Inject constructor(
 
     fun onStatusSelected(status: ItemStatus) {
         val currentUserItem = _state.value.userItem
+        val currentItem = _state.value.item // capture at click time, not inside coroutine
         viewModelScope.launch {
             _state.update { it.copy(isUpdating = true) }
             if (currentUserItem == null) {
-                val item = _state.value.item
                 addUserItemUseCase(
                     mediaType = mediaType,
                     apiId = apiId,
-                    title = item?.title ?: "",
-                    posterUrl = item?.posterUrl,
+                    title = currentItem?.title ?: "",
+                    posterUrl = currentItem?.posterUrl,
                     status = status,
                 )
             } else {

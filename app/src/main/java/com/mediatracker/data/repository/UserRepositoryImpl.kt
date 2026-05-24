@@ -1,6 +1,7 @@
 package com.mediatracker.data.repository
 
 import com.mediatracker.data.firestore.FirestoreDataSource
+import com.mediatracker.data.local.MediaItemDao
 import com.mediatracker.data.local.UserItemDao
 import com.mediatracker.data.local.toDomain
 import com.mediatracker.data.local.toEntity
@@ -17,18 +18,37 @@ import javax.inject.Singleton
 @Singleton
 class UserRepositoryImpl @Inject constructor(
     private val userItemDao: UserItemDao,
+    private val mediaItemDao: MediaItemDao,
     private val firestoreDataSource: FirestoreDataSource,
 ) : UserRepository {
 
     override fun getUserItemsFlow(): Flow<List<UserItem>> =
-        userItemDao.getAll().map { entities -> entities.map { it.toDomain() } }
+        userItemDao.getAll().map { entities ->
+            entities.map { entity ->
+                val domain = entity.toDomain()
+                // Backfill: if UserItem has no posterUrl, try to recover from media_items cache
+                if (domain.posterUrl.isNullOrBlank()) {
+                    val mediaId = "${domain.mediaType.name.lowercase()}_${domain.apiId}"
+                    val mediaEntity = mediaItemDao.getById(mediaId)
+                    if (mediaEntity != null && mediaEntity.posterUrl.isNotBlank()) {
+                        domain.copy(posterUrl = mediaEntity.posterUrl)
+                    } else {
+                        domain
+                    }
+                } else {
+                    domain
+                }
+            }
+        }
 
     override suspend fun syncUserItems(): Result<Unit> = runCatching {
         firestoreDataSource.getUserItems().onSuccess { items ->
             items.forEach { item ->
                 val existing = userItemDao.getById(item.id)
                 if (existing == null || existing.updatedAt < item.updatedAt) {
-                    userItemDao.insert(item.toEntity())
+                    // Preserve existing posterUrl from Room if Firestore has none
+                    val mergedPosterUrl = item.posterUrl ?: existing?.posterUrl
+                    userItemDao.insert(item.copy(posterUrl = mergedPosterUrl).toEntity())
                 }
             }
         }.onFailure { Timber.w(it, "Firestore sync failed, using local data") }

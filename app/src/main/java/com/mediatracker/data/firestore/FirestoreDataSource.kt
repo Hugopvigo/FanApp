@@ -64,7 +64,7 @@ class FirestoreDataSource @Inject constructor(
             "addedAt" to now,
             "updatedAt" to now,
         )
-        if (posterUrl != null) data["posterUrl"] = posterUrl
+        if (!posterUrl.isNullOrBlank()) data["posterUrl"] = posterUrl
         val docRef = db.collection(path).add(data).await()
         UserItem(
             id = docRef.id,

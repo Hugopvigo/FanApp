@@ -18,7 +18,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
+import coil.compose.SubcomposeAsyncImage
 import androidx.compose.ui.res.stringResource
 import com.mediatracker.R
 import com.mediatracker.domain.model.MediaType
@@ -38,13 +38,20 @@ fun LibraryItemCard(
         verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
         if (!userItem.posterUrl.isNullOrBlank()) {
-            AsyncImage(
+            SubcomposeAsyncImage(
                 model = userItem.posterUrl,
                 contentDescription = userItem.title,
                 modifier = Modifier
                     .size(width = 120.dp, height = 180.dp)
                     .clip(MaterialTheme.shapes.medium),
                 contentScale = ContentScale.Crop,
+                error = {
+                    GradientPoster(
+                        title = userItem.title,
+                        kind = userItem.mediaType,
+                        modifier = Modifier.size(width = 120.dp, height = 180.dp),
+                    )
+                },
             )
         } else {
             GradientPoster(
