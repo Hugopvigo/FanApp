@@ -5,6 +5,9 @@ import com.mediatracker.data.local.MediaItemDao
 import com.mediatracker.data.local.toDomain
 import com.mediatracker.data.local.toEntity
 import com.mediatracker.data.remote.books.GoogleBooksApi
+import com.mediatracker.data.remote.books.buildGoogleBooksQuery
+import com.mediatracker.data.remote.books.filterQualityBooks
+import com.mediatracker.data.remote.books.getBookSearchLang
 import com.mediatracker.data.remote.books.toMediaItem
 import com.mediatracker.data.remote.tmdb.TmdbApi
 import com.mediatracker.data.remote.tmdb.toMediaItem
@@ -25,11 +28,24 @@ class MediaRepositoryImpl @Inject constructor(
     companion object {
         private const val TTL_DETAIL_MS = 24 * 60 * 60 * 1000L
 
+        /**
+         * Minimum publication year for trending/search results.
+         * Books older than this are filtered out client-side.
+         * Google Books API has no server-side year filter, so we do it here.
+         */
+        private const val MIN_BOOK_PUBLICATION_YEAR = 2015
+
+        /**
+         * Trending queries rotate daily across popular, high-quality subjects.
+         * Combined with orderBy=newest, this surfaces recent releases in each genre.
+         */
         private val BOOKS_TRENDING_QUERIES = listOf(
             "subject:fiction",
             "subject:fantasy",
+            "subject:science+fiction",
             "subject:romance",
             "subject:thriller",
+            "subject:mystery",
             "subject:biography",
         )
 
@@ -45,9 +61,12 @@ class MediaRepositoryImpl @Inject constructor(
                 MediaType.SERIES -> tmdbApi.searchTv(query).results.map { it.toMediaItem(MediaType.SERIES) }
                 MediaType.MOVIE -> tmdbApi.searchMovie(query).results.map { it.toMediaItem(MediaType.MOVIE) }
                 MediaType.BOOK -> googleBooksApi.searchBooks(
-                    query = query,
+                    query = buildGoogleBooksQuery(query),
+                    langRestrict = getBookSearchLang(),
                     key = BuildConfig.GOOGLE_BOOKS_API_KEY,
-                ).items.map { it.toMediaItem() }
+                ).items
+                    .filterQualityBooks(minYear = MIN_BOOK_PUBLICATION_YEAR)
+                    .map { it.toMediaItem() }
             }.also { items -> cacheItems(items) }
         }.onFailure { Timber.e(it, "Search failed: $query ($mediaType)") }
 
@@ -58,8 +77,11 @@ class MediaRepositoryImpl @Inject constructor(
                 MediaType.MOVIE -> tmdbApi.getTrendingMovies().results.map { it.toMediaItem(MediaType.MOVIE) }
                 MediaType.BOOK -> googleBooksApi.getPopularBooks(
                     query = trendingBooksQuery(),
+                    langRestrict = getBookSearchLang(),
                     key = BuildConfig.GOOGLE_BOOKS_API_KEY,
-                ).items.map { it.toMediaItem() }
+                ).items
+                    .filterQualityBooks(minYear = MIN_BOOK_PUBLICATION_YEAR)
+                    .map { it.toMediaItem() }
             }.also { items -> cacheItems(items) }
         }.onFailure { Timber.e(it, "Trending failed: $mediaType") }
 
@@ -86,7 +108,10 @@ class MediaRepositoryImpl @Inject constructor(
             }
             MediaType.BOOK -> {
                 val apiId = id.removePrefix("book_")
-                googleBooksApi.getBookDetail(apiId, key = BuildConfig.GOOGLE_BOOKS_API_KEY).toMediaItem()
+                googleBooksApi.getBookDetail(
+                    apiId,
+                    key = BuildConfig.GOOGLE_BOOKS_API_KEY,
+                ).toMediaItem()
             }
         }
         mediaItemDao.insert(item.toEntity())

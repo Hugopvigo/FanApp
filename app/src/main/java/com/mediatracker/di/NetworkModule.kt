@@ -2,6 +2,7 @@ package com.mediatracker.di
 
 import com.mediatracker.BuildConfig
 import com.mediatracker.data.remote.books.GoogleBooksApi
+import com.mediatracker.data.remote.books.GoogleBooksRateLimiter
 import com.mediatracker.data.remote.tmdb.TmdbApi
 import dagger.Module
 import dagger.Provides
@@ -77,6 +78,7 @@ object NetworkModule {
         loggingInterceptor: HttpLoggingInterceptor,
     ): OkHttpClient = OkHttpClient.Builder()
         .addInterceptor(loggingInterceptor)
+        .addInterceptor(GoogleBooksRateLimiter())
         .connectTimeout(15, TimeUnit.SECONDS)
         .readTimeout(15, TimeUnit.SECONDS)
         .build()
