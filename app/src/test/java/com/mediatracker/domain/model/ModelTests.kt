@@ -84,6 +84,8 @@ class UserItemTest {
             id = "item_1",
             mediaType = MediaType.SERIES,
             apiId = "tv_1396",
+            title = "Breaking Bad",
+            posterUrl = "https://image.tmdb.org/t/p/w500/bb.jpg",
             status = ItemStatus.IN_PROGRESS,
             favorite = true,
             addedAt = 1700000000000L,
@@ -93,6 +95,7 @@ class UserItemTest {
         assertEquals("item_1", item.id)
         assertEquals(MediaType.SERIES, item.mediaType)
         assertEquals("tv_1396", item.apiId)
+        assertEquals("Breaking Bad", item.title)
         assertEquals(ItemStatus.IN_PROGRESS, item.status)
         assertTrue(item.favorite)
         assertEquals(1700000000000L, item.addedAt)
@@ -105,6 +108,8 @@ class UserItemTest {
             id = "item_2",
             mediaType = MediaType.BOOK,
             apiId = "book_xyz",
+            title = "Book Title",
+            posterUrl = null,
             status = ItemStatus.WATCHLIST,
             favorite = false,
             addedAt = 0L,
@@ -112,6 +117,7 @@ class UserItemTest {
         )
 
         assertFalse(item.favorite)
+        assertNull(item.posterUrl)
     }
 }
 
@@ -133,6 +139,8 @@ class MediaItemWithUserStatusTest {
             id = "item_1",
             mediaType = MediaType.SERIES,
             apiId = "tv_1396",
+            title = "Breaking Bad",
+            posterUrl = "https://image.tmdb.org/t/p/w500/bb.jpg",
             status = ItemStatus.COMPLETED,
             favorite = true,
             addedAt = 1700000000000L,
