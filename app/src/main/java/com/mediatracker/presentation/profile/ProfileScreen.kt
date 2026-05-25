@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -46,6 +47,8 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mediatracker.R
+import com.mediatracker.presentation.components.GlassSurface
+import com.mediatracker.presentation.theme.DisplayFontFamily
 import com.mediatracker.presentation.theme.LocalAppTheme
 import com.mediatracker.presentation.theme.fanAppColors
 
@@ -78,33 +81,36 @@ fun ProfileScreen(
             .background(MaterialTheme.colorScheme.background)
             .verticalScroll(rememberScrollState()),
     ) {
-        // ── Profile Banner ────────────────────────────────────────────────
+        Spacer(Modifier.statusBarsPadding())
+
+        // ── Profile Banner ────────────────────────────────────────────────────
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
-                .clip(RoundedCornerShape(22.dp))
+                .padding(horizontal = 16.dp, vertical = 8.dp)
+                .clip(RoundedCornerShape(24.dp))
                 .background(Brush.linearGradient(fanColors.gradient2))
                 .padding(18.dp),
         ) {
+            // Decorative sparkles
+            Text("✨", fontSize = 14.sp, modifier = Modifier.align(Alignment.TopEnd).padding(4.dp))
+            Text("✨", fontSize = 10.sp, modifier = Modifier.align(Alignment.TopEnd).padding(top = 28.dp, end = 28.dp))
+
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(14.dp),
             ) {
-                // Avatar (tappable)
+                // Avatar
                 Box(
                     modifier = Modifier
-                        .size(64.dp)
-                        .clip(RoundedCornerShape(20.dp))
+                        .size(68.dp)
+                        .clip(RoundedCornerShape(22.dp))
                         .background(Color.White.copy(alpha = 0.92f))
                         .clickable { viewModel.openAvatarDialog() },
                     contentAlignment = Alignment.Center,
                 ) {
                     if (avatarId != null) {
-                        Text(
-                            text = avatarId!!,
-                            fontSize = 32.sp,
-                        )
+                        Text(text = avatarId!!, fontSize = 34.sp)
                     } else {
                         Text(
                             text = initial,
@@ -122,7 +128,10 @@ fun ProfileScreen(
                     ) {
                         Text(
                             text = displayName,
-                            style = MaterialTheme.typography.headlineSmall,
+                            style = MaterialTheme.typography.headlineSmall.copy(
+                                fontFamily = DisplayFontFamily,
+                                letterSpacing = (-0.3).sp,
+                            ),
                             color = Color.White,
                             modifier = Modifier.weight(1f, fill = false),
                         )
@@ -138,33 +147,38 @@ fun ProfileScreen(
                             )
                         }
                     }
-                        Text(
-                            text = userEmail ?: "",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = Color.White.copy(alpha = 0.82f),
-                            fontWeight = FontWeight.Medium,
-                        )
+                    Text(
+                        text = userEmail ?: "",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color.White.copy(alpha = 0.82f),
+                        fontWeight = FontWeight.Medium,
+                    )
+                    // Level badge
+                    Box(
+                        modifier = Modifier
+                            .padding(top = 6.dp)
+                            .clip(RoundedCornerShape(999.dp))
+                            .background(Color.White.copy(alpha = 0.22f))
+                            .padding(horizontal = 10.dp, vertical = 3.dp),
+                    ) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(4.dp),
-                            modifier = Modifier.padding(top = 4.dp),
                         ) {
-                            Text(
-                                text = stats.levelIcon,
-                                fontSize = 14.sp,
-                            )
+                            Text(text = stats.levelIcon, fontSize = 12.sp)
                             Text(
                                 text = "Nv.${stats.level} · ${stats.levelTitle}",
-                                style = MaterialTheme.typography.labelMedium,
-                                color = Color.White.copy(alpha = 0.9f),
+                                style = MaterialTheme.typography.labelSmall,
+                                color = Color.White.copy(alpha = 0.95f),
                                 fontWeight = FontWeight.Bold,
                             )
                         }
                     }
                 }
             }
+        }
 
-        // ── Stats ─────────────────────────────────────────────────────────
+        // ── Stats glass tiles ─────────────────────────────────────────────────
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -172,28 +186,30 @@ fun ProfileScreen(
             horizontalArrangement = Arrangement.spacedBy(10.dp),
         ) {
             val statItems = listOf(
-                Triple("🎬", R.string.profile_series, stats.seriesInProgress + stats.seriesCompleted),
-                Triple("🎥", R.string.profile_movies, stats.moviesInProgress + stats.moviesCompleted),
-                Triple("📖", R.string.profile_books, stats.booksInProgress + stats.booksCompleted),
+                Triple("🎬", stringResource(R.string.profile_series), stats.seriesInProgress + stats.seriesCompleted),
+                Triple("🎥", stringResource(R.string.profile_movies), stats.moviesInProgress + stats.moviesCompleted),
+                Triple("📖", stringResource(R.string.profile_books), stats.booksInProgress + stats.booksCompleted),
             )
-            statItems.forEach { (icon, labelRes, count) ->
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .clip(RoundedCornerShape(16.dp))
-                        .background(MaterialTheme.colorScheme.surfaceVariant)
-                        .padding(14.dp),
-                    contentAlignment = Alignment.Center,
+            statItems.forEach { (icon, label, count) ->
+                GlassSurface(
+                    modifier = Modifier.weight(1f),
+                    radius = 18.dp,
                 ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(icon, fontSize = 24.sp)
+                    Column(
+                        modifier = Modifier.padding(14.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        Text(icon, fontSize = 22.sp)
                         Text(
                             text = count.toString(),
-                            style = MaterialTheme.typography.headlineSmall,
+                            style = MaterialTheme.typography.headlineSmall.copy(
+                                fontFamily = DisplayFontFamily,
+                                letterSpacing = (-0.4).sp,
+                            ),
                             color = MaterialTheme.colorScheme.onSurface,
                         )
                         Text(
-                            text = stringResource(labelRes),
+                            text = label,
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
@@ -204,10 +220,14 @@ fun ProfileScreen(
 
         Spacer(Modifier.height(24.dp))
 
-        // ── Settings ──────────────────────────────────────────────────────
+        // ── Settings section ──────────────────────────────────────────────────
         Text(
             text = stringResource(R.string.profile_settings),
-            style = MaterialTheme.typography.titleLarge,
+            style = MaterialTheme.typography.titleLarge.copy(
+                fontFamily = DisplayFontFamily,
+                fontWeight = FontWeight.Normal,
+                letterSpacing = (-0.3).sp,
+            ),
             color = MaterialTheme.colorScheme.onBackground,
             modifier = Modifier.padding(horizontal = 20.dp, vertical = 4.dp),
         )
@@ -221,7 +241,12 @@ fun ProfileScreen(
             onClick = onNavigateToTheme,
         )
         SettingRow(icon = "🌐", label = stringResource(R.string.profile_language), value = stringResource(R.string.profile_language_value))
-        SettingRow(icon = "🔔", label = stringResource(R.string.profile_notifications), value = if (unreadCount > 0) "$unreadCount" else stringResource(R.string.profile_notif_enabled), onClick = onNavigateToNotifications)
+        SettingRow(
+            icon = "🔔",
+            label = stringResource(R.string.profile_notifications),
+            value = if (unreadCount > 0) "$unreadCount" else stringResource(R.string.profile_notif_enabled),
+            onClick = onNavigateToNotifications,
+        )
         SettingRow(icon = "🔒", label = stringResource(R.string.profile_privacy), onClick = onNavigateToPrivacy)
         SettingRow(icon = "🔑", label = stringResource(R.string.change_password), onClick = onNavigateToChangePassword)
 
@@ -243,7 +268,7 @@ fun ProfileScreen(
         Spacer(Modifier.height(32.dp))
     }
 
-    // ── Edit Name Dialog ──────────────────────────────────────────────────
+    // ── Edit Name Dialog ──────────────────────────────────────────────────────
     if (showEditNameDialog) {
         var nameText by rememberSaveable { mutableStateOf(userName ?: "") }
         AlertDialog(
@@ -261,19 +286,15 @@ fun ProfileScreen(
                 TextButton(
                     onClick = { viewModel.updateUserName(nameText) },
                     enabled = nameText.isNotBlank(),
-                ) {
-                    Text(stringResource(R.string.profile_save))
-                }
+                ) { Text(stringResource(R.string.profile_save)) }
             },
             dismissButton = {
-                TextButton(onClick = { viewModel.closeEditNameDialog() }) {
-                    Text(stringResource(R.string.profile_cancel))
-                }
+                TextButton(onClick = { viewModel.closeEditNameDialog() }) { Text(stringResource(R.string.profile_cancel)) }
             },
         )
     }
 
-    // ── Avatar Picker Dialog ──────────────────────────────────────────────
+    // ── Avatar Picker Dialog ──────────────────────────────────────────────────
     if (showAvatarDialog) {
         AlertDialog(
             onDismissRequest = { viewModel.closeAvatarDialog() },
@@ -291,7 +312,7 @@ fun ProfileScreen(
                                 .clip(RoundedCornerShape(12.dp))
                                 .background(
                                     if (emoji == avatarId) MaterialTheme.colorScheme.primaryContainer
-                                    else MaterialTheme.colorScheme.surfaceVariant
+                                    else MaterialTheme.colorScheme.surfaceVariant,
                                 )
                                 .clickable { viewModel.updateAvatar(emoji) },
                             contentAlignment = Alignment.Center,
@@ -303,14 +324,13 @@ fun ProfileScreen(
             },
             confirmButton = {},
             dismissButton = {
-                TextButton(onClick = { viewModel.closeAvatarDialog() }) {
-                    Text(stringResource(R.string.profile_cancel))
-                }
+                TextButton(onClick = { viewModel.closeAvatarDialog() }) { Text(stringResource(R.string.profile_cancel)) }
             },
         )
     }
 }
 
+// ─── Settings row ─────────────────────────────────────────────────────────────
 @Composable
 private fun SettingRow(
     icon: String,
@@ -321,7 +341,7 @@ private fun SettingRow(
 ) {
     val fanColors = MaterialTheme.fanAppColors
     val bgColor = if (highlight) {
-        MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f)
+        MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.45f)
     } else {
         Color.Transparent
     }
@@ -330,10 +350,10 @@ private fun SettingRow(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 2.dp)
-            .clip(RoundedCornerShape(12.dp))
+            .clip(RoundedCornerShape(14.dp))
             .background(bgColor)
             .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier)
-            .padding(horizontal = 12.dp, vertical = 11.dp),
+            .padding(horizontal = 14.dp, vertical = 13.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
@@ -350,7 +370,7 @@ private fun SettingRow(
                 text = value,
                 style = MaterialTheme.typography.bodySmall,
                 color = if (highlight) MaterialTheme.colorScheme.primary
-                else MaterialTheme.colorScheme.onSurfaceVariant,
+                        else MaterialTheme.colorScheme.onSurfaceVariant,
                 fontWeight = FontWeight.Medium,
             )
         }
