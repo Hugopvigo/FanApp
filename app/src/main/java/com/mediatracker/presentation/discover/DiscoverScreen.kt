@@ -90,10 +90,11 @@ private fun DiscoverScreenContent(
                         style = MaterialTheme.typography.titleMedium,
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                     )
-                    if (state.isLoadingTrending) {
-                        LoadingState()
-                    } else {
-                        MediaRow(
+                    when {
+                        state.isLoadingTrending -> LoadingState()
+                        state.error != null -> ErrorState(state.error ?: stringResource(R.string.error_unknown))
+                        state.trending.isEmpty() -> EmptyState(stringResource(R.string.discover_no_trending))
+                        else -> MediaRow(
                             items = state.trending,
                             onItemClick = onItemClick,
                         )

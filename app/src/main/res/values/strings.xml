@@ -41,6 +41,7 @@
     <string name="discover_top_movies">Top Movies</string>
     <string name="discover_top_books">Top Books</string>
     <string name="discover_top_trending">Top Trending</string>
+    <string name="discover_no_trending">No trending results available</string>
 
     <!-- Library -->
     <string name="library_title">Library</string>

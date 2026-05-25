@@ -37,7 +37,8 @@ class MediaRepositoryImpl @Inject constructor(
 
         /**
          * Trending queries rotate daily across popular, high-quality subjects.
-         * Combined with orderBy=newest, this surfaces recent releases in each genre.
+         * orderBy=relevance returns the most popular books matching each subject —
+         * a close approximation of "trending" for Google Books.
          */
         private val BOOKS_TRENDING_QUERIES = listOf(
             "subject:fiction",

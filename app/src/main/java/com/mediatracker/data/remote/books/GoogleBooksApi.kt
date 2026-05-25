@@ -20,7 +20,7 @@ interface GoogleBooksApi {
     @GET("volumes")
     suspend fun getPopularBooks(
         @Query("q") query: String = "subject:fiction",
-        @Query("orderBy") orderBy: String = "newest",
+        @Query("orderBy") orderBy: String = "relevance",
         @Query("maxResults") maxResults: Int = 20,
         @Query("langRestrict") langRestrict: String,
         @Query("printType") printType: String = "books",

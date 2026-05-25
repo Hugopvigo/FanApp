@@ -41,6 +41,7 @@
     <string name="discover_top_movies">Top Películas</string>
     <string name="discover_top_books">Top Libros</string>
     <string name="discover_top_trending">Top Trending</string>
+    <string name="discover_no_trending">No hay resultados de tendencia disponibles</string>
 
     <!-- Library -->
     <string name="library_title">Biblioteca</string>
