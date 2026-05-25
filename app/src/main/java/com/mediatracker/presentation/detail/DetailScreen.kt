@@ -1,34 +1,40 @@
 package com.mediatracker.presentation.detail
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -38,15 +44,17 @@ import com.mediatracker.domain.model.ItemStatus
 import com.mediatracker.domain.model.MediaItem
 import com.mediatracker.domain.model.MediaType
 import com.mediatracker.domain.model.UserItem
+import com.mediatracker.domain.model.displayLabel
+import com.mediatracker.presentation.components.DetailScreenSkeleton
 import com.mediatracker.presentation.components.ErrorState
 import com.mediatracker.presentation.components.FavoriteToggle
-import com.mediatracker.presentation.components.LoadingState
 import com.mediatracker.presentation.components.StatusChip
 import com.mediatracker.presentation.theme.AppTheme
 import com.mediatracker.presentation.theme.MediaTrackerTheme
-import androidx.compose.ui.tooling.preview.Preview
+import com.mediatracker.presentation.theme.fanAppColors
 
-@OptIn(ExperimentalMaterial3Api::class)
+private val HERO_HEIGHT = 380.dp
+
 @Composable
 fun DetailScreen(
     onBack: () -> Unit,
@@ -54,136 +62,228 @@ fun DetailScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(state.item?.title ?: stringResource(R.string.detail_title)) },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
-                    }
-                },
-            )
-        }
-    ) { padding ->
-        when {
-            state.isLoading -> LoadingState(modifier = Modifier.padding(padding))
-            state.error != null -> ErrorState(state.error ?: stringResource(R.string.error_unknown), modifier = Modifier.padding(padding))
-            state.item != null -> DetailContent(
-                state = state,
-                onStatusSelected = viewModel::onStatusSelected,
-                onRemoveFromList = viewModel::onRemoveFromList,
-                onToggleFavorite = viewModel::onToggleFavorite,
-                modifier = Modifier.padding(padding),
-            )
-        }
+    when {
+        state.isLoading -> DetailScreenSkeleton()
+        state.error != null -> ErrorState(state.error ?: stringResource(R.string.error_unknown))
+        state.item != null -> DetailContent(
+            state = state,
+            onBack = onBack,
+            onStatusSelected = viewModel::onStatusSelected,
+            onRemoveFromList = viewModel::onRemoveFromList,
+            onToggleFavorite = viewModel::onToggleFavorite,
+        )
     }
 }
 
 @Composable
 private fun DetailContent(
     state: DetailUiState,
+    onBack: () -> Unit,
     onStatusSelected: (ItemStatus) -> Unit,
     onRemoveFromList: () -> Unit,
     onToggleFavorite: () -> Unit,
-    modifier: Modifier = Modifier,
 ) {
     val item = state.item ?: return
     val userItem = state.userItem
+    val bgColor = MaterialTheme.colorScheme.background
+    val fanColors = MaterialTheme.fanAppColors
+    val scrollState = rememberScrollState()
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(16.dp),
-    ) {
-        AsyncImage(
-            model = item.posterUrl,
-            contentDescription = item.title,
+    Box(modifier = Modifier.fillMaxSize()) {
+        // ── Scrollable content ────────────────────────────────────────────
+        Column(
             modifier = Modifier
-                .fillMaxWidth(0.5f)
-                .aspectRatio(2f / 3f)
-                .clip(MaterialTheme.shapes.medium),
-            contentScale = ContentScale.Crop,
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Text(
-            text = item.title,
-            style = MaterialTheme.typography.headlineMedium,
-        )
-
-        if (item.releaseDate.isNotBlank()) {
-            Text(
-                text = item.releaseDate.take(4),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
-
-        if (item.genres.isNotEmpty()) {
-            Text(
-                text = item.genres.joinToString(", "),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
-
-        if (item.rating > 0f) {
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = "%.1f / 10".format(item.rating),
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.primary,
-            )
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Text(
-            text = item.overview,
-            style = MaterialTheme.typography.bodyMedium,
-            maxLines = 10,
-            overflow = TextOverflow.Ellipsis,
-        )
-
-        item.extraData?.let { extra ->
-            Spacer(modifier = Modifier.height(16.dp))
-            ExtraInfo(extra = extra, mediaType = item.mediaType)
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(4.dp),
+                .fillMaxSize()
+                .verticalScroll(scrollState),
         ) {
-            ItemStatus.entries.forEach { status ->
-                StatusChip(
-                    status = status,
-                    selected = userItem?.status == status,
-                    onClick = { onStatusSelected(status) },
+            // ── Hero ──────────────────────────────────────────────────────
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(HERO_HEIGHT),
+            ) {
+                // Poster o gradient fallback
+                if (item.posterUrl.isNotBlank()) {
+                    AsyncImage(
+                        model = item.posterUrl,
+                        contentDescription = item.title,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop,
+                    )
+                } else {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(Brush.linearGradient(fanColors.gradientAccent)),
+                    )
+                }
+
+                // Scrim: sutil arriba → opaco abajo (hacia bgColor)
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(
+                            Brush.verticalGradient(
+                                colorStops = arrayOf(
+                                    0.00f to Color.Black.copy(alpha = 0.18f),
+                                    0.38f to Color.Transparent,
+                                    0.68f to bgColor.copy(alpha = 0.50f),
+                                    1.00f to bgColor,
+                                ),
+                            ),
+                        ),
                 )
-            }
-            if (userItem != null) {
-                OutlinedButton(onClick = onRemoveFromList) {
-                    Text(stringResource(R.string.detail_remove))
+
+                // Info superpuesta: badges + título + géneros
+                Column(
+                    modifier = Modifier
+                        .align(Alignment.BottomStart)
+                        .padding(horizontal = 20.dp, vertical = 18.dp),
+                    verticalArrangement = Arrangement.spacedBy(5.dp),
+                ) {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        HeroBadge(item.mediaType.displayLabel)
+                        if (item.releaseDate.isNotBlank()) {
+                            HeroBadge(item.releaseDate.take(4))
+                        }
+                        if (item.rating > 0f) {
+                            HeroBadge("★ ${"%.1f".format(item.rating)}")
+                        }
+                    }
+                    Text(
+                        text = item.title,
+                        style = MaterialTheme.typography.headlineMedium,
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 3,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                    if (item.genres.isNotEmpty()) {
+                        Text(
+                            text = item.genres.take(3).joinToString(" · "),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = Color.White.copy(alpha = 0.75f),
+                        )
+                    }
                 }
             }
+
+            // ── Contenido bajo el hero ────────────────────────────────────
+            Column(
+                modifier = Modifier.padding(horizontal = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+            ) {
+                // Status chips + Remove
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    ItemStatus.entries.forEach { status ->
+                        StatusChip(
+                            status = status,
+                            selected = userItem?.status == status,
+                            onClick = { onStatusSelected(status) },
+                        )
+                    }
+                    if (userItem != null) {
+                        OutlinedButton(onClick = onRemoveFromList) {
+                            Text(stringResource(R.string.detail_remove))
+                        }
+                    }
+                }
+
+                // Favorite toggle
+                if (userItem != null) {
+                    FavoriteToggle(
+                        isFavorite = userItem.favorite,
+                        onToggle = onToggleFavorite,
+                        enabled = userItem.status != ItemStatus.ABANDONED,
+                    )
+                }
+
+                // Sinopsis
+                if (item.overview.isNotBlank()) {
+                    Text(
+                        text = item.overview,
+                        style = MaterialTheme.typography.bodyMedium,
+                        maxLines = 10,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
+
+                // Datos extra (temporadas, duración, autor, etc.)
+                item.extraData?.let { ExtraInfo(extra = it, mediaType = item.mediaType) }
+
+                Spacer(Modifier.height(16.dp))
+            }
         }
 
-        if (userItem != null) {
-            Spacer(modifier = Modifier.height(8.dp))
-            FavoriteToggle(
-                isFavorite = userItem.favorite,
-                onToggle = onToggleFavorite,
-                enabled = userItem.status != ItemStatus.ABANDONED,
+        // ── Back button flotante ──────────────────────────────────────────
+        Box(
+            modifier = Modifier
+                .padding(12.dp)
+                .size(40.dp)
+                .clip(CircleShape)
+                .background(Color.Black.copy(alpha = 0.38f))
+                .clickable(onClick = onBack),
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                contentDescription = stringResource(R.string.back),
+                tint = Color.White,
+                modifier = Modifier.size(20.dp),
             )
         }
     }
 }
 
-@Preview(showBackground = true, heightDp = 600)
+@Composable
+private fun HeroBadge(text: String) {
+    Surface(
+        shape = RoundedCornerShape(999.dp),
+        color = Color.Black.copy(alpha = 0.40f),
+    ) {
+        Text(
+            text = text,
+            style = MaterialTheme.typography.labelSmall,
+            color = Color.White,
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp),
+        )
+    }
+}
+
+@Composable
+private fun ExtraInfo(extra: Map<String, String>, mediaType: MediaType) {
+    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        extra.forEach { (key, value) ->
+            val label = when (key) {
+                "numberOfSeasons" -> stringResource(R.string.detail_seasons)
+                "numberOfEpisodes" -> stringResource(R.string.detail_episodes)
+                "creators" -> stringResource(R.string.detail_creators)
+                "runtime" -> stringResource(R.string.detail_runtime)
+                "authors" -> stringResource(R.string.detail_author)
+                "publisher" -> stringResource(R.string.detail_publisher)
+                "pageCount" -> stringResource(R.string.detail_pages)
+                else -> key
+            }
+            val displayValue = if (key == "runtime") "$value min" else value
+            Row {
+                Text(
+                    text = "$label: ",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Text(text = displayValue, style = MaterialTheme.typography.bodyMedium)
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true, heightDp = 700)
 @Composable
 private fun DetailContentPreview() {
     MediaTrackerTheme(appTheme = AppTheme.Fantasy) {
@@ -213,6 +313,7 @@ private fun DetailContentPreview() {
                 ),
                 isLoading = false,
             ),
+            onBack = {},
             onStatusSelected = {},
             onRemoveFromList = {},
             onToggleFavorite = {},
@@ -220,35 +321,10 @@ private fun DetailContentPreview() {
     }
 }
 
+@Preview(showBackground = true, heightDp = 700)
 @Composable
-private fun ExtraInfo(extra: Map<String, String>, mediaType: MediaType) {
-    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        extra.forEach { (key, value) ->
-            val label = when (key) {
-                "numberOfSeasons" -> stringResource(R.string.detail_seasons)
-                "numberOfEpisodes" -> stringResource(R.string.detail_episodes)
-                "creators" -> stringResource(R.string.detail_creators)
-                "runtime" -> stringResource(R.string.detail_runtime)
-                "authors" -> stringResource(R.string.detail_author)
-                "publisher" -> stringResource(R.string.detail_publisher)
-                "pageCount" -> stringResource(R.string.detail_pages)
-                else -> key
-            }
-            val displayValue = when (key) {
-                "runtime" -> "$value min"
-                else -> value
-            }
-            Row {
-                Text(
-                    text = "$label: ",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-                Text(
-                    text = displayValue,
-                    style = MaterialTheme.typography.bodyMedium,
-                )
-            }
-        }
+private fun DetailSkeletonPreview() {
+    MediaTrackerTheme(appTheme = AppTheme.Dark) {
+        DetailScreenSkeleton()
     }
 }
