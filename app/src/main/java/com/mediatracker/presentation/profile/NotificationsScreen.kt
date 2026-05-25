@@ -23,15 +23,14 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mediatracker.R
 import androidx.compose.ui.tooling.preview.Preview
 import com.mediatracker.presentation.theme.AppTheme
@@ -41,11 +40,9 @@ import com.mediatracker.presentation.theme.MediaTrackerTheme
 @Composable
 fun NotificationsScreen(
     onBack: () -> Unit,
+    viewModel: NotificationsViewModel = hiltViewModel(),
 ) {
-    var pushEnabled by rememberSaveable { mutableStateOf(true) }
-    var newReleasesEnabled by rememberSaveable { mutableStateOf(true) }
-    var recommendationsEnabled by rememberSaveable { mutableStateOf(false) }
-    var weeklySummaryEnabled by rememberSaveable { mutableStateOf(false) }
+    val prefs by viewModel.preferences.collectAsStateWithLifecycle()
 
     Scaffold(
         topBar = {
@@ -84,8 +81,8 @@ fun NotificationsScreen(
                 emoji = "🔔",
                 title = stringResource(R.string.notifications_push),
                 subtitle = stringResource(R.string.notifications_push_subtitle),
-                checked = pushEnabled,
-                onCheckedChange = { pushEnabled = it },
+                checked = prefs.pushEnabled,
+                onCheckedChange = { viewModel.onPushEnabledChanged(it) },
             )
 
             Spacer(Modifier.height(12.dp))
@@ -94,9 +91,9 @@ fun NotificationsScreen(
                 emoji = "🆕",
                 title = stringResource(R.string.notifications_new_releases),
                 subtitle = stringResource(R.string.notifications_new_releases_subtitle),
-                checked = newReleasesEnabled,
-                onCheckedChange = { newReleasesEnabled = it },
-                enabled = pushEnabled,
+                checked = prefs.newReleasesEnabled,
+                onCheckedChange = { viewModel.onNewReleasesChanged(it) },
+                enabled = prefs.pushEnabled,
             )
 
             Spacer(Modifier.height(12.dp))
@@ -105,9 +102,9 @@ fun NotificationsScreen(
                 emoji = "💡",
                 title = stringResource(R.string.notifications_recommendations),
                 subtitle = stringResource(R.string.notifications_recommendations_subtitle),
-                checked = recommendationsEnabled,
-                onCheckedChange = { recommendationsEnabled = it },
-                enabled = pushEnabled,
+                checked = prefs.recommendationsEnabled,
+                onCheckedChange = { viewModel.onRecommendationsChanged(it) },
+                enabled = prefs.pushEnabled,
             )
 
             Spacer(Modifier.height(12.dp))
@@ -116,9 +113,9 @@ fun NotificationsScreen(
                 emoji = "📊",
                 title = stringResource(R.string.notifications_weekly_summary),
                 subtitle = stringResource(R.string.notifications_weekly_summary_subtitle),
-                checked = weeklySummaryEnabled,
-                onCheckedChange = { weeklySummaryEnabled = it },
-                enabled = pushEnabled,
+                checked = prefs.weeklySummaryEnabled,
+                onCheckedChange = { viewModel.onWeeklySummaryChanged(it) },
+                enabled = prefs.pushEnabled,
             )
 
             Spacer(Modifier.height(32.dp))

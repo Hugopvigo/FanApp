@@ -4,8 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mediatracker.data.auth.AuthDataSource
 import com.mediatracker.data.firestore.FirestoreDataSource
+import com.mediatracker.data.local.NotificationDao
 import com.mediatracker.domain.usecase.GetUserStatsUseCase
-import com.mediatracker.domain.usecase.UserStats
+import com.mediatracker.domain.model.UserStats
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -22,6 +23,7 @@ class ProfileViewModel @Inject constructor(
     getUserStatsUseCase: GetUserStatsUseCase,
     private val authDataSource: AuthDataSource,
     private val firestoreDataSource: FirestoreDataSource,
+    notificationDao: NotificationDao,
 ) : ViewModel() {
 
     val stats: StateFlow<UserStats> = getUserStatsUseCase()
@@ -34,6 +36,9 @@ class ProfileViewModel @Inject constructor(
     val userEmail: StateFlow<String?> = authDataSource.authStateFlow()
         .map { it.userEmail }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), authDataSource.getUserEmail())
+
+    val unreadNotificationCount: StateFlow<Int> = notificationDao.getUnreadCount()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0)
 
     private val _avatarId = MutableStateFlow<String?>(null)
     val avatarId: StateFlow<String?> = _avatarId.asStateFlow()

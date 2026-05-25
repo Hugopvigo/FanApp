@@ -36,7 +36,7 @@ Olvídate de tener 3 apps distintas. Todo tu contenido, un solo sitio.
 | 🏠 **Home** | Resumen: continúa donde lo dejaste, novedades, favoritos, últimos guardados |
 | 🔍 **Discover** | Busca series, películas o libros por separado + ranking de trending |
 | 📚 **Library** | Tus listas filtradas por estado: quiero ver, en progreso, completado, abandonado |
-| 👤 **Profile** | Contadores, listas completas, ajustes de idioma, cerrar sesión |
+| 👤 **Profile** | Contadores, nivel de gamificación, ajustes de tema, notificaciones, privacidad, cerrar sesión |
 
 > 🚧 Pantallas, nombres y flujos pueden cambiar durante el desarrollo.
 
@@ -121,7 +121,7 @@ Cada serie, película o libro puede estar en un estado. Y puedes marcarlo como f
 ## 🔑 Estado actual
 
 ```
-████████████████░░░░  75% — Sprint 3 completado · Sprint 4 en progreso
+████████████████████ 95% — Sprint 5 completado · Sprint 6 planificado
 ```
 
 | Sprint | Estado |
@@ -129,7 +129,8 @@ Cada serie, película o libro puede estar en un estado. Y puedes marcarlo como f
 | Sprint 1 — Setup + Auth | ✅ Completado |
 | Sprint 2 — Upgrade de Versiones | ✅ Completado |
 | Sprint 3 — APIs + Data Layer + Library | ✅ Completado |
-| Sprint 4 — Temas + Home + Pulido | ⏳ En progreso |
+| Sprint 4 — Temas + Home + Pulido | ✅ Completado |
+| Sprint 5 — Bugs, Mejoras y Pendientes | ✅ Completado |
 
 Para seguir el progreso en detalle, consulta `CHANGELOG.md` y los archivos `Sprint*.md`.
 

@@ -68,6 +68,7 @@ fun ProfileScreen(
     val avatarId by viewModel.avatarId.collectAsStateWithLifecycle()
     val showEditNameDialog by viewModel.showEditNameDialog.collectAsStateWithLifecycle()
     val showAvatarDialog by viewModel.showAvatarDialog.collectAsStateWithLifecycle()
+    val unreadCount by viewModel.unreadNotificationCount.collectAsStateWithLifecycle()
     val displayName = userName?.takeIf { it.isNotBlank() }?.capitalizeWords() ?: "Usuario"
     val initial = displayName.first().uppercaseChar().toString()
 
@@ -137,15 +138,31 @@ fun ProfileScreen(
                             )
                         }
                     }
-                    Text(
-                        text = userEmail ?: "",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = Color.White.copy(alpha = 0.82f),
-                        fontWeight = FontWeight.Medium,
-                    )
+                        Text(
+                            text = userEmail ?: "",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = Color.White.copy(alpha = 0.82f),
+                            fontWeight = FontWeight.Medium,
+                        )
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(4.dp),
+                            modifier = Modifier.padding(top = 4.dp),
+                        ) {
+                            Text(
+                                text = stats.levelIcon,
+                                fontSize = 14.sp,
+                            )
+                            Text(
+                                text = "Nv.${stats.level} · ${stats.levelTitle}",
+                                style = MaterialTheme.typography.labelMedium,
+                                color = Color.White.copy(alpha = 0.9f),
+                                fontWeight = FontWeight.Bold,
+                            )
+                        }
+                    }
                 }
             }
-        }
 
         // ── Stats ─────────────────────────────────────────────────────────
         Row(
@@ -204,7 +221,7 @@ fun ProfileScreen(
             onClick = onNavigateToTheme,
         )
         SettingRow(icon = "🌐", label = stringResource(R.string.profile_language), value = stringResource(R.string.profile_language_value))
-        SettingRow(icon = "🔔", label = stringResource(R.string.profile_notifications), value = stringResource(R.string.profile_notif_enabled), onClick = onNavigateToNotifications)
+        SettingRow(icon = "🔔", label = stringResource(R.string.profile_notifications), value = if (unreadCount > 0) "$unreadCount" else stringResource(R.string.profile_notif_enabled), onClick = onNavigateToNotifications)
         SettingRow(icon = "🔒", label = stringResource(R.string.profile_privacy), onClick = onNavigateToPrivacy)
         SettingRow(icon = "🔑", label = stringResource(R.string.change_password), onClick = onNavigateToChangePassword)
 

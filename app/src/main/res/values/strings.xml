@@ -136,6 +136,16 @@
     <string name="notifications_weekly_summary">Weekly summary</string>
     <string name="notifications_weekly_summary_subtitle">A weekly recap of what you watched, read and discovered</string>
 
+    <!-- Gamification -->
+    <string name="gamification_level">Lv.%1$d</string>
+    <string name="gamification_xp">%1$d XP</string>
+    <string name="gamification_level_novato">Novice</string>
+    <string name="gamification_level_aficionado">Amateur</string>
+    <string name="gamification_level_entusiasta">Enthusiast</string>
+    <string name="gamification_level_experto">Expert</string>
+    <string name="gamification_level_maestro">Master</string>
+    <string name="gamification_level_leyenda">Legend</string>
+
     <!-- Privacy -->
     <string name="privacy_title">Privacy</string>
     <string name="privacy_description">We care about your privacy. Here\'s a summary of how we handle your data.</string>
@@ -151,4 +161,12 @@
     <string name="privacy_delete_dialog_title">Delete account?</string>
     <string name="privacy_delete_dialog_message">This action is permanent and cannot be undone. All your data — library, favorites, and profile — will be deleted.</string>
     <string name="privacy_delete_confirm">Delete</string>
+    <string name="privacy_toggle_public_profile">Public profile</string>
+    <string name="privacy_toggle_public_profile_subtitle">Other users can see your profile</string>
+    <string name="privacy_toggle_show_stats">Show stats</string>
+    <string name="privacy_toggle_show_stats_subtitle">Your stats are visible on your public profile</string>
+    <string name="privacy_toggle_show_library">Show library</string>
+    <string name="privacy_toggle_show_library_subtitle">Your library is visible on your public profile</string>
+    <string name="privacy_toggle_share_activity">Share activity</string>
+    <string name="privacy_toggle_share_activity_subtitle">Your activity (ratings, completions) is shared</string>
 </resources>

@@ -30,3 +30,15 @@ data class UserItemEntity(
     val addedAt: Long,
     val updatedAt: Long,
 )
+
+@Entity(tableName = "notifications")
+data class NotificationEntity(
+    @PrimaryKey val id: String,
+    val type: String,
+    val title: String,
+    val body: String,
+    val isRead: Boolean = false,
+    val createdAt: Long,
+    val relatedApiId: String? = null,
+    val relatedMediaType: String? = null,
+)

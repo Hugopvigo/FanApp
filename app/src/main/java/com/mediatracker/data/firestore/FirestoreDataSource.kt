@@ -117,4 +117,36 @@ class FirestoreDataSource @Inject constructor(
         val uid = authProvider.userId ?: throw IllegalStateException("User not logged in")
         db.document("/users/$uid").set(mapOf("avatarId" to avatarId), com.google.firebase.firestore.SetOptions.merge()).await()
     }
+
+    suspend fun getPrivacySettings(): Result<PrivacySettings> = runCatching {
+        val db = firestore ?: throw IllegalStateException("Firestore not configured")
+        val uid = authProvider.userId ?: throw IllegalStateException("User not logged in")
+        val doc = db.document("/users/$uid/privacy/settings").get().await()
+        PrivacySettings(
+            publicProfile = doc.getBoolean("publicProfile") ?: true,
+            showStats = doc.getBoolean("showStats") ?: true,
+            showLibrary = doc.getBoolean("showLibrary") ?: true,
+            shareActivity = doc.getBoolean("shareActivity") ?: false,
+        )
+    }
+
+    suspend fun updatePrivacySettings(settings: PrivacySettings): Result<Unit> = runCatching {
+        val db = firestore ?: throw IllegalStateException("Firestore not configured")
+        val uid = authProvider.userId ?: throw IllegalStateException("User not logged in")
+        db.document("/users/$uid/privacy/settings").set(settings.toMap()).await()
+    }
+}
+
+data class PrivacySettings(
+    val publicProfile: Boolean = true,
+    val showStats: Boolean = true,
+    val showLibrary: Boolean = true,
+    val shareActivity: Boolean = false,
+) {
+    fun toMap(): Map<String, Boolean> = mapOf(
+        "publicProfile" to publicProfile,
+        "showStats" to showStats,
+        "showLibrary" to showLibrary,
+        "shareActivity" to shareActivity,
+    )
 }

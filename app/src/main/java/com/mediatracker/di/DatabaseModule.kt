@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import com.mediatracker.data.local.AppDatabase
 import com.mediatracker.data.local.MediaItemDao
+import com.mediatracker.data.local.NotificationDao
 import com.mediatracker.data.local.UserItemDao
 import dagger.Module
 import dagger.Provides
@@ -23,7 +24,9 @@ object DatabaseModule {
             context,
             AppDatabase::class.java,
             "mediatracker.db",
-        ).addMigrations(AppDatabase.MIGRATION_1_2).build()
+        )
+            .addMigrations(AppDatabase.MIGRATION_1_2, AppDatabase.MIGRATION_2_3)
+            .build()
 
     @Provides
     fun provideMediaItemDao(database: AppDatabase): MediaItemDao =
@@ -32,4 +35,8 @@ object DatabaseModule {
     @Provides
     fun provideUserItemDao(database: AppDatabase): UserItemDao =
         database.userItemDao()
+
+    @Provides
+    fun provideNotificationDao(database: AppDatabase): NotificationDao =
+        database.notificationDao()
 }

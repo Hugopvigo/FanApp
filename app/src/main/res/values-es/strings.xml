@@ -136,6 +136,16 @@
     <string name="notifications_weekly_summary">Resumen semanal</string>
     <string name="notifications_weekly_summary_subtitle">Un resumen semanal de lo que viste, leíste y descubriste</string>
 
+    <!-- Gamification -->
+    <string name="gamification_level">Nv.%1$d</string>
+    <string name="gamification_xp">%1$d XP</string>
+    <string name="gamification_level_novato">Novato</string>
+    <string name="gamification_level_aficionado">Aficionado</string>
+    <string name="gamification_level_entusiasta">Entusiasta</string>
+    <string name="gamification_level_experto">Experto</string>
+    <string name="gamification_level_maestro">Maestro</string>
+    <string name="gamification_level_leyenda">Leyenda</string>
+
     <!-- Privacy -->
     <string name="privacy_title">Privacidad</string>
     <string name="privacy_description">Nos importa tu privacidad. Aquí tienes un resumen de cómo manejamos tus datos.</string>
@@ -151,4 +161,12 @@
     <string name="privacy_delete_dialog_title">¿Eliminar cuenta?</string>
     <string name="privacy_delete_dialog_message">Esta acción es permanente y no se puede deshacer. Todos tus datos — biblioteca, favoritos y perfil — serán eliminados.</string>
     <string name="privacy_delete_confirm">Eliminar</string>
+    <string name="privacy_toggle_public_profile">Perfil público</string>
+    <string name="privacy_toggle_public_profile_subtitle">Otros usuarios pueden ver tu perfil</string>
+    <string name="privacy_toggle_show_stats">Mostrar estadísticas</string>
+    <string name="privacy_toggle_show_stats_subtitle">Tus estadísticas son visibles en tu perfil público</string>
+    <string name="privacy_toggle_show_library">Mostrar biblioteca</string>
+    <string name="privacy_toggle_show_library_subtitle">Tu biblioteca es visible en tu perfil público</string>
+    <string name="privacy_toggle_share_activity">Compartir actividad</string>
+    <string name="privacy_toggle_share_activity_subtitle">Tu actividad (valoraciones, completados) se comparte</string>
 </resources>

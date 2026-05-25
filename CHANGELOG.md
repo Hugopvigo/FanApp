@@ -2,6 +2,37 @@
 
 ## Sprint 5 — Bugs, Mejoras y Pendientes (2026-05-18–…)
 
+### T8 — Gamificación (modelo + nivel en perfil)
+- `domain/model/Gamification.kt` (nuevo): data classes `UserLevel`, `UserRanking`, `YearStat`, `Achievement`, `AchievementCondition`
+- `domain/model/Ranking.kt` (nuevo): data class `Ranking`
+- `domain/model/UserStats.kt` (nuevo): `UserStats` movido desde `GetUserStatsUseCase.kt` al paquete `domain/model/`; añadidos campos `totalXp`, `level`, `levelTitle`, `levelIcon`
+- `GetUserStatsUseCase.kt`: cálculo de XP retroactivo (add=+5, completed=+25, in_progress=+10, favorite=+5); `calculateLevel()` basado en items completados (6 niveles: Novato→Leyenda); `UserStats` importado desde `domain.model`
+- `ProfileScreen.kt`: badge de nivel debajo del email (icono + "Nv.X · Título")
+- `ProfileViewModel.kt`: import actualizado de `UserStats`
+- Strings EN/ES: `gamification_level`, `gamification_xp`, `gamification_level_*` (6 niveles)
+
+### T5 — Pantalla Notificaciones (completada)
+- `Entities.kt`: añadida `NotificationEntity` (id, type, title, body, isRead, createdAt, relatedApiId, relatedMediaType)
+- `NotificationDao.kt` (nuevo): DAO con `getAll()`, `getUnread()`, `getUnreadCount()`, `markAsRead()`, `markAllAsRead()`, `deleteById()`, `deleteAll()`
+- `AppDatabase.kt`: versión 2→3, migración `MIGRATION_2_3` (CREATE TABLE notifications)
+- `DatabaseModule.kt`: registrada `MIGRATION_2_3`; provee `NotificationDao`
+- `NotificationPreferencesRepository.kt` (nuevo): persistencia DataStore de toggles de notificaciones (push, new releases, recommendations, weekly summary)
+- `NotificationsViewModel.kt` (nuevo): ViewModel con `preferencesFlow`, `notifications`, `unreadCount`; acciones de toggle y mark-as-read
+- `NotificationsScreen.kt`: refactorizada para usar `NotificationsViewModel`; toggles persistidos vía DataStore
+- `ProfileViewModel.kt`: inyecta `NotificationDao`; expone `unreadNotificationCount`
+- `ProfileScreen.kt`: muestra contador de no leídas en la fila de notificaciones
+
+### T6 — Pantalla Privacidad (completada)
+- `FirestoreDataSource.kt`: añadidos `getPrivacySettings()` y `updatePrivacySettings()` en `/users/{uid}/privacy/settings`; data class `PrivacySettings` (publicProfile, showStats, showLibrary, shareActivity)
+- `PrivacyViewModel.kt` (nuevo): ViewModel con carga de settings desde Firestore, toggles reactivos, guardado inmediato
+- `PrivacyScreen.kt`: 4 toggles de privacidad (perfil público, mostrar stats, mostrar biblioteca, compartir actividad) con persistencia en Firestore
+- Strings EN/ES: `privacy_toggle_public_profile`, `privacy_toggle_show_stats`, `privacy_toggle_show_library`, `privacy_toggle_share_activity` + subtítulos
+
+### T12 — .gitignore secrets (completada)
+- `.gitignore`: ya cubre `google-services.json`, `client_secret*.json`, `*.jks`, `*.keystore`
+- `git ls-files`: confirmado que ningún secret está tracked en git
+- `app/google-services.json.example`: existe como referencia para nuevos devs
+
 ### T1 — Fix Google Books Trending + API improvements
 - `GoogleBooksApi.kt`: query por defecto cambiada de `*` a `subject:fiction+subject:bestseller`
 - `MediaRepositoryImpl.kt`: queries curatoras rotativas por día (5 géneros: ficción, fantasía, romance, thriller, no ficción)

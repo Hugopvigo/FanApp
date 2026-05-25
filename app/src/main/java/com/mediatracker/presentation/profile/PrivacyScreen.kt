@@ -25,6 +25,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -43,6 +44,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mediatracker.R
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mediatracker.presentation.theme.AppTheme
 import com.mediatracker.presentation.theme.MediaTrackerTheme
 
@@ -51,8 +54,10 @@ import com.mediatracker.presentation.theme.MediaTrackerTheme
 fun PrivacyScreen(
     onBack: () -> Unit,
     onDeleteAccount: () -> Unit = {},
+    viewModel: PrivacyViewModel = hiltViewModel(),
 ) {
     var showDeleteDialog by rememberSaveable { mutableStateOf(false) }
+    val settings by viewModel.settings.collectAsStateWithLifecycle()
 
     Scaffold(
         topBar = {
@@ -117,7 +122,7 @@ fun PrivacyScreen(
                 subtitle = stringResource(R.string.privacy_third_party_subtitle),
             )
 
-            Spacer(Modifier.height(32.dp))
+            Spacer(Modifier.height(24.dp))
 
             Text(
                 text = stringResource(R.string.privacy_actions_title),
@@ -127,6 +132,46 @@ fun PrivacyScreen(
             )
 
             Spacer(Modifier.height(12.dp))
+
+            PrivacyToggleRow(
+                emoji = "👤",
+                title = stringResource(R.string.privacy_toggle_public_profile),
+                subtitle = stringResource(R.string.privacy_toggle_public_profile_subtitle),
+                checked = settings.publicProfile,
+                onCheckedChange = { viewModel.onPublicProfileChanged(it) },
+            )
+
+            Spacer(Modifier.height(8.dp))
+
+            PrivacyToggleRow(
+                emoji = "📊",
+                title = stringResource(R.string.privacy_toggle_show_stats),
+                subtitle = stringResource(R.string.privacy_toggle_show_stats_subtitle),
+                checked = settings.showStats,
+                onCheckedChange = { viewModel.onShowStatsChanged(it) },
+            )
+
+            Spacer(Modifier.height(8.dp))
+
+            PrivacyToggleRow(
+                emoji = "📚",
+                title = stringResource(R.string.privacy_toggle_show_library),
+                subtitle = stringResource(R.string.privacy_toggle_show_library_subtitle),
+                checked = settings.showLibrary,
+                onCheckedChange = { viewModel.onShowLibraryChanged(it) },
+            )
+
+            Spacer(Modifier.height(8.dp))
+
+            PrivacyToggleRow(
+                emoji = "🔄",
+                title = stringResource(R.string.privacy_toggle_share_activity),
+                subtitle = stringResource(R.string.privacy_toggle_share_activity_subtitle),
+                checked = settings.shareActivity,
+                onCheckedChange = { viewModel.onShareActivityChanged(it) },
+            )
+
+            Spacer(Modifier.height(24.dp))
 
             OutlinedButton(
                 onClick = { showDeleteDialog = true },
@@ -167,6 +212,55 @@ fun PrivacyScreen(
                 }
             },
         )
+    }
+}
+
+@Composable
+private fun PrivacyToggleRow(
+    emoji: String,
+    title: String,
+    subtitle: String,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+) {
+    Surface(
+        shape = RoundedCornerShape(16.dp),
+        color = MaterialTheme.colorScheme.surfaceVariant,
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 14.dp, vertical = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(42.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(MaterialTheme.colorScheme.surface),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(emoji, fontSize = 20.sp)
+            }
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+                Text(
+                    text = subtitle,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            Switch(
+                checked = checked,
+                onCheckedChange = onCheckedChange,
+            )
+        }
     }
 }
 
