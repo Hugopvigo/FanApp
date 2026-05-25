@@ -3,6 +3,9 @@ package com.mediatracker.presentation.theme
 import androidx.compose.ui.graphics.Color
 
 // ─── Fantasy (light dreamy — lila/rosa pastel) ────────────────────────────
+val FantasySurfaceGlass  = Color(0x6BFFFFFF) // 42% white — glass panel
+val FantasySurfaceElev   = Color(0xC8FFFFFF) // 78% white — elevated glass
+val FantasyHairline      = Color(0xB3FFFFFF) // 70% white — top edge highlight
 val FantasyBg            = Color(0xFFFBF2FA)
 val FantasySurface       = Color(0xB8FFFFFF) // rgba(255,255,255,0.72)
 val FantasySurfaceSolid  = Color(0xFFFEFAFD)
@@ -26,6 +29,9 @@ val FantasySurfContainer = Color(0xFFF2E8FB)
 val FantasySurfVariant   = Color(0xFFEFE4F8)
 
 // ─── Light (warm cream) ───────────────────────────────────────────────────
+val LightSurfaceGlass    = Color(0x80FFFFFF) // 50% white — glass panel
+val LightSurfaceElev     = Color(0xDBFFFFFF) // 86% white — elevated glass
+val LightHairline        = Color(0xB3FFFFFF) // 70% white — top edge highlight
 val LightBg              = Color(0xFFFAF8F5)
 val LightSurface         = Color(0xFFFFFFFF)
 val LightText            = Color(0xFF1F1A26)
@@ -48,6 +54,9 @@ val LightSurfContainer   = Color(0xFFF3EEFE)
 val LightSurfVariant     = Color(0xFFEEE9F7)
 
 // ─── Purple (dark night — deep purple) ───────────────────────────────────
+val PurpleSurfaceGlass   = Color(0x0FFFFFFF) // 6% white — glass on dark
+val PurpleSurfaceElev    = Color(0x1CFFFFFF) // 11% white — elevated glass on dark
+val PurpleHairline       = Color(0x1FFFFFFF) // 12% white — subtle top edge
 val PurpleBg             = Color(0xFF0F0A1A)
 val PurpleSurface        = Color(0xFF1A1226)
 val PurpleText           = Color(0xFFECE6F5)
@@ -70,6 +79,9 @@ val PurpleSurfContainer  = Color(0xFF1C1230)
 val PurpleSurfVariant    = Color(0xFF221838)
 
 // ─── Dark (masculine — true black, steel blue) ───────────────────────────
+val DarkSurfaceGlass     = Color(0x0FFFFFFF) // 6% white — glass on true black
+val DarkSurfaceElev      = Color(0x1CFFFFFF) // 11% white — elevated glass
+val DarkHairline         = Color(0x1FFFFFFF) // 12% white — subtle top edge
 val DarkBg               = Color(0xFF0A0B0E)
 val DarkSurface          = Color(0xFF14161B)
 val DarkText             = Color(0xFFECEDF1)

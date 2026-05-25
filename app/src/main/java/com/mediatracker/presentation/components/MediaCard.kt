@@ -26,13 +26,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.tooling.preview.Preview
 import coil.compose.AsyncImage
 import com.mediatracker.domain.model.MediaItem
 import com.mediatracker.domain.model.MediaType
 import com.mediatracker.presentation.theme.DisplayFontFamily
 import com.mediatracker.presentation.theme.AppTheme
 import com.mediatracker.presentation.theme.MediaTrackerTheme
-import androidx.compose.ui.tooling.preview.Preview
+import com.mediatracker.presentation.theme.fanAppColors
 
 private val POSTER_GRADIENTS = listOf(
     listOf(Color(0xFFFFB3D1), Color(0xFFF06292)),
@@ -64,8 +65,8 @@ fun GradientPoster(
 ) {
     val idx = titleGradientIndex(title)
     val colors = POSTER_GRADIENTS[idx]
-    val brush = Brush.linearGradient(colors)
-    val shape = MaterialTheme.shapes.medium
+    val brush = Brush.linearGradient(colors, start = androidx.compose.ui.geometry.Offset(0f, 0f), end = androidx.compose.ui.geometry.Offset(Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY))
+    val shape = RoundedCornerShape(14.dp)
     val isBook = kind == MediaType.BOOK
 
     Box(
@@ -73,13 +74,25 @@ fun GradientPoster(
             .clip(shape)
             .background(brush),
     ) {
-        // Soft highlight overlay
+        // Radial top highlight
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    Brush.radialGradient(
+                        colors = listOf(Color.White.copy(alpha = 0.35f), Color.Transparent),
+                        radius = Float.POSITIVE_INFINITY,
+                        center = androidx.compose.ui.geometry.Offset(0f, 0f),
+                    ),
+                ),
+        )
+        // Vertical bottom fade
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .background(
                     Brush.verticalGradient(
-                        listOf(Color.White.copy(alpha = 0.28f), Color.Transparent),
+                        listOf(Color.Transparent, Color.Black.copy(alpha = 0.18f)),
                     ),
                 ),
         )
@@ -121,8 +134,8 @@ fun GradientPoster(
                 Text(
                     text = when (kind) {
                         MediaType.SERIES -> "🎬"
-                        MediaType.MOVIE -> "🎥"
-                        MediaType.BOOK -> "📖"
+                        MediaType.MOVIE  -> "🎥"
+                        MediaType.BOOK   -> "📖"
                     },
                     fontSize = 12.sp,
                 )
@@ -149,53 +162,78 @@ fun MediaCard(
     item: MediaItem,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    showFavBadge: Boolean = false,
 ) {
+    val fanColors = MaterialTheme.fanAppColors
+
     Column(
         modifier = modifier
             .width(120.dp)
             .clickable(onClick = onClick),
-        verticalArrangement = Arrangement.spacedBy(4.dp),
+        verticalArrangement = Arrangement.spacedBy(5.dp),
     ) {
-        if (item.posterUrl.isNotBlank()) {
-            AsyncImage(
-                model = item.posterUrl,
-                contentDescription = item.title,
-                modifier = Modifier
-                    .size(width = 120.dp, height = 180.dp)
-                    .clip(MaterialTheme.shapes.medium),
-                contentScale = ContentScale.Crop,
-            )
-        } else {
-            GradientPoster(
-                title = item.title,
-                kind = item.mediaType,
-                rating = item.rating,
-                modifier = Modifier.size(width = 120.dp, height = 180.dp),
-            )
+        Box {
+            if (item.posterUrl.isNotBlank()) {
+                AsyncImage(
+                    model = item.posterUrl,
+                    contentDescription = item.title,
+                    modifier = Modifier
+                        .size(width = 120.dp, height = 180.dp)
+                        .clip(RoundedCornerShape(14.dp)),
+                    contentScale = ContentScale.Crop,
+                )
+            } else {
+                GradientPoster(
+                    title = item.title,
+                    kind = item.mediaType,
+                    rating = item.rating,
+                    modifier = Modifier.size(width = 120.dp, height = 180.dp),
+                )
+            }
+            // Fav sparkle badge
+            if (showFavBadge) {
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.TopStart)
+                        .padding(6.dp)
+                        .size(22.dp)
+                        .clip(RoundedCornerShape(999.dp))
+                        .background(Color.White.copy(alpha = 0.92f)),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text("⭐", fontSize = 11.sp)
+                }
+            }
         }
+
         Text(
             text = item.title,
             style = MaterialTheme.typography.bodySmall,
             fontWeight = FontWeight.SemiBold,
             maxLines = 2,
             overflow = TextOverflow.Ellipsis,
+            color = MaterialTheme.colorScheme.onBackground,
         )
-        Text(
-            text = when (item.mediaType) {
-                MediaType.SERIES -> "🎬 Serie"
-                MediaType.MOVIE -> "🎥 Película"
-                MediaType.BOOK -> "📖 Libro"
-            },
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-        if (item.rating > 0f) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
+        ) {
             Text(
-                text = "★ ${"%.1f".format(item.rating)}",
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.primary,
-                fontWeight = FontWeight.Bold,
+                text = when (item.mediaType) {
+                    MediaType.SERIES -> "🎬"
+                    MediaType.MOVIE  -> "🎥"
+                    MediaType.BOOK   -> "📖"
+                },
+                fontSize = 10.sp,
             )
+            if (item.rating > 0f) {
+                Text(
+                    text = "★ ${"%.1f".format(item.rating)}",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.Bold,
+                )
+            }
         }
     }
 }
@@ -216,19 +254,6 @@ private fun MediaCardPreview() {
                 genres = listOf("Sci-Fi", "Drama"),
             ),
             onClick = {},
-        )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun GradientPosterPreview() {
-    MediaTrackerTheme(appTheme = AppTheme.Fantasy) {
-        GradientPoster(
-            title = "El Señor de los Anillos",
-            kind = MediaType.BOOK,
-            rating = 4.9f,
-            modifier = Modifier.size(width = 120.dp, height = 180.dp),
         )
     }
 }

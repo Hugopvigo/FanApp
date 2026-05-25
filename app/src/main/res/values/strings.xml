@@ -26,10 +26,11 @@
     <!-- Home -->
     <string name="home_title">Home</string>
     <string name="home_subtitle">Continue where you left off, trending, favorites...</string>
-    <string name="home_continue">Continue where you left off</string>
-    <string name="home_trending">Trending Now</string>
-    <string name="home_favorites">Your Favorites</string>
-    <string name="home_recent">Recently Saved</string>
+    <string name="home_continue">Continúa donde lo dejaste</string>
+    <string name="home_trending">Tendencias</string>
+    <string name="home_favorites">Tus favoritos</string>
+    <string name="home_recent">Añadidos recientemente</string>
+    <string name="home_see_all">Ver todo</string>
 
     <!-- Discover -->
     <string name="discover_title">Discover</string>
