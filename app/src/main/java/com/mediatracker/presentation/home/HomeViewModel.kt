@@ -2,6 +2,7 @@ package com.mediatracker.presentation.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.mediatracker.data.auth.AuthDataSource
 import com.mediatracker.domain.model.ItemStatus
 import com.mediatracker.domain.model.MediaItem
 import com.mediatracker.domain.model.MediaType
@@ -13,11 +14,13 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class HomeUiState(
+    val userName: String? = null,
     val trending: List<MediaItem> = emptyList(),
     val continueWatching: List<MediaItem> = emptyList(),
     val favorites: List<MediaItem> = emptyList(),
@@ -31,14 +34,24 @@ class HomeViewModel @Inject constructor(
     private val getTrendingUseCase: GetTrendingUseCase,
     private val getUserItemsUseCase: GetUserItemsUseCase,
     private val getMediaDetailUseCase: GetMediaDetailUseCase,
+    private val authDataSource: AuthDataSource,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(HomeUiState())
     val state: StateFlow<HomeUiState> = _state.asStateFlow()
 
     init {
+        observeUserName()
         loadTrending()
         observeUserItems()
+    }
+
+    private fun observeUserName() {
+        viewModelScope.launch {
+            authDataSource.authStateFlow()
+                .map { it.userName }
+                .collect { name -> _state.update { it.copy(userName = name) } }
+        }
     }
 
     private fun loadTrending() {
@@ -56,7 +69,6 @@ class HomeViewModel @Inject constructor(
                 val inProgress = items.filter { it.status == ItemStatus.IN_PROGRESS }
                 val favs = items.filter { it.favorite }
                 val recentItems = items.sortedByDescending { it.addedAt }.take(10)
-
                 loadMediaDetails(inProgress, favs, recentItems)
             }
         }
