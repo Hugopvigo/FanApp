@@ -36,7 +36,7 @@ internal data class NavItem(
 )
 
 @Composable
-fun FloatingBottomNav(
+internal fun FloatingBottomNav(
     currentDestination: NavDestination?,
     onNavigate: (BottomNavRoute) -> Unit,
     items: List<NavItem>,
