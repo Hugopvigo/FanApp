@@ -1,5 +1,13 @@
 package com.mediatracker.presentation.navigation
 
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -107,9 +115,7 @@ private fun MainScreen(
     Scaffold(
         bottomBar = {
             if (showBottomBar) {
-                NavigationBar(
-                    containerColor = fanColors.navBarBg,
-                ) {
+                NavigationBar(containerColor = fanColors.navBarBg) {
                     bottomNavItems.forEach { item ->
                         val selected = when (item.route) {
                             BottomNavRoute.Home     -> currentDestination?.hasRoute(BottomNavRoute.Home::class) == true
@@ -147,6 +153,11 @@ private fun MainScreen(
             navController = navController,
             startDestination = BottomNavRoute.Home,
             modifier = Modifier.padding(padding),
+            // Crossfade suave para cambios de tab
+            enterTransition = { fadeIn(tween(180, easing = FastOutSlowInEasing)) },
+            exitTransition = { fadeOut(tween(120, easing = FastOutSlowInEasing)) },
+            popEnterTransition = { fadeIn(tween(180, easing = FastOutSlowInEasing)) },
+            popExitTransition = { fadeOut(tween(120, easing = FastOutSlowInEasing)) },
         ) {
             composable<BottomNavRoute.Home> {
                 HomeScreen(
@@ -170,20 +181,48 @@ private fun MainScreen(
                 )
             }
             composable<BottomNavRoute.Profile> {
-            ProfileScreen(
-                onLogout = { authViewModel.logout() },
-                onNavigateToTheme = { navController.navigate(Route.Theme) },
-                onNavigateToChangePassword = { navController.navigate(Route.ChangePassword) },
-                onNavigateToNotifications = { navController.navigate(Route.Notifications) },
-                onNavigateToPrivacy = { navController.navigate(Route.Privacy) },
-            )
-            }
-            composable<Route.Detail> {
-                DetailScreen(
-                    onBack = { navController.popBackStack() },
+                ProfileScreen(
+                    onLogout = { authViewModel.logout() },
+                    onNavigateToTheme = { navController.navigate(Route.Theme) },
+                    onNavigateToChangePassword = { navController.navigate(Route.ChangePassword) },
+                    onNavigateToNotifications = { navController.navigate(Route.Notifications) },
+                    onNavigateToPrivacy = { navController.navigate(Route.Privacy) },
                 )
             }
-            composable<Route.Theme> {
+
+            // Detail: slide desde la derecha + fade
+            composable<Route.Detail>(
+                enterTransition = {
+                    fadeIn(tween(280)) +
+                        slideInHorizontally(tween(280, easing = FastOutSlowInEasing)) { it / 3 }
+                },
+                exitTransition = {
+                    fadeOut(tween(180)) +
+                        slideOutHorizontally(tween(180)) { -it / 6 }
+                },
+                popEnterTransition = {
+                    fadeIn(tween(280)) +
+                        slideInHorizontally(tween(280, easing = FastOutSlowInEasing)) { -it / 3 }
+                },
+                popExitTransition = {
+                    fadeOut(tween(220)) +
+                        slideOutHorizontally(tween(220, easing = FastOutSlowInEasing)) { it / 3 }
+                },
+            ) {
+                DetailScreen(onBack = { navController.popBackStack() })
+            }
+
+            // Sub-pantallas de Profile: slide hacia arriba (efecto sheet)
+            composable<Route.Theme>(
+                enterTransition = {
+                    fadeIn(tween(260)) +
+                        slideInVertically(tween(260, easing = FastOutSlowInEasing)) { it / 2 }
+                },
+                popExitTransition = {
+                    fadeOut(tween(200)) +
+                        slideOutVertically(tween(200)) { it / 2 }
+                },
+            ) {
                 ThemeScreen(
                     currentTheme = LocalAppTheme.current,
                     onThemeSelected = { theme ->
@@ -193,13 +232,40 @@ private fun MainScreen(
                     onBack = { navController.popBackStack() },
                 )
             }
-            composable<Route.ChangePassword> {
+            composable<Route.ChangePassword>(
+                enterTransition = {
+                    fadeIn(tween(260)) +
+                        slideInVertically(tween(260, easing = FastOutSlowInEasing)) { it / 2 }
+                },
+                popExitTransition = {
+                    fadeOut(tween(200)) +
+                        slideOutVertically(tween(200)) { it / 2 }
+                },
+            ) {
                 ChangePasswordScreen(onBack = { navController.popBackStack() })
             }
-            composable<Route.Notifications> {
+            composable<Route.Notifications>(
+                enterTransition = {
+                    fadeIn(tween(260)) +
+                        slideInVertically(tween(260, easing = FastOutSlowInEasing)) { it / 2 }
+                },
+                popExitTransition = {
+                    fadeOut(tween(200)) +
+                        slideOutVertically(tween(200)) { it / 2 }
+                },
+            ) {
                 NotificationsScreen(onBack = { navController.popBackStack() })
             }
-            composable<Route.Privacy> {
+            composable<Route.Privacy>(
+                enterTransition = {
+                    fadeIn(tween(260)) +
+                        slideInVertically(tween(260, easing = FastOutSlowInEasing)) { it / 2 }
+                },
+                popExitTransition = {
+                    fadeOut(tween(200)) +
+                        slideOutVertically(tween(200)) { it / 2 }
+                },
+            ) {
                 PrivacyScreen(
                     onBack = { navController.popBackStack() },
                     onDeleteAccount = { authViewModel.logout() },
