@@ -3,6 +3,7 @@ package com.mediatracker.di
 import com.mediatracker.BuildConfig
 import com.mediatracker.data.remote.books.GoogleBooksApi
 import com.mediatracker.data.remote.books.GoogleBooksRateLimiter
+import com.mediatracker.data.remote.books.OpenLibraryApi
 import com.mediatracker.data.remote.tmdb.TmdbApi
 import dagger.Module
 import dagger.Provides
@@ -25,6 +26,7 @@ object NetworkModule {
 
     private const val TMDB_BASE_URL = "https://api.themoviedb.org/3/"
     private const val GOOGLE_BOOKS_BASE_URL = "https://www.googleapis.com/books/v1/"
+    private const val OPEN_LIBRARY_BASE_URL = "https://openlibrary.org/"
 
     @Provides
     @Singleton
@@ -108,6 +110,29 @@ object NetworkModule {
         .build()
 
     @Provides
+    @Named("openLibrary")
+    @Singleton
+    fun provideOpenLibraryOkHttpClient(
+        loggingInterceptor: HttpLoggingInterceptor,
+    ): OkHttpClient = OkHttpClient.Builder()
+        .addInterceptor(loggingInterceptor)
+        .connectTimeout(15, TimeUnit.SECONDS)
+        .readTimeout(15, TimeUnit.SECONDS)
+        .build()
+
+    @Provides
+    @Named("openLibrary")
+    @Singleton
+    fun provideOpenLibraryRetrofit(
+        @Named("openLibrary") client: OkHttpClient,
+        json: Json,
+    ): Retrofit = Retrofit.Builder()
+        .baseUrl(OPEN_LIBRARY_BASE_URL)
+        .client(client)
+        .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
+        .build()
+
+    @Provides
     @Singleton
     fun provideTmdbApi(@Named("tmdb") retrofit: Retrofit): TmdbApi =
         retrofit.create(TmdbApi::class.java)
@@ -116,4 +141,9 @@ object NetworkModule {
     @Singleton
     fun provideGoogleBooksApi(@Named("books") retrofit: Retrofit): GoogleBooksApi =
         retrofit.create(GoogleBooksApi::class.java)
+
+    @Provides
+    @Singleton
+    fun provideOpenLibraryApi(@Named("openLibrary") retrofit: Retrofit): OpenLibraryApi =
+        retrofit.create(OpenLibraryApi::class.java)
 }
