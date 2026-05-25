@@ -40,6 +40,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.layout.ContentScale
+import coil.compose.AsyncImage
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.stringResource
@@ -316,15 +318,28 @@ private fun TrendingCard(
         modifier = Modifier.clickable(onClick = onClick),
         contentAlignment = Alignment.BottomStart,
     ) {
-        GradientPoster(
-            title = item.title,
-            kind = item.mediaType,
-            rating = item.rating,
-            modifier = Modifier
-                .padding(start = 28.dp) // make room for rank number
-                .width(110.dp)
-                .height(165.dp),
-        )
+        if (item.posterUrl.isNotBlank()) {
+            AsyncImage(
+                model = item.posterUrl,
+                contentDescription = item.title,
+                modifier = Modifier
+                    .padding(start = 28.dp)
+                    .width(110.dp)
+                    .height(165.dp)
+                    .clip(RoundedCornerShape(14.dp)),
+                contentScale = ContentScale.Crop,
+            )
+        } else {
+            GradientPoster(
+                title = item.title,
+                kind = item.mediaType,
+                rating = item.rating,
+                modifier = Modifier
+                    .padding(start = 28.dp)
+                    .width(110.dp)
+                    .height(165.dp),
+            )
+        }
         // Hollow outline rank number
         Text(
             text = rank.toString(),

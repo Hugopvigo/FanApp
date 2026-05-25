@@ -9,7 +9,7 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
@@ -107,21 +107,16 @@ private fun MainScreen(
     )
 
     Scaffold(
-        bottomBar = {
-            if (showBottomBar) {
-                Spacer(Modifier.navigationBarsPadding().padding(bottom = 80.dp))
-            }
-        },
-    ) { innerPadding ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding),
-        ) {
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
+    ) { _ ->
+        Box(modifier = Modifier.fillMaxSize()) {
             NavHost(
                 navController = navController,
                 startDestination = BottomNavRoute.Home,
-                modifier = Modifier.fillMaxSize(),
+                modifier = if (showBottomBar)
+                    Modifier.fillMaxSize().navigationBarsPadding().padding(bottom = 88.dp)
+                else
+                    Modifier.fillMaxSize(),
                 // Crossfade suave para cambios de tab
                 enterTransition = { fadeIn(tween(180, easing = FastOutSlowInEasing)) },
                 exitTransition = { fadeOut(tween(120, easing = FastOutSlowInEasing)) },

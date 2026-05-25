@@ -196,10 +196,13 @@ fun ProfileScreen(
                     radius = 18.dp,
                 ) {
                     Column(
-                        modifier = Modifier.padding(14.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(14.dp),
                         horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center,
                     ) {
-                        Text(icon, fontSize = 22.sp)
+                        Text(icon, fontSize = 24.sp)
                         Text(
                             text = count.toString(),
                             style = MaterialTheme.typography.headlineSmall.copy(
@@ -357,7 +360,12 @@ private fun SettingRow(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        Text(icon, fontSize = 18.sp)
+        Box(
+            modifier = Modifier.size(32.dp),
+            contentAlignment = Alignment.Center,
+        ) {
+            Text(icon, fontSize = 20.sp)
+        }
         Text(
             text = label,
             style = MaterialTheme.typography.bodyMedium,

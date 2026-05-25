@@ -2,56 +2,56 @@ package com.mediatracker.presentation.theme
 
 import androidx.compose.ui.graphics.Color
 
-// ─── Fantasy (light dreamy — lila/rosa pastel) ────────────────────────────
-val FantasySurfaceGlass  = Color(0x6BFFFFFF) // 42% white — glass panel
-val FantasySurfaceElev   = Color(0xC8FFFFFF) // 78% white — elevated glass
-val FantasyHairline      = Color(0xB3FFFFFF) // 70% white — top edge highlight
-val FantasyBg            = Color(0xFFFBF2FA)
-val FantasySurface       = Color(0xB8FFFFFF) // rgba(255,255,255,0.72)
-val FantasySurfaceSolid  = Color(0xFFFEFAFD)
-val FantasyText          = Color(0xFF3A1F4F)
-val FantasyTextMuted     = Color(0xFF7A5A92)
-val FantasyTextDim       = Color(0xFFA48AB8)
-val FantasyPrimary       = Color(0xFF9B6DD6)
-val FantasyPrimarySoft   = Color(0xFFC9B1EF)
-val FantasyAccent        = Color(0xFFEC7EB1)
-val FantasyAccentSoft    = Color(0xFFF9C6D9)
-val FantasyBorder        = Color(0x249B6DD6) // rgba(155,109,214,0.14)
-val FantasyBorderStrong  = Color(0x479B6DD6) // rgba(155,109,214,0.28)
-val FantasyStatusWant    = Color(0xFFA78BFA)
-val FantasyStatusProg    = Color(0xFFF59EC3)
-val FantasyStatusDone    = Color(0xFF7DD3A8)
-val FantasyStatusDropped = Color(0xFFC4A4BE)
-val FantasyStatusFav     = Color(0xFFEC7EB1)
-val FantasySparkle       = Color(0xFFF5B1D6)
-val FantasyNavBar        = Color(0xE0FFFFFF) // rgba(255,255,255,0.88)
-val FantasySurfContainer = Color(0xFFF2E8FB)
-val FantasySurfVariant   = Color(0xFFEFE4F8)
+// ─── Fantasy (dreamy pink/violet — más rosa y mágico) ────────────────────
+val FantasySurfaceGlass  = Color(0x6BFFFFFF)
+val FantasySurfaceElev   = Color(0xC8FFFFFF)
+val FantasyHairline      = Color(0xB3FFFFFF)
+val FantasyBg            = Color(0xFFFFF0F8)  // rosa suave
+val FantasySurface       = Color(0xB8FFFFFF)
+val FantasySurfaceSolid  = Color(0xFFFFF5FC)
+val FantasyText          = Color(0xFF4A1060)  // púrpura profundo
+val FantasyTextMuted     = Color(0xFF8B3FAF)  // violeta medio
+val FantasyTextDim       = Color(0xFFBD88D4)  // lavanda
+val FantasyPrimary       = Color(0xFFA855F7)  // violet-500
+val FantasyPrimarySoft   = Color(0xFFF3E8FF)  // violet-100
+val FantasyAccent        = Color(0xFFF43F8E)  // rosa hot pink
+val FantasyAccentSoft    = Color(0xFFFFE4F0)
+val FantasyBorder        = Color(0x28A855F7)
+val FantasyBorderStrong  = Color(0x4CA855F7)
+val FantasyStatusWant    = Color(0xFFA855F7)
+val FantasyStatusProg    = Color(0xFFF43F8E)
+val FantasyStatusDone    = Color(0xFF34D399)
+val FantasyStatusDropped = Color(0xFFBD88D4)
+val FantasyStatusFav     = Color(0xFFF43F8E)
+val FantasySparkle       = Color(0xFFF43F8E)
+val FantasyNavBar        = Color(0xF0FFF5FC)  // blanco con toque rosa
+val FantasySurfContainer = Color(0xFFEED6F8)
+val FantasySurfVariant   = Color(0xFFF3E5FA)
 
-// ─── Light (warm cream) ───────────────────────────────────────────────────
-val LightSurfaceGlass    = Color(0x80FFFFFF) // 50% white — glass panel
-val LightSurfaceElev     = Color(0xDBFFFFFF) // 86% white — elevated glass
-val LightHairline        = Color(0xB3FFFFFF) // 70% white — top edge highlight
-val LightBg              = Color(0xFFFAF8F5)
+// ─── Light (blanco limpio + azul) ────────────────────────────────────────
+val LightSurfaceGlass    = Color(0x80FFFFFF)
+val LightSurfaceElev     = Color(0xDBFFFFFF)
+val LightHairline        = Color(0xB3FFFFFF)
+val LightBg              = Color(0xFFF0F6FF)  // tinte azul muy suave
 val LightSurface         = Color(0xFFFFFFFF)
-val LightText            = Color(0xFF1F1A26)
-val LightTextMuted       = Color(0xFF6B6477)
-val LightTextDim         = Color(0xFF9C95A8)
-val LightPrimary         = Color(0xFF6D4DC7)
-val LightPrimarySoft     = Color(0xFFD9CCFF)
-val LightAccent          = Color(0xFFD44A8F)
-val LightAccentSoft      = Color(0xFFF6C5DC)
-val LightBorder          = Color(0x14281E32) // rgba(40,30,50,0.08)
-val LightBorderStrong    = Color(0x29281E32) // rgba(40,30,50,0.16)
-val LightStatusWant      = Color(0xFF8B5CF6)
-val LightStatusProg      = Color(0xFFEC4899)
-val LightStatusDone      = Color(0xFF10B981)
-val LightStatusDropped   = Color(0xFF94748B)
-val LightStatusFav       = Color(0xFFD44A8F)
-val LightSparkle         = Color(0xFFD44A8F)
+val LightText            = Color(0xFF0F172A)  // slate-900 casi negro
+val LightTextMuted       = Color(0xFF475569)  // slate-600
+val LightTextDim         = Color(0xFF94A3B8)  // slate-400
+val LightPrimary         = Color(0xFF2563EB)  // blue-600
+val LightPrimarySoft     = Color(0xFFDBEAFE)  // blue-100
+val LightAccent          = Color(0xFF0EA5E9)  // sky-500
+val LightAccentSoft      = Color(0xFFE0F2FE)  // sky-100
+val LightBorder          = Color(0x1F2563EB)  // azul semitransparente
+val LightBorderStrong    = Color(0x3D2563EB)
+val LightStatusWant      = Color(0xFF6366F1)  // indigo
+val LightStatusProg      = Color(0xFF0EA5E9)  // sky
+val LightStatusDone      = Color(0xFF10B981)  // emerald
+val LightStatusDropped   = Color(0xFF94A3B8)  // slate
+val LightStatusFav       = Color(0xFF2563EB)  // blue
+val LightSparkle         = Color(0xFF2563EB)
 val LightNavBar          = Color(0xFFFFFFFF)
-val LightSurfContainer   = Color(0xFFF3EEFE)
-val LightSurfVariant     = Color(0xFFEEE9F7)
+val LightSurfContainer   = Color(0xFFE8F0FE)  // azul muy claro
+val LightSurfVariant     = Color(0xFFEEF3FF)
 
 // ─── Purple (dark night — deep purple) ───────────────────────────────────
 val PurpleSurfaceGlass   = Color(0x0FFFFFFF) // 6% white — glass on dark

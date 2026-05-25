@@ -57,9 +57,9 @@ val LocalFanAppColors = staticCompositionLocalOf {
         sparkleColor     = FantasySparkle,
         primarySoftColor = FantasyPrimarySoft,
         navBarBg         = FantasyNavBar,
-        gradient1        = listOf(Color(0xFFF9C6D9), Color(0xFFC9B1EF)),
-        gradient2        = listOf(Color(0xFFFFD6E8), Color(0xFFD9C4FF)),
-        gradientAccent   = listOf(Color(0xFFB794F6), Color(0xFFEC7EB1)),
+        gradient1        = listOf(Color(0xFFFFD6EC), Color(0xFFE8B8F8)),
+        gradient2        = listOf(Color(0xFF7C3AED), Color(0xFFDB2777)), // violet-600 → pink-600 (texto blanco legible)
+        gradientAccent   = listOf(Color(0xFFA855F7), Color(0xFFF43F8E)),
         isDark           = false,
     )
 }
@@ -75,11 +75,11 @@ val MaterialTheme.appTheme: AppTheme
 // ─── Color Schemes ────────────────────────────────────────────────────────
 
 private val FantasyColorScheme = lightColorScheme(
-    primary              = FantasyPrimary,
+    primary              = FantasyPrimary,       // violet-500
     onPrimary            = Color.White,
     primaryContainer     = FantasyPrimarySoft,
     onPrimaryContainer   = FantasyText,
-    secondary            = FantasyAccent,
+    secondary            = FantasyAccent,        // hot pink
     onSecondary          = Color.White,
     secondaryContainer   = FantasyAccentSoft,
     onSecondaryContainer = FantasyText,
@@ -99,21 +99,21 @@ private val FantasyColorScheme = lightColorScheme(
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary              = LightPrimary,
+    primary              = LightPrimary,         // blue-600
     onPrimary            = Color.White,
-    primaryContainer     = LightPrimarySoft,
+    primaryContainer     = LightPrimarySoft,     // blue-100
     onPrimaryContainer   = LightText,
-    secondary            = LightAccent,
+    secondary            = LightAccent,          // sky-500
     onSecondary          = Color.White,
     secondaryContainer   = LightAccentSoft,
     onSecondaryContainer = LightText,
     tertiary             = LightStatusDone,
     onTertiary           = Color.White,
-    background           = LightBg,
-    onBackground         = LightText,
+    background           = LightBg,              // tinte azul suave
+    onBackground         = LightText,            // slate-900
     surface              = LightSurface,
     onSurface            = LightText,
-    onSurfaceVariant     = LightTextMuted,
+    onSurfaceVariant     = LightTextMuted,       // slate-600
     surfaceVariant       = LightSurfVariant,
     surfaceContainer     = LightSurfContainer,
     outline              = LightBorderStrong,
@@ -188,9 +188,9 @@ private val FantasyFanAppColors = FanAppColors(
     sparkleColor     = FantasySparkle,
     primarySoftColor = FantasyPrimarySoft,
     navBarBg         = FantasyNavBar,
-    gradient1        = listOf(Color(0xFFF9C6D9), Color(0xFFC9B1EF)),
-    gradient2        = listOf(Color(0xFFFFD6E8), Color(0xFFD9C4FF)),
-    gradientAccent   = listOf(Color(0xFFB794F6), Color(0xFFEC7EB1)),
+    gradient1        = listOf(Color(0xFFFFD6EC), Color(0xFFE8B8F8)), // rosa → lavanda
+    gradient2        = listOf(Color(0xFF7C3AED), Color(0xFFDB2777)), // violet-600 → pink-600 (texto blanco legible)
+    gradientAccent   = listOf(Color(0xFFA855F7), Color(0xFFF43F8E)), // violet → hot pink
     isDark           = false,
 )
 
@@ -210,9 +210,9 @@ private val LightFanAppColors = FanAppColors(
     sparkleColor     = LightSparkle,
     primarySoftColor = LightPrimarySoft,
     navBarBg         = LightNavBar,
-    gradient1        = listOf(Color(0xFFF6C5DC), Color(0xFFD9CCFF)),
-    gradient2        = listOf(Color(0xFFFFD1E1), Color(0xFFC8B6F7)),
-    gradientAccent   = listOf(Color(0xFF6D4DC7), Color(0xFFD44A8F)),
+    gradient1        = listOf(Color(0xFFDBEAFE), Color(0xFFEEF3FF)), // blue-100 → azul muy claro
+    gradient2        = listOf(Color(0xFF1D4ED8), Color(0xFF0284C7)), // blue-700 → sky-600 (texto blanco legible)
+    gradientAccent   = listOf(Color(0xFF2563EB), Color(0xFF0EA5E9)), // blue → sky
     isDark           = false,
 )
 
