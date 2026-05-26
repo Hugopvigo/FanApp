@@ -61,6 +61,7 @@ fun ProfileScreen(
     onNavigateToChangePassword: () -> Unit = {},
     onNavigateToNotifications: () -> Unit = {},
     onNavigateToPrivacy: () -> Unit = {},
+    onNavigateToFanCard: () -> Unit = {},
     viewModel: ProfileViewModel = hiltViewModel(),
 ) {
     val fanColors = MaterialTheme.fanAppColors
@@ -235,6 +236,13 @@ fun ProfileScreen(
             modifier = Modifier.padding(horizontal = 20.dp, vertical = 4.dp),
         )
         Spacer(Modifier.height(8.dp))
+
+        SettingRow(
+            icon = "🃏",
+            label = stringResource(R.string.fancard_title),
+            highlight = true,
+            onClick = onNavigateToFanCard,
+        )
 
         SettingRow(
             icon = "🎨",

@@ -171,4 +171,31 @@
     <string name="privacy_toggle_show_library_subtitle">Your library is visible on your public profile</string>
     <string name="privacy_toggle_share_activity">Share activity</string>
     <string name="privacy_toggle_share_activity_subtitle">Your activity (ratings, completions) is shared</string>
+
+    <!-- Quick Add -->
+    <string name="quick_add_title">Quick Add</string>
+    <string name="quick_add_search_hint">Search series, movies, books…</string>
+    <string name="quick_add_added">Added</string>
+    <string name="quick_add_add">Add to watchlist</string>
+    <string name="quick_add_status_watchlist">Watchlist</string>
+    <string name="quick_add_status_in_progress">In progress</string>
+    <string name="quick_add_status_completed">Completed</string>
+    <string name="quick_add_status_abandoned">Abandoned</string>
+    <string name="nav_add">Add</string>
+
+    <!-- Rating & Notes -->
+    <string name="detail_your_rating">Your rating</string>
+    <string name="detail_notes">Notes</string>
+    <string name="detail_notes_hint">Write your thoughts…</string>
+
+    <!-- FanCard -->
+    <string name="fancard_title">FanCard</string>
+    <string name="fancard_share">Share</string>
+    <string name="fancard_share_title">Share your FanCard</string>
+    <string name="fancard_type_rating">Rating</string>
+    <string name="fancard_type_top">Top</string>
+    <string name="fancard_type_profile">Profile</string>
+    <string name="fancard_top_title">My Top Completed</string>
+    <string name="fancard_no_items">Rate some items to create your FanCard!</string>
+    <string name="fancard_rating_prompt">Share your rating as a FanCard!</string>
 </resources>

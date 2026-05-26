@@ -11,6 +11,7 @@ sealed interface Route {
     @Serializable data object ChangePassword : Route
     @Serializable data object Notifications : Route
     @Serializable data object Privacy : Route
+    @Serializable data object FanCard : Route
 }
 
 sealed interface BottomNavRoute {

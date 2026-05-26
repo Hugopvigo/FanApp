@@ -170,4 +170,20 @@
     <string name="privacy_toggle_show_library_subtitle">Tu biblioteca es visible en tu perfil público</string>
     <string name="privacy_toggle_share_activity">Compartir actividad</string>
     <string name="privacy_toggle_share_activity_subtitle">Tu actividad (valoraciones, completados) se comparte</string>
+
+    <!-- Rating & Notes -->
+    <string name="detail_your_rating">Tu valoración</string>
+    <string name="detail_notes">Notas</string>
+    <string name="detail_notes_hint">Escribe tus impresiones…</string>
+
+    <!-- FanCard -->
+    <string name="fancard_title">FanCard</string>
+    <string name="fancard_share">Compartir</string>
+    <string name="fancard_share_title">Comparte tu FanCard</string>
+    <string name="fancard_type_rating">Valoración</string>
+    <string name="fancard_type_top">Top</string>
+    <string name="fancard_type_profile">Perfil</string>
+    <string name="fancard_top_title">Mi Top Completados</string>
+    <string name="fancard_no_items">¡Valora algunos items para crear tu FanCard!</string>
+    <string name="fancard_rating_prompt">¡Comparte tu valoración como FanCard!</string>
 </resources>

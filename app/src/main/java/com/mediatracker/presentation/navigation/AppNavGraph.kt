@@ -16,6 +16,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -34,12 +37,14 @@ import com.mediatracker.presentation.auth.AuthViewModel
 import com.mediatracker.presentation.auth.LoginScreen
 import com.mediatracker.presentation.detail.DetailScreen
 import com.mediatracker.presentation.discover.DiscoverScreen
+import com.mediatracker.presentation.fancard.FanCardScreen
 import com.mediatracker.presentation.home.HomeScreen
 import com.mediatracker.presentation.library.LibraryScreen
 import com.mediatracker.presentation.profile.ChangePasswordScreen
 import com.mediatracker.presentation.profile.NotificationsScreen
 import com.mediatracker.presentation.profile.PrivacyScreen
 import com.mediatracker.presentation.profile.ProfileScreen
+import com.mediatracker.presentation.quickadd.QuickAddSheet
 import com.mediatracker.presentation.theme.AppTheme
 import com.mediatracker.presentation.theme.LocalAppTheme
 import com.mediatracker.presentation.theme.ThemeScreen
@@ -93,7 +98,10 @@ private fun MainScreen(
         currentDestination?.hasRoute(Route.Theme::class) != true &&
         currentDestination?.hasRoute(Route.Notifications::class) != true &&
         currentDestination?.hasRoute(Route.Privacy::class) != true &&
-        currentDestination?.hasRoute(Route.ChangePassword::class) != true
+        currentDestination?.hasRoute(Route.ChangePassword::class) != true &&
+        currentDestination?.hasRoute(Route.FanCard::class) != true
+
+    var showQuickAdd by remember { mutableStateOf(false) }
 
     val navItems = makeNavItems(
         labelResHome     = R.string.nav_home,
@@ -145,13 +153,14 @@ private fun MainScreen(
                     )
                 }
                 composable<BottomNavRoute.Profile> {
-                    ProfileScreen(
-                        onLogout = { authViewModel.logout() },
-                        onNavigateToTheme = { navController.navigate(Route.Theme) },
-                        onNavigateToChangePassword = { navController.navigate(Route.ChangePassword) },
-                        onNavigateToNotifications = { navController.navigate(Route.Notifications) },
-                        onNavigateToPrivacy = { navController.navigate(Route.Privacy) },
-                    )
+            ProfileScreen(
+                onLogout = { authViewModel.logout() },
+                onNavigateToTheme = { navController.navigate(Route.Theme) },
+                onNavigateToChangePassword = { navController.navigate(Route.ChangePassword) },
+                onNavigateToNotifications = { navController.navigate(Route.Notifications) },
+                onNavigateToPrivacy = { navController.navigate(Route.Privacy) },
+                onNavigateToFanCard = { navController.navigate(Route.FanCard) },
+            )
                 }
                 // Detail: slide desde la derecha + fade
                 composable<Route.Detail>(
@@ -172,7 +181,10 @@ private fun MainScreen(
                             slideOutHorizontally(tween(220, easing = FastOutSlowInEasing)) { it / 3 }
                     },
                 ) {
-                    DetailScreen(onBack = { navController.popBackStack() })
+                    DetailScreen(
+            onBack = { navController.popBackStack() },
+            onNavigateToFanCard = { navController.navigate(Route.FanCard) },
+        )
                 }
                 // Sub-pantallas de Profile: slide hacia arriba (efecto sheet)
                 composable<Route.Theme>(
@@ -228,34 +240,55 @@ private fun MainScreen(
                             slideOutVertically(tween(200)) { it / 2 }
                     },
                 ) {
-                    PrivacyScreen(
-                        onBack = { navController.popBackStack() },
-                        onDeleteAccount = { authViewModel.logout() },
-                    )
-                }
+            PrivacyScreen(
+                onBack = { navController.popBackStack() },
+                onDeleteAccount = { authViewModel.logout() },
+            )
+        }
+        composable<Route.FanCard>(
+            enterTransition = {
+                fadeIn(tween(260)) + slideInVertically(tween(260, easing = FastOutSlowInEasing)) { it / 2 }
+            },
+            popExitTransition = {
+                fadeOut(tween(200)) + slideOutVertically(tween(200)) { it / 2 }
+            },
+        ) {
+            FanCardScreen(onBack = { navController.popBackStack() })
+        }
             }
 
             // Floating glass nav bar overlaid at the bottom
             if (showBottomBar) {
-                FloatingBottomNav(
-                    currentDestination = currentDestination,
-                    onNavigate = { route ->
-                        navController.navigate(route) {
-                            popUpTo(navController.graph.findStartDestination().id) {
-                                saveState = true
-                            }
-                            launchSingleTop = true
-                            restoreState = true
+            FloatingBottomNav(
+                currentDestination = currentDestination,
+                onNavigate = { route ->
+                    navController.navigate(route) {
+                        popUpTo(navController.graph.findStartDestination().id) {
+                            saveState = true
                         }
-                    },
-                    items = navItems,
-                    modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .navigationBarsPadding()
-                        .padding(bottom = 16.dp),
-                )
-            }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                onAddClick = { showQuickAdd = true },
+                items = navItems,
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .navigationBarsPadding()
+                    .padding(bottom = 16.dp),
+            )
         }
+
+        if (showQuickAdd) {
+            QuickAddSheet(
+                onDismiss = { showQuickAdd = false },
+                onItemClick = { item ->
+                    showQuickAdd = false
+                    navController.navigate(Route.Detail(item.media.apiId, item.media.mediaType))
+                },
+            )
+        }
+    }
     }
 }
 
