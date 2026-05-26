@@ -10,7 +10,10 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -27,6 +30,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hasRoute
+import com.mediatracker.R
 import com.mediatracker.presentation.theme.fanAppColors
 
 internal data class NavItem(
@@ -39,6 +43,7 @@ internal data class NavItem(
 internal fun FloatingBottomNav(
     currentDestination: NavDestination?,
     onNavigate: (BottomNavRoute) -> Unit,
+    onAddClick: () -> Unit,
     items: List<NavItem>,
     modifier: Modifier = Modifier,
 ) {
@@ -72,15 +77,18 @@ internal fun FloatingBottomNav(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 8.dp, vertical = 8.dp),
-                horizontalArrangement = Arrangement.SpaceAround,
+                    .padding(horizontal = 4.dp, vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically,
             ) {
-                items.forEach { item ->
+                items.forEachIndexed { index, item ->
+                    if (index == 2) {
+                        CenterFab(onClick = onAddClick)
+                    }
                     val selected = when (item.route) {
-                        BottomNavRoute.Home     -> currentDestination?.hasRoute(BottomNavRoute.Home::class) == true
+                        BottomNavRoute.Home -> currentDestination?.hasRoute(BottomNavRoute.Home::class) == true
                         BottomNavRoute.Discover -> currentDestination?.hasRoute(BottomNavRoute.Discover::class) == true
-                        BottomNavRoute.Library  -> currentDestination?.hasRoute(BottomNavRoute.Library::class) == true
-                        BottomNavRoute.Profile  -> currentDestination?.hasRoute(BottomNavRoute.Profile::class) == true
+                        BottomNavRoute.Library -> currentDestination?.hasRoute(BottomNavRoute.Library::class) == true
+                        BottomNavRoute.Profile -> currentDestination?.hasRoute(BottomNavRoute.Profile::class) == true
                     }
 
                     NavPillItem(
@@ -92,6 +100,26 @@ internal fun FloatingBottomNav(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun CenterFab(onClick: () -> Unit) {
+    val fanColors = MaterialTheme.fanAppColors
+    Box(
+        modifier = Modifier
+            .size(44.dp)
+            .clip(CircleShape)
+            .background(Brush.linearGradient(fanColors.gradientAccent))
+            .clickable(onClick = onClick),
+        contentAlignment = Alignment.Center,
+    ) {
+        Icon(
+            imageVector = Icons.Default.Add,
+            contentDescription = stringResource(R.string.nav_add),
+            tint = Color.White,
+            modifier = Modifier.size(24.dp),
+        )
     }
 }
 
@@ -129,7 +157,7 @@ private fun NavPillItem(
                 imageVector = item.icon,
                 contentDescription = stringResource(item.labelRes),
                 tint = if (selected) MaterialTheme.colorScheme.primary
-                       else MaterialTheme.colorScheme.onSurfaceVariant,
+                else MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.size(22.dp),
             )
         }
@@ -138,7 +166,7 @@ private fun NavPillItem(
             style = MaterialTheme.typography.labelSmall,
             fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium,
             color = if (selected) MaterialTheme.colorScheme.primary
-                    else MaterialTheme.colorScheme.onSurfaceVariant,
+            else MaterialTheme.colorScheme.onSurfaceVariant,
         )
     }
 }
