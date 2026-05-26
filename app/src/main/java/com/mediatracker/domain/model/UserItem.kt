@@ -10,6 +10,8 @@ data class UserItem(
     val favorite: Boolean,
     val addedAt: Long,
     val updatedAt: Long,
+    val userRating: Int? = null,
+    val notes: String? = null,
 )
 
 data class MediaItemWithUserStatus(

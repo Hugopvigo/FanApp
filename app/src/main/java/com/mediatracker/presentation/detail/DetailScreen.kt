@@ -18,13 +18,24 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Snackbar
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -58,20 +69,59 @@ private val HERO_HEIGHT = 380.dp
 @Composable
 fun DetailScreen(
     onBack: () -> Unit,
+    onNavigateToFanCard: (() -> Unit)? = null,
     viewModel: DetailViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val fanColors = MaterialTheme.fanAppColors
+    var showRatingCardPrompt by remember { mutableStateOf(false) }
+    val previousRating = remember { mutableStateOf<Int?>(null) }
 
-    when {
-        state.isLoading -> DetailScreenSkeleton()
-        state.error != null -> ErrorState(state.error ?: stringResource(R.string.error_unknown))
-        state.item != null -> DetailContent(
-            state = state,
-            onBack = onBack,
-            onStatusSelected = viewModel::onStatusSelected,
-            onRemoveFromList = viewModel::onRemoveFromList,
-            onToggleFavorite = viewModel::onToggleFavorite,
-        )
+    LaunchedEffect(state.userItem?.userRating) {
+        val currentRating = state.userItem?.userRating
+        if (currentRating != null && currentRating != previousRating.value && previousRating.value != null) {
+            showRatingCardPrompt = true
+        }
+        previousRating.value = currentRating
+    }
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        when {
+            state.isLoading -> DetailScreenSkeleton()
+            state.error != null -> ErrorState(state.error ?: stringResource(R.string.error_unknown))
+            state.item != null -> DetailContent(
+                state = state,
+                onBack = onBack,
+                onStatusSelected = viewModel::onStatusSelected,
+                onRemoveFromList = viewModel::onRemoveFromList,
+                onToggleFavorite = viewModel::onToggleFavorite,
+                onRatingChanged = viewModel::onRatingChanged,
+                onNotesChanged = viewModel::onNotesChanged,
+            )
+        }
+
+        if (showRatingCardPrompt && onNavigateToFanCard != null) {
+            Snackbar(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(16.dp),
+                action = {
+                    TextButton(onClick = {
+                        showRatingCardPrompt = false
+                        onNavigateToFanCard()
+                    }) {
+                        Text(stringResource(R.string.fancard_share), color = fanColors.gradientAccent.first())
+                    }
+                },
+                dismissAction = {
+                    IconButton(onClick = { showRatingCardPrompt = false }) {
+                        Icon(Icons.Filled.Close, contentDescription = null, modifier = Modifier.size(18.dp))
+                    }
+                },
+            ) {
+                Text(stringResource(R.string.fancard_rating_prompt))
+            }
+        }
     }
 }
 
@@ -82,6 +132,8 @@ private fun DetailContent(
     onStatusSelected: (ItemStatus) -> Unit,
     onRemoveFromList: () -> Unit,
     onToggleFavorite: () -> Unit,
+    onRatingChanged: (Int?) -> Unit,
+    onNotesChanged: (String) -> Unit,
 ) {
     val item = state.item ?: return
     val userItem = state.userItem
@@ -195,14 +247,30 @@ private fun DetailContent(
                     }
                 }
 
-                // Favorite toggle
-                if (userItem != null) {
-                    FavoriteToggle(
-                        isFavorite = userItem.favorite,
-                        onToggle = onToggleFavorite,
-                        enabled = userItem.status != ItemStatus.ABANDONED,
-                    )
-                }
+            // Favorite toggle
+            if (userItem != null) {
+                FavoriteToggle(
+                    isFavorite = userItem.favorite,
+                    onToggle = onToggleFavorite,
+                    enabled = userItem.status != ItemStatus.ABANDONED,
+                )
+            }
+
+            // Star rating
+            if (userItem != null) {
+                StarRatingBar(
+                    rating = userItem.userRating,
+                    onRatingChanged = onRatingChanged,
+                )
+            }
+
+            // Notes
+            if (userItem != null) {
+                NotesField(
+                    notes = userItem.notes.orEmpty(),
+                    onNotesChanged = onNotesChanged,
+                )
+            }
 
                 // Sinopsis
                 if (item.overview.isNotBlank()) {
@@ -283,41 +351,100 @@ private fun ExtraInfo(extra: Map<String, String>, mediaType: MediaType) {
     }
 }
 
+@Composable
+private fun StarRatingBar(
+    rating: Int?,
+    onRatingChanged: (Int?) -> Unit,
+) {
+    val fanColors = MaterialTheme.fanAppColors
+    Column {
+        Text(
+            text = stringResource(R.string.detail_your_rating),
+            style = MaterialTheme.typography.labelLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Spacer(Modifier.height(4.dp))
+        Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+            (1..5).forEach { star ->
+                val selected = rating != null && star <= rating
+                Icon(
+                    imageVector = if (selected) Icons.Filled.Star else Icons.Filled.StarBorder,
+                    contentDescription = "$star",
+                    tint = if (selected) fanColors.gradientAccent.first()
+                    else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.38f),
+                    modifier = Modifier
+                        .size(36.dp)
+                        .clickable {
+                            onRatingChanged(if (rating == star) null else star)
+                        },
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun NotesField(
+    notes: String,
+    onNotesChanged: (String) -> Unit,
+) {
+    Column {
+        Text(
+            text = stringResource(R.string.detail_notes),
+            style = MaterialTheme.typography.labelLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Spacer(Modifier.height(4.dp))
+        OutlinedTextField(
+            value = notes,
+            onValueChange = onNotesChanged,
+            placeholder = { Text(stringResource(R.string.detail_notes_hint)) },
+            modifier = Modifier.fillMaxWidth(),
+            maxLines = 4,
+            shape = RoundedCornerShape(12.dp),
+        )
+    }
+}
+
 @Preview(showBackground = true, heightDp = 700)
 @Composable
 private fun DetailContentPreview() {
     MediaTrackerTheme(appTheme = AppTheme.Fantasy) {
-        DetailContent(
-            state = DetailUiState(
-                item = MediaItem(
-                    id = "preview_d1",
-                    mediaType = MediaType.MOVIE,
-                    title = "Inception",
-                    overview = "Un ladrón especializado en extraer secretos del subconsciente a través de los sueños recibe la tarea de implantar una idea en la mente de un CEO.",
-                    posterUrl = "",
-                    releaseDate = "2010-07-16",
-                    rating = 8.8f,
-                    genres = listOf("Acción", "Sci-Fi", "Thriller"),
-                    extraData = mapOf("runtime" to "148", "creators" to "Christopher Nolan"),
-                ),
-                userItem = UserItem(
-                    id = "preview_u1",
-                    mediaType = MediaType.MOVIE,
-                    apiId = "mv_1",
-                    title = "Inception",
-                    posterUrl = null,
-                    status = ItemStatus.COMPLETED,
-                    favorite = true,
-                    addedAt = 0L,
-                    updatedAt = 0L,
-                ),
-                isLoading = false,
+    DetailContent(
+        state = DetailUiState(
+            item = MediaItem(
+                id = "preview_d1",
+                mediaType = MediaType.MOVIE,
+                title = "Inception",
+                overview = "Un ladrón especializado en extraer secretos del subconsciente a través de los sueños recibe la tarea de implantar una idea en la mente de un CEO.",
+                posterUrl = "",
+                releaseDate = "2010-07-16",
+                rating = 8.8f,
+                genres = listOf("Acción", "Sci-Fi", "Thriller"),
+                extraData = mapOf("runtime" to "148", "creators" to "Christopher Nolan"),
             ),
-            onBack = {},
-            onStatusSelected = {},
-            onRemoveFromList = {},
-            onToggleFavorite = {},
-        )
+            userItem = UserItem(
+                id = "preview_u1",
+                mediaType = MediaType.MOVIE,
+                apiId = "mv_1",
+                title = "Inception",
+                posterUrl = null,
+                status = ItemStatus.COMPLETED,
+                favorite = true,
+                addedAt = 0L,
+                updatedAt = 0L,
+                userRating = 4,
+                notes = "Amazing movie!",
+            ),
+            isLoading = false,
+        ),
+        onBack = {},
+        onStatusSelected = {},
+        onRemoveFromList = {},
+        onToggleFavorite = {},
+        onRatingChanged = {},
+        onNotesChanged = {},
+    )
     }
 }
 

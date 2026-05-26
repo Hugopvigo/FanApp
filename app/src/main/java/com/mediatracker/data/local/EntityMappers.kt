@@ -45,6 +45,8 @@ fun UserItemEntity.toDomain(): UserItem = UserItem(
     favorite = favorite,
     addedAt = addedAt,
     updatedAt = updatedAt,
+    userRating = userRating,
+    notes = notes,
 )
 
 fun UserItem.toEntity(): UserItemEntity = UserItemEntity(
@@ -57,6 +59,8 @@ fun UserItem.toEntity(): UserItemEntity = UserItemEntity(
     favorite = favorite,
     addedAt = addedAt,
     updatedAt = updatedAt,
+    userRating = userRating,
+    notes = notes,
 )
 
 fun Pair<MediaItemEntity, UserItemEntity?>.toMediaItemWithUserStatus(): MediaItemWithUserStatus =

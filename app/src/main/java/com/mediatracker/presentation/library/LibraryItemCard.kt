@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -24,6 +25,7 @@ import com.mediatracker.R
 import com.mediatracker.domain.model.MediaType
 import com.mediatracker.domain.model.UserItem
 import com.mediatracker.presentation.components.GradientPoster
+import com.mediatracker.presentation.theme.fanAppColors
 
 @Composable
 fun LibraryItemCard(
@@ -86,6 +88,22 @@ fun LibraryItemCard(
                     modifier = Modifier.size(12.dp),
                     tint = MaterialTheme.colorScheme.secondary,
                 )
+            }
+        }
+
+        if (userItem.userRating != null) {
+            val fanColors = MaterialTheme.fanAppColors
+            Row(horizontalArrangement = Arrangement.spacedBy(1.dp)) {
+                (1..5).forEach { star ->
+                    Icon(
+                        imageVector = if (star <= userItem.userRating) Icons.Filled.Star
+                        else Icons.Filled.StarBorder,
+                        contentDescription = null,
+                        modifier = Modifier.size(12.dp),
+                        tint = if (star <= userItem.userRating) fanColors.gradientAccent.first()
+                        else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.30f),
+                    )
+                }
             }
         }
     }

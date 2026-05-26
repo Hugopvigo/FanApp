@@ -99,4 +99,28 @@ class UserRepositoryImpl @Inject constructor(
         firestoreDataSource.removeItem(itemId)
         userItemDao.deleteById(itemId)
     }.onFailure { Timber.e(it, "Remove user item failed: $itemId") }
+
+    override suspend fun updateUserRating(itemId: String, rating: Int?): Result<Unit> =
+        runCatching {
+            val entity = userItemDao.getById(itemId)
+                ?: throw NoSuchElementException("Item $itemId not found")
+            userItemDao.insert(
+                entity.copy(
+                    userRating = rating,
+                    updatedAt = System.currentTimeMillis(),
+                )
+            )
+        }.onFailure { Timber.e(it, "Update rating failed: $itemId") }
+
+    override suspend fun updateUserNotes(itemId: String, notes: String): Result<Unit> =
+        runCatching {
+            val entity = userItemDao.getById(itemId)
+                ?: throw NoSuchElementException("Item $itemId not found")
+            userItemDao.insert(
+                entity.copy(
+                    notes = notes,
+                    updatedAt = System.currentTimeMillis(),
+                )
+            )
+        }.onFailure { Timber.e(it, "Update notes failed: $itemId") }
 }

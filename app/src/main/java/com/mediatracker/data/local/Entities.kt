@@ -29,6 +29,8 @@ data class UserItemEntity(
     val favorite: Boolean,
     val addedAt: Long,
     val updatedAt: Long,
+    val userRating: Int? = null,
+    val notes: String? = null,
 )
 
 @Entity(tableName = "notifications")

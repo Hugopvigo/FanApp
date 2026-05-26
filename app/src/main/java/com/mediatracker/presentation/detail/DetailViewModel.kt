@@ -13,6 +13,8 @@ import com.mediatracker.domain.usecase.GetUserItemsUseCase
 import com.mediatracker.domain.usecase.RemoveUserItemUseCase
 import com.mediatracker.domain.usecase.ToggleFavoriteUseCase
 import com.mediatracker.domain.usecase.UpdateItemStatusUseCase
+import com.mediatracker.domain.usecase.UpdateUserRatingUseCase
+import com.mediatracker.domain.usecase.UpdateUserNotesUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -38,6 +40,8 @@ class DetailViewModel @Inject constructor(
     private val updateItemStatusUseCase: UpdateItemStatusUseCase,
     private val toggleFavoriteUseCase: ToggleFavoriteUseCase,
     private val removeUserItemUseCase: RemoveUserItemUseCase,
+    private val updateUserRatingUseCase: UpdateUserRatingUseCase,
+    private val updateUserNotesUseCase: UpdateUserNotesUseCase,
 ) : ViewModel() {
 
     private val apiId: String = savedStateHandle["apiId"] ?: ""
@@ -111,6 +115,20 @@ class DetailViewModel @Inject constructor(
         val currentUserItem = _state.value.userItem ?: return
         viewModelScope.launch {
             toggleFavoriteUseCase(currentUserItem.id)
+        }
+    }
+
+    fun onRatingChanged(rating: Int?) {
+        val currentUserItem = _state.value.userItem ?: return
+        viewModelScope.launch {
+            updateUserRatingUseCase(currentUserItem.id, rating)
+        }
+    }
+
+    fun onNotesChanged(notes: String) {
+        val currentUserItem = _state.value.userItem ?: return
+        viewModelScope.launch {
+            updateUserNotesUseCase(currentUserItem.id, notes)
         }
     }
 }
