@@ -87,7 +87,7 @@ private fun HomeScreenContent(
 
                 HomeHeader()
 
-                GreetingLine()
+                GreetingLine(userName = state.userName)
 
                 Spacer(Modifier.height(20.dp))
 
@@ -230,21 +230,23 @@ private fun HomeHeader() {
 
 // ─── Greeting ─────────────────────────────────────────────────────────────────
 @Composable
-private fun GreetingLine() {
+private fun GreetingLine(userName: String?) {
     val hour = remember { Calendar.getInstance().get(Calendar.HOUR_OF_DAY) }
     val greeting = when {
-        hour < 6  -> "Buenas noches"
+        hour < 6 -> "Buenas noches"
         hour < 12 -> "Buenos días"
         hour < 20 -> "Buenas tardes"
-        else      -> "Buenas noches"
+        else -> "Buenas noches"
     }
+    val firstName = userName?.takeIf { it.isNotBlank() }?.split(" ")?.firstOrNull()
+    val displayText = if (firstName != null) "$greeting, $firstName" else greeting
     Row(
         modifier = Modifier.padding(horizontal = 20.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(6.dp),
     ) {
         Text(
-            text = greeting,
+            text = displayText,
             style = MaterialTheme.typography.headlineMedium.copy(
                 fontFamily = DisplayFontFamily,
                 letterSpacing = (-0.4).sp,

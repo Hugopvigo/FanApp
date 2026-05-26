@@ -42,7 +42,7 @@ import com.mediatracker.domain.model.ItemStatus
 import com.mediatracker.domain.model.MediaType
 import com.mediatracker.domain.model.UserItem
 import com.mediatracker.presentation.components.EmptyState
-import com.mediatracker.presentation.components.LoadingState
+import com.mediatracker.presentation.components.LibraryGridSkeleton
 import com.mediatracker.presentation.components.fanColor
 import com.mediatracker.presentation.components.statusIcon
 import com.mediatracker.presentation.theme.AppTheme
@@ -149,7 +149,7 @@ private fun LibraryScreenContent(
         Spacer(Modifier.height(12.dp))
 
         when {
-            state.isLoading -> LoadingState()
+            state.isLoading -> LibraryGridSkeleton()
             state.items.isEmpty() -> EmptyState(
                 message = when (state.selectedStatus) {
                     ItemStatus.WATCHLIST   -> stringResource(R.string.library_empty_watchlist)

@@ -105,6 +105,117 @@ fun FeaturedCardSkeleton(modifier: Modifier = Modifier) {
 }
 
 @Composable
+fun DiscoverScreenSkeleton(modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(horizontal = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+    ) {
+        ShimmerBox(
+            modifier = Modifier.fillMaxWidth().height(44.dp),
+            shape = RoundedCornerShape(14.dp),
+        )
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            repeat(3) {
+                ShimmerBox(
+                    modifier = Modifier.height(32.dp).width(90.dp),
+                    shape = RoundedCornerShape(999.dp),
+                )
+            }
+        }
+        ShimmerBox(
+            modifier = Modifier.fillMaxWidth(0.45f).height(20.dp),
+            shape = RoundedCornerShape(4.dp),
+        )
+        MediaRowSkeleton()
+    }
+}
+
+@Composable
+fun LibraryGridSkeleton(modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
+            ShimmerBox(
+                modifier = Modifier.fillMaxWidth(0.35f).height(28.dp),
+                shape = RoundedCornerShape(4.dp),
+            )
+            ShimmerBox(
+                modifier = Modifier.width(60.dp).height(16.dp),
+                shape = RoundedCornerShape(4.dp),
+            )
+        }
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            repeat(4) {
+                ShimmerBox(
+                    modifier = Modifier.height(32.dp).width(80.dp),
+                    shape = RoundedCornerShape(999.dp),
+                )
+            }
+        }
+        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+            repeat(4) {
+                ShimmerBox(
+                    modifier = Modifier.height(28.dp).width(90.dp),
+                    shape = RoundedCornerShape(12.dp),
+                )
+            }
+        }
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            repeat(3) {
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(6.dp),
+                ) {
+                    ShimmerBox(
+                        modifier = Modifier.fillMaxWidth().height(180.dp),
+                        shape = RoundedCornerShape(12.dp),
+                    )
+                    ShimmerBox(
+                        modifier = Modifier.fillMaxWidth().height(12.dp),
+                        shape = RoundedCornerShape(4.dp),
+                    )
+                }
+            }
+        }
+        Spacer(Modifier.height(12.dp))
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            repeat(3) {
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(6.dp),
+                ) {
+                    ShimmerBox(
+                        modifier = Modifier.fillMaxWidth().height(180.dp),
+                        shape = RoundedCornerShape(12.dp),
+                    )
+                    ShimmerBox(
+                        modifier = Modifier.fillMaxWidth().height(12.dp),
+                        shape = RoundedCornerShape(4.dp),
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
 fun DetailScreenSkeleton(modifier: Modifier = Modifier) {
     Column(modifier = modifier.fillMaxSize()) {
         ShimmerBox(

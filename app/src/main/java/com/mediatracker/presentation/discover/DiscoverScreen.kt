@@ -58,7 +58,8 @@ import com.mediatracker.presentation.components.EmptyState
 import com.mediatracker.presentation.components.ErrorState
 import com.mediatracker.presentation.components.GlassSurface
 import com.mediatracker.presentation.components.GradientPoster
-import com.mediatracker.presentation.components.LoadingState
+import com.mediatracker.presentation.components.DiscoverScreenSkeleton
+import com.mediatracker.presentation.components.MediaRowSkeleton
 import com.mediatracker.presentation.components.MediaCard
 import com.mediatracker.presentation.theme.AppTheme
 import com.mediatracker.presentation.theme.DisplayFontFamily
@@ -150,7 +151,7 @@ private fun DiscoverScreenContent(
         Spacer(Modifier.height(16.dp))
 
         when {
-            state.isLoading -> LoadingState()
+            state.isLoading -> DiscoverScreenSkeleton()
             state.error != null && state.searchResults.isEmpty() ->
                 ErrorState(state.error ?: stringResource(R.string.error_unknown))
             state.searchQuery.isNotBlank() && state.searchResults.isEmpty() ->
@@ -163,7 +164,7 @@ private fun DiscoverScreenContent(
                 )
                 Spacer(Modifier.height(10.dp))
                 when {
-                    state.isLoadingTrending -> LoadingState()
+                    state.isLoadingTrending -> MediaRowSkeleton()
                     state.error != null -> ErrorState(state.error ?: stringResource(R.string.error_unknown))
                     state.trending.isEmpty() -> EmptyState(stringResource(R.string.discover_no_trending))
                     else -> {
