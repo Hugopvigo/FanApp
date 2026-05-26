@@ -69,6 +69,14 @@ class AuthViewModel @Inject constructor(
         _state.update { it.copy(isRegisterMode = !it.isRegisterMode, error = null) }
     }
 
+    fun onGoogleSignIn(idToken: String) {
+        viewModelScope.launch {
+            _state.update { it.copy(isLoading = true, error = null) }
+            val result = authDataSource.signInWithGoogle(idToken)
+            _state.update { it.copy(isLoading = false, error = result.error) }
+        }
+    }
+
     fun login() {
         val s = _state.value
         val emailError = validateEmail(s.email)

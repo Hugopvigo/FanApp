@@ -44,6 +44,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -55,6 +56,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
 import com.mediatracker.R
 import com.mediatracker.presentation.theme.fanAppColors
 
@@ -67,6 +73,21 @@ fun LoginScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val fanColors = MaterialTheme.fanAppColors
     val accentBrush = Brush.linearGradient(fanColors.gradientAccent)
+    val context = LocalContext.current
+
+    val googleLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult(),
+    ) { result ->
+        try {
+            val account = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+                .getResult(ApiException::class.java)
+            account.idToken?.let { viewModel.onGoogleSignIn(it) }
+        } catch (e: ApiException) {
+            if (e.statusCode != 16) {
+                viewModel.clearError()
+            }
+        }
+    }
 
     val resetSentMessage = stringResource(R.string.forgot_password_sent)
     LaunchedEffect(state.error) {
@@ -258,8 +279,15 @@ fun LoginScreen(
 
                 Spacer(Modifier.height(16.dp))
 
-                OutlinedButton(
-                    onClick = { },
+        OutlinedButton(
+            onClick = {
+                val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                    .requestIdToken(context.getString(R.string.default_web_client_id))
+                    .requestEmail()
+                    .build()
+                val client = GoogleSignIn.getClient(context, gso)
+                googleLauncher.launch(client.signInIntent)
+            },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(52.dp),

@@ -5,6 +5,7 @@ import com.google.firebase.auth.FirebaseAuthEmailException
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException
+import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.UserProfileChangeRequest
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -50,6 +51,23 @@ class AuthDataSource @Inject constructor(
         }
         auth?.addAuthStateListener(listener)
         awaitClose { auth?.removeAuthStateListener(listener) }
+    }
+
+    suspend fun signInWithGoogle(idToken: String): AuthResult {
+        val firebaseAuth = auth ?: return AuthResult(error = "Firebase no está configurado. Añade google-services.json.")
+        return try {
+            val credential = GoogleAuthProvider.getCredential(idToken, null)
+            val result = firebaseAuth.signInWithCredential(credential).await()
+            val user = result.user
+            AuthResult(
+                isLoggedIn = true,
+                userEmail = user?.email,
+                userName = user?.displayName,
+            )
+        } catch (e: Exception) {
+            Timber.e(e, "Google Sign-In failed")
+            AuthResult(error = mapAuthError(e))
+        }
     }
 
     suspend fun loginWithEmail(email: String, password: String): AuthResult {
