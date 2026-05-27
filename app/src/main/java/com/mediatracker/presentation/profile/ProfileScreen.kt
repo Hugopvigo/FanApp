@@ -74,6 +74,7 @@ fun ProfileScreen(
     val showEditNameDialog by viewModel.showEditNameDialog.collectAsStateWithLifecycle()
     val showAvatarDialog by viewModel.showAvatarDialog.collectAsStateWithLifecycle()
     val unreadCount by viewModel.unreadNotificationCount.collectAsStateWithLifecycle()
+    val streak by viewModel.streak.collectAsStateWithLifecycle()
     val displayName = userName?.takeIf { it.isNotBlank() }?.capitalizeWords() ?: "Usuario"
     val initial = displayName.first().uppercaseChar().toString()
 
@@ -220,10 +221,63 @@ fun ProfileScreen(
                         )
                     }
                 }
+        }
+    }
+
+    if (streak.currentStreak > 0 || streak.longestStreak > 0) {
+        Spacer(Modifier.height(12.dp))
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
+            GlassSurface(modifier = Modifier.weight(1f), radius = 18.dp) {
+                Column(
+                    modifier = Modifier.fillMaxWidth().padding(14.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    Text("🔥", fontSize = 24.sp)
+                    Text(
+                        text = streak.currentStreak.toString(),
+                        style = MaterialTheme.typography.headlineSmall.copy(
+                            fontFamily = DisplayFontFamily,
+                            letterSpacing = (-0.4).sp,
+                        ),
+                        color = MaterialTheme.colorScheme.onSurface,
+                    )
+                    Text(
+                        text = stringResource(R.string.streak_current),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
+            GlassSurface(modifier = Modifier.weight(1f), radius = 18.dp) {
+                Column(
+                    modifier = Modifier.fillMaxWidth().padding(14.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    Text("⚡", fontSize = 24.sp)
+                    Text(
+                        text = streak.longestStreak.toString(),
+                        style = MaterialTheme.typography.headlineSmall.copy(
+                            fontFamily = DisplayFontFamily,
+                            letterSpacing = (-0.4).sp,
+                        ),
+                        color = MaterialTheme.colorScheme.onSurface,
+                    )
+                    Text(
+                        text = stringResource(R.string.streak_longest),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
             }
         }
+    }
 
-        Spacer(Modifier.height(24.dp))
+    Spacer(Modifier.height(24.dp))
 
         // ── Settings section ──────────────────────────────────────────────────
         Text(

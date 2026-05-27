@@ -51,3 +51,11 @@ data class AchievementEntity(
     val condition: String,
     val unlockedAt: Long? = null,
 )
+
+@Entity(tableName = "streaks")
+data class StreakEntity(
+    @PrimaryKey val id: String = "user_streak",
+    val currentStreak: Int = 0,
+    val longestStreak: Int = 0,
+    val lastActiveDate: String = "",
+)

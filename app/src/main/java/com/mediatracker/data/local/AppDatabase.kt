@@ -6,8 +6,8 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
 @Database(
-    entities = [MediaItemEntity::class, UserItemEntity::class, NotificationEntity::class, AchievementEntity::class],
-    version = 5,
+    entities = [MediaItemEntity::class, UserItemEntity::class, NotificationEntity::class, AchievementEntity::class, StreakEntity::class],
+    version = 6,
     exportSchema = false,
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -15,6 +15,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun userItemDao(): UserItemDao
     abstract fun notificationDao(): NotificationDao
     abstract fun achievementDao(): AchievementDao
+    abstract fun streakDao(): StreakDao
 
     companion object {
         val MIGRATION_1_2 = object : Migration(1, 2) {
@@ -48,16 +49,29 @@ abstract class AppDatabase : RoomDatabase() {
         }
     }
 
-    val MIGRATION_4_5 = object : Migration(4, 5) {
-        override fun migrate(db: SupportSQLiteDatabase) {
-            db.execSQL("""
-            CREATE TABLE IF NOT EXISTS achievements (
-                id TEXT NOT NULL PRIMARY KEY,
-                condition TEXT NOT NULL,
-                unlockedAt INTEGER DEFAULT NULL
-            )
-            """.trimIndent())
+        val MIGRATION_4_5 = object : Migration(4, 5) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("""
+                    CREATE TABLE IF NOT EXISTS achievements (
+                        id TEXT NOT NULL PRIMARY KEY,
+                        condition TEXT NOT NULL,
+                        unlockedAt INTEGER DEFAULT NULL
+                    )
+                """.trimIndent())
+            }
+        }
+
+        val MIGRATION_5_6 = object : Migration(5, 6) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("""
+                    CREATE TABLE IF NOT EXISTS streaks (
+                        id TEXT NOT NULL PRIMARY KEY,
+                        currentStreak INTEGER NOT NULL DEFAULT 0,
+                        longestStreak INTEGER NOT NULL DEFAULT 0,
+                        lastActiveDate TEXT NOT NULL DEFAULT ''
+                    )
+                """.trimIndent())
+            }
         }
     }
-}
 }

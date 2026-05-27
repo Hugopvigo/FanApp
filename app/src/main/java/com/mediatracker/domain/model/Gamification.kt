@@ -28,6 +28,12 @@ data class YearStat(
     val totalCompleted: Int,
 )
 
+data class UserStreak(
+    val currentStreak: Int,
+    val longestStreak: Int,
+    val lastActiveDate: String,
+)
+
 data class Achievement(
     val id: String,
     val title: String,

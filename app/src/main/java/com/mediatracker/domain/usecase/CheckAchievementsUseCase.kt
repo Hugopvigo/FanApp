@@ -4,6 +4,7 @@ import com.mediatracker.data.local.AchievementDao
 import com.mediatracker.data.local.AchievementEntity
 import com.mediatracker.data.local.NotificationDao
 import com.mediatracker.data.local.NotificationEntity
+import com.mediatracker.data.local.StreakDao
 import com.mediatracker.domain.model.ACHIEVEMENT_DEFS
 import com.mediatracker.domain.model.AchievementCondition
 import com.mediatracker.domain.model.ItemStatus
@@ -17,6 +18,7 @@ class CheckAchievementsUseCase @Inject constructor(
     private val userRepository: UserRepository,
     private val achievementDao: AchievementDao,
     private val notificationDao: NotificationDao,
+    private val streakDao: StreakDao,
 ) {
     suspend operator fun invoke() {
         val items = try {
@@ -42,24 +44,24 @@ class CheckAchievementsUseCase @Inject constructor(
         val hasBooks = activeItems.any { it.mediaType == MediaType.BOOK }
         val distinctTypes = listOf(hasSeries, hasMovies, hasBooks).count { it }
 
+        val currentStreak = streakDao.get()?.currentStreak ?: 0
+
         for (def in ACHIEVEMENT_DEFS) {
-            if (def.condition == AchievementCondition.STREAK_7 || def.condition == AchievementCondition.STREAK_30) {
-                continue
-            }
             val existing = achievementDao.getById(def.id)
             if (existing?.unlockedAt != null) continue
 
-            val (unlocked, progress) = evaluateCondition(
-                condition = def.condition,
-                target = def.target,
-                totalItems = activeItems.size,
-                totalCompleted = totalCompleted,
-                seriesCompleted = seriesCompleted,
-                moviesCompleted = moviesCompleted,
-                booksCompleted = booksCompleted,
-                favorites = favorites,
-                distinctTypes = distinctTypes,
-            )
+        val (unlocked, progress) = evaluateCondition(
+            condition = def.condition,
+            target = def.target,
+            totalItems = activeItems.size,
+            totalCompleted = totalCompleted,
+            seriesCompleted = seriesCompleted,
+            moviesCompleted = moviesCompleted,
+            booksCompleted = booksCompleted,
+            favorites = favorites,
+            distinctTypes = distinctTypes,
+            currentStreak = currentStreak,
+        )
 
             if (unlocked) {
                 val now = System.currentTimeMillis()
@@ -102,6 +104,7 @@ class CheckAchievementsUseCase @Inject constructor(
         booksCompleted: Int,
         favorites: Int,
         distinctTypes: Int,
+        currentStreak: Int = 0,
     ): Pair<Boolean, Int> = when (condition) {
         AchievementCondition.FIRST_ADD -> (totalItems >= target) to minOf(totalItems, target)
         AchievementCondition.FIRST_COMPLETE -> (totalCompleted >= target) to minOf(totalCompleted, target)
@@ -116,7 +119,7 @@ class CheckAchievementsUseCase @Inject constructor(
             val minPerType = minOf(seriesCompleted, moviesCompleted, booksCompleted)
             (minPerType >= target) to minOf(minPerType, target)
         }
-        AchievementCondition.STREAK_7,
-        AchievementCondition.STREAK_30 -> (false) to 0
+        AchievementCondition.STREAK_7 -> (currentStreak >= target) to minOf(currentStreak, target)
+        AchievementCondition.STREAK_30 -> (currentStreak >= target) to minOf(currentStreak, target)
     }
 }

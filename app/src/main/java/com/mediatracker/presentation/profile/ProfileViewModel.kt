@@ -7,6 +7,8 @@ import com.mediatracker.data.firestore.FirestoreDataSource
 import com.mediatracker.data.local.NotificationDao
 import com.mediatracker.domain.usecase.GetUserStatsUseCase
 import com.mediatracker.domain.model.UserStats
+import com.mediatracker.domain.model.UserStreak
+import com.mediatracker.domain.usecase.UpdateStreakUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -24,6 +26,7 @@ class ProfileViewModel @Inject constructor(
     private val authDataSource: AuthDataSource,
     private val firestoreDataSource: FirestoreDataSource,
     notificationDao: NotificationDao,
+    private val updateStreakUseCase: UpdateStreakUseCase,
 ) : ViewModel() {
 
     val stats: StateFlow<UserStats> = getUserStatsUseCase()
@@ -54,6 +57,16 @@ class ProfileViewModel @Inject constructor(
 
     init {
         loadAvatar()
+        loadStreak()
+    }
+
+    private val _streak = MutableStateFlow(UserStreak(0, 0, ""))
+    val streak: StateFlow<UserStreak> = _streak.asStateFlow()
+
+    private fun loadStreak() {
+        viewModelScope.launch {
+            _streak.value = updateStreakUseCase.getStreak()
+        }
     }
 
     private fun loadAvatar() {

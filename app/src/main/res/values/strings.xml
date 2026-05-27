@@ -201,4 +201,8 @@
 
     <!-- Achievements -->
     <string name="achievements_title">Achievements</string>
+
+    <!-- Streaks -->
+    <string name="streak_current">Current streak</string>
+    <string name="streak_longest">Best streak</string>
 </resources>

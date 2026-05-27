@@ -6,6 +6,7 @@ import com.mediatracker.data.local.AchievementDao
 import com.mediatracker.data.local.AppDatabase
 import com.mediatracker.data.local.MediaItemDao
 import com.mediatracker.data.local.NotificationDao
+import com.mediatracker.data.local.StreakDao
 import com.mediatracker.data.local.UserItemDao
 import dagger.Module
 import dagger.Provides
@@ -26,7 +27,7 @@ object DatabaseModule {
             AppDatabase::class.java,
             "mediatracker.db",
         )
-            .addMigrations(AppDatabase.MIGRATION_1_2, AppDatabase.MIGRATION_2_3, AppDatabase.MIGRATION_3_4, AppDatabase.MIGRATION_4_5)
+            .addMigrations(AppDatabase.MIGRATION_1_2, AppDatabase.MIGRATION_2_3, AppDatabase.MIGRATION_3_4, AppDatabase.MIGRATION_4_5, AppDatabase.MIGRATION_5_6)
             .build()
 
     @Provides
@@ -42,6 +43,10 @@ object DatabaseModule {
         database.notificationDao()
 
     @Provides
-    fun provideAchievementDao(database: AppDatabase): AchievementDao =
+    fun provideAchievementDao(database: AppDatabase): AchievementDao = 
         database.achievementDao()
+
+    @Provides
+    fun provideStreakDao(database: AppDatabase): StreakDao = 
+        database.streakDao()
 }

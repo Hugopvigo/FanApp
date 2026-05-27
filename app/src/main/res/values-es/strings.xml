@@ -189,4 +189,8 @@
 
     <!-- Achievements -->
     <string name="achievements_title">Logros</string>
+
+    <!-- Streaks -->
+    <string name="streak_current">Racha actual</string>
+    <string name="streak_longest">Mejor racha</string>
 </resources>

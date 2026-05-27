@@ -7,9 +7,11 @@ import com.mediatracker.domain.model.ItemStatus
 import com.mediatracker.domain.model.MediaItem
 import com.mediatracker.domain.model.MediaType
 import com.mediatracker.domain.model.UserItem
+import com.mediatracker.domain.model.UserStreak
 import com.mediatracker.domain.usecase.GetMediaDetailUseCase
 import com.mediatracker.domain.usecase.GetTrendingUseCase
 import com.mediatracker.domain.usecase.GetUserItemsUseCase
+import com.mediatracker.domain.usecase.UpdateStreakUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -21,6 +23,7 @@ import javax.inject.Inject
 
 data class HomeUiState(
     val userName: String? = null,
+    val currentStreak: Int = 0,
     val trending: List<MediaItem> = emptyList(),
     val continueWatching: List<MediaItem> = emptyList(),
     val favorites: List<MediaItem> = emptyList(),
@@ -35,6 +38,7 @@ class HomeViewModel @Inject constructor(
     private val getUserItemsUseCase: GetUserItemsUseCase,
     private val getMediaDetailUseCase: GetMediaDetailUseCase,
     private val authDataSource: AuthDataSource,
+    private val updateStreakUseCase: UpdateStreakUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(HomeUiState())
@@ -44,6 +48,14 @@ class HomeViewModel @Inject constructor(
         observeUserName()
         loadTrending()
         observeUserItems()
+        checkStreak()
+    }
+
+    private fun checkStreak() {
+        viewModelScope.launch {
+            val streak = updateStreakUseCase()
+            _state.update { it.copy(currentStreak = streak.currentStreak) }
+        }
     }
 
     private fun observeUserName() {

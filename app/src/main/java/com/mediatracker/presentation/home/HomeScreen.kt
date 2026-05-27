@@ -85,9 +85,9 @@ private fun HomeScreenContent(
             ) {
                 Spacer(Modifier.statusBarsPadding())
 
-                HomeHeader()
+        HomeHeader()
 
-                GreetingLine(userName = state.userName)
+        GreetingLine(userName = state.userName, currentStreak = state.currentStreak)
 
                 Spacer(Modifier.height(20.dp))
 
@@ -230,7 +230,7 @@ private fun HomeHeader() {
 
 // ─── Greeting ─────────────────────────────────────────────────────────────────
 @Composable
-private fun GreetingLine(userName: String?) {
+private fun GreetingLine(userName: String?, currentStreak: Int = 0) {
     val hour = remember { Calendar.getInstance().get(Calendar.HOUR_OF_DAY) }
     val greeting = when {
         hour < 6 -> "Buenas noches"
@@ -253,7 +253,22 @@ private fun GreetingLine(userName: String?) {
             ),
             color = MaterialTheme.colorScheme.onBackground,
         )
-        Text(text = "✨", fontSize = 22.sp)
+        if (currentStreak > 0) {
+            Surface(
+                shape = RoundedCornerShape(8.dp),
+                color = MaterialTheme.fanAppColors.gradientAccent.first().copy(alpha = 0.15f),
+            ) {
+                Text(
+                    text = "🔥 $currentStreak",
+                    style = MaterialTheme.typography.labelLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.fanAppColors.gradientAccent.first(),
+                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp),
+                )
+            }
+        } else {
+            Text(text = "✨", fontSize = 22.sp)
+        }
     }
 }
 
