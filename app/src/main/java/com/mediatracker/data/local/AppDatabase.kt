@@ -6,14 +6,15 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
 @Database(
-    entities = [MediaItemEntity::class, UserItemEntity::class, NotificationEntity::class],
-    version = 4,
+    entities = [MediaItemEntity::class, UserItemEntity::class, NotificationEntity::class, AchievementEntity::class],
+    version = 5,
     exportSchema = false,
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun mediaItemDao(): MediaItemDao
     abstract fun userItemDao(): UserItemDao
     abstract fun notificationDao(): NotificationDao
+    abstract fun achievementDao(): AchievementDao
 
     companion object {
         val MIGRATION_1_2 = object : Migration(1, 2) {
@@ -46,5 +47,17 @@ abstract class AppDatabase : RoomDatabase() {
             db.execSQL("ALTER TABLE user_items ADD COLUMN notes TEXT DEFAULT NULL")
         }
     }
+
+    val MIGRATION_4_5 = object : Migration(4, 5) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL("""
+            CREATE TABLE IF NOT EXISTS achievements (
+                id TEXT NOT NULL PRIMARY KEY,
+                condition TEXT NOT NULL,
+                unlockedAt INTEGER DEFAULT NULL
+            )
+            """.trimIndent())
+        }
     }
+}
 }

@@ -6,7 +6,9 @@ import javax.inject.Inject
 
 class UpdateItemStatusUseCase @Inject constructor(
     private val userRepository: UserRepository,
+    private val checkAchievementsUseCase: CheckAchievementsUseCase,
 ) {
     suspend operator fun invoke(itemId: String, status: ItemStatus): Result<Unit> =
         userRepository.updateItemStatus(itemId, status)
+            .also { if (it.isSuccess) checkAchievementsUseCase() }
 }

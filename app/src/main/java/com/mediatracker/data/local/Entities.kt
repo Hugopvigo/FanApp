@@ -44,3 +44,10 @@ data class NotificationEntity(
     val relatedApiId: String? = null,
     val relatedMediaType: String? = null,
 )
+
+@Entity(tableName = "achievements")
+data class AchievementEntity(
+    @PrimaryKey val id: String,
+    val condition: String,
+    val unlockedAt: Long? = null,
+)

@@ -2,6 +2,7 @@ package com.mediatracker.di
 
 import android.content.Context
 import androidx.room.Room
+import com.mediatracker.data.local.AchievementDao
 import com.mediatracker.data.local.AppDatabase
 import com.mediatracker.data.local.MediaItemDao
 import com.mediatracker.data.local.NotificationDao
@@ -25,7 +26,7 @@ object DatabaseModule {
             AppDatabase::class.java,
             "mediatracker.db",
         )
-            .addMigrations(AppDatabase.MIGRATION_1_2, AppDatabase.MIGRATION_2_3, AppDatabase.MIGRATION_3_4)
+            .addMigrations(AppDatabase.MIGRATION_1_2, AppDatabase.MIGRATION_2_3, AppDatabase.MIGRATION_3_4, AppDatabase.MIGRATION_4_5)
             .build()
 
     @Provides
@@ -39,4 +40,8 @@ object DatabaseModule {
     @Provides
     fun provideNotificationDao(database: AppDatabase): NotificationDao =
         database.notificationDao()
+
+    @Provides
+    fun provideAchievementDao(database: AppDatabase): AchievementDao =
+        database.achievementDao()
 }

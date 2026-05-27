@@ -8,6 +8,7 @@ import javax.inject.Inject
 
 class AddUserItemUseCase @Inject constructor(
     private val userRepository: UserRepository,
+    private val checkAchievementsUseCase: CheckAchievementsUseCase,
 ) {
     suspend operator fun invoke(
         mediaType: MediaType,
@@ -16,4 +17,5 @@ class AddUserItemUseCase @Inject constructor(
         posterUrl: String?,
         status: ItemStatus = ItemStatus.WATCHLIST,
     ): Result<UserItem> = userRepository.addUserItem(mediaType, apiId, title, posterUrl, status)
+        .also { if (it.isSuccess) checkAchievementsUseCase() }
 }

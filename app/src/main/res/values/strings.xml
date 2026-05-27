@@ -198,4 +198,7 @@
     <string name="fancard_top_title">My Top Completed</string>
     <string name="fancard_no_items">Rate some items to create your FanCard!</string>
     <string name="fancard_rating_prompt">Share your rating as a FanCard!</string>
+
+    <!-- Achievements -->
+    <string name="achievements_title">Achievements</string>
 </resources>

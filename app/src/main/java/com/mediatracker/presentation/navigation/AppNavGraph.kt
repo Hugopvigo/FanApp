@@ -35,6 +35,7 @@ import com.mediatracker.domain.model.MediaItem
 import com.mediatracker.domain.model.MediaType
 import com.mediatracker.presentation.auth.AuthViewModel
 import com.mediatracker.presentation.auth.LoginScreen
+import com.mediatracker.presentation.achievements.AchievementsScreen
 import com.mediatracker.presentation.detail.DetailScreen
 import com.mediatracker.presentation.discover.DiscoverScreen
 import com.mediatracker.presentation.fancard.FanCardScreen
@@ -99,7 +100,8 @@ private fun MainScreen(
         currentDestination?.hasRoute(Route.Notifications::class) != true &&
         currentDestination?.hasRoute(Route.Privacy::class) != true &&
         currentDestination?.hasRoute(Route.ChangePassword::class) != true &&
-        currentDestination?.hasRoute(Route.FanCard::class) != true
+        currentDestination?.hasRoute(Route.FanCard::class) != true &&
+        currentDestination?.hasRoute(Route.Achievements::class) != true
 
     var showQuickAdd by remember { mutableStateOf(false) }
 
@@ -160,6 +162,7 @@ private fun MainScreen(
                 onNavigateToNotifications = { navController.navigate(Route.Notifications) },
                 onNavigateToPrivacy = { navController.navigate(Route.Privacy) },
                 onNavigateToFanCard = { navController.navigate(Route.FanCard) },
+                onNavigateToAchievements = { navController.navigate(Route.Achievements) },
             )
                 }
                 // Detail: slide desde la derecha + fade
@@ -253,9 +256,19 @@ private fun MainScreen(
                 fadeOut(tween(200)) + slideOutVertically(tween(200)) { it / 2 }
             },
         ) {
-            FanCardScreen(onBack = { navController.popBackStack() })
+        FanCardScreen(onBack = { navController.popBackStack() })
         }
-            }
+        composable<Route.Achievements>(
+            enterTransition = {
+                fadeIn(tween(260)) + slideInVertically(tween(260, easing = FastOutSlowInEasing)) { it / 2 }
+            },
+            popExitTransition = {
+                fadeOut(tween(200)) + slideOutVertically(tween(200)) { it / 2 }
+            },
+        ) {
+            AchievementsScreen(onBack = { navController.popBackStack() })
+        }
+        }
 
             // Floating glass nav bar overlaid at the bottom
             if (showBottomBar) {
