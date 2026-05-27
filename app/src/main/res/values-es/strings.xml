@@ -193,4 +193,14 @@
     <!-- Streaks -->
     <string name="streak_current">Racha actual</string>
     <string name="streak_longest">Mejor racha</string>
+
+    <!-- Leaderboard -->
+    <string name="lb_title">Ranking</string>
+    <string name="lb_tab_alltime">Histórico</string>
+    <string name="lb_tab_yearly">Anual</string>
+    <string name="lb_tab_series">Series</string>
+    <string name="lb_tab_movies">Pelis</string>
+    <string name="lb_tab_books">Libros</string>
+    <string name="lb_completed">completados</string>
+    <string name="lb_you">Tú</string>
 </resources>

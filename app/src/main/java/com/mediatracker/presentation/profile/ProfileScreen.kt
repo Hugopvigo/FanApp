@@ -63,6 +63,7 @@ fun ProfileScreen(
     onNavigateToPrivacy: () -> Unit = {},
     onNavigateToFanCard: () -> Unit = {},
     onNavigateToAchievements: () -> Unit = {},
+    onNavigateToLeaderboard: () -> Unit = {},
     viewModel: ProfileViewModel = hiltViewModel(),
 ) {
     val fanColors = MaterialTheme.fanAppColors
@@ -304,6 +305,13 @@ fun ProfileScreen(
             label = stringResource(R.string.achievements_title),
             highlight = true,
             onClick = onNavigateToAchievements,
+        )
+
+        SettingRow(
+            icon = "📊",
+            label = stringResource(R.string.lb_title),
+            highlight = true,
+            onClick = onNavigateToLeaderboard,
         )
 
         SettingRow(

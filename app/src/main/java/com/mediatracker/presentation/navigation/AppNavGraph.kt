@@ -37,6 +37,7 @@ import com.mediatracker.presentation.auth.AuthViewModel
 import com.mediatracker.presentation.auth.LoginScreen
 import com.mediatracker.presentation.achievements.AchievementsScreen
 import com.mediatracker.presentation.detail.DetailScreen
+import com.mediatracker.presentation.leaderboard.LeaderboardScreen
 import com.mediatracker.presentation.discover.DiscoverScreen
 import com.mediatracker.presentation.fancard.FanCardScreen
 import com.mediatracker.presentation.home.HomeScreen
@@ -101,7 +102,8 @@ private fun MainScreen(
         currentDestination?.hasRoute(Route.Privacy::class) != true &&
         currentDestination?.hasRoute(Route.ChangePassword::class) != true &&
         currentDestination?.hasRoute(Route.FanCard::class) != true &&
-        currentDestination?.hasRoute(Route.Achievements::class) != true
+        currentDestination?.hasRoute(Route.Achievements::class) != true &&
+        currentDestination?.hasRoute(Route.Leaderboard::class) != true
 
     var showQuickAdd by remember { mutableStateOf(false) }
 
@@ -163,6 +165,7 @@ private fun MainScreen(
                 onNavigateToPrivacy = { navController.navigate(Route.Privacy) },
                 onNavigateToFanCard = { navController.navigate(Route.FanCard) },
                 onNavigateToAchievements = { navController.navigate(Route.Achievements) },
+                onNavigateToLeaderboard = { navController.navigate(Route.Leaderboard) },
             )
                 }
                 // Detail: slide desde la derecha + fade
@@ -267,6 +270,16 @@ private fun MainScreen(
             },
         ) {
             AchievementsScreen(onBack = { navController.popBackStack() })
+        }
+        composable<Route.Leaderboard>(
+            enterTransition = {
+                fadeIn(tween(260)) + slideInVertically(tween(260, easing = FastOutSlowInEasing)) { it / 2 }
+            },
+            popExitTransition = {
+                fadeOut(tween(200)) + slideOutVertically(tween(200)) { it / 2 }
+            },
+        ) {
+            LeaderboardScreen(onBack = { navController.popBackStack() })
         }
         }
 

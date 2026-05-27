@@ -205,4 +205,14 @@
     <!-- Streaks -->
     <string name="streak_current">Current streak</string>
     <string name="streak_longest">Best streak</string>
+
+    <!-- Leaderboard -->
+    <string name="lb_title">Leaderboard</string>
+    <string name="lb_tab_alltime">All-Time</string>
+    <string name="lb_tab_yearly">Yearly</string>
+    <string name="lb_tab_series">Series</string>
+    <string name="lb_tab_movies">Movies</string>
+    <string name="lb_tab_books">Books</string>
+    <string name="lb_completed">completed</string>
+    <string name="lb_you">You</string>
 </resources>
