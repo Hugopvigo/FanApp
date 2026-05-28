@@ -1,5 +1,6 @@
 package com.mediatracker.presentation.detail
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -12,23 +13,26 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -61,6 +65,7 @@ import com.mediatracker.presentation.components.ErrorState
 import com.mediatracker.presentation.components.FavoriteToggle
 import com.mediatracker.presentation.components.StatusChip
 import com.mediatracker.presentation.theme.AppTheme
+import com.mediatracker.presentation.theme.DisplayFontFamily
 import com.mediatracker.presentation.theme.MediaTrackerTheme
 import com.mediatracker.presentation.theme.fanAppColors
 
@@ -97,6 +102,7 @@ fun DetailScreen(
                 onToggleFavorite = viewModel::onToggleFavorite,
                 onRatingChanged = viewModel::onRatingChanged,
                 onNotesChanged = viewModel::onNotesChanged,
+                onSeasonEpisodeChanged = viewModel::onSeasonEpisodeChanged,
             )
         }
 
@@ -109,18 +115,14 @@ fun DetailScreen(
                     TextButton(onClick = {
                         showRatingCardPrompt = false
                         onNavigateToFanCard()
-                    }) {
-                        Text(stringResource(R.string.fancard_share), color = fanColors.gradientAccent.first())
-                    }
+                    }) { Text(stringResource(R.string.fancard_share), color = fanColors.gradientAccent.first()) }
                 },
                 dismissAction = {
                     IconButton(onClick = { showRatingCardPrompt = false }) {
                         Icon(Icons.Filled.Close, contentDescription = null, modifier = Modifier.size(18.dp))
                     }
                 },
-            ) {
-                Text(stringResource(R.string.fancard_rating_prompt))
-            }
+            ) { Text(stringResource(R.string.fancard_rating_prompt)) }
         }
     }
 }
@@ -134,6 +136,7 @@ private fun DetailContent(
     onToggleFavorite: () -> Unit,
     onRatingChanged: (Int?) -> Unit,
     onNotesChanged: (String) -> Unit,
+    onSeasonEpisodeChanged: (Int?, Int?) -> Unit,
 ) {
     val item = state.item ?: return
     val userItem = state.userItem
@@ -142,19 +145,16 @@ private fun DetailContent(
     val scrollState = rememberScrollState()
 
     Box(modifier = Modifier.fillMaxSize()) {
-        // ── Scrollable content ────────────────────────────────────────────
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(scrollState),
         ) {
-            // ── Hero ──────────────────────────────────────────────────────
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(HERO_HEIGHT),
             ) {
-                // Poster o gradient fallback
                 if (item.posterUrl.isNotBlank()) {
                     AsyncImage(
                         model = item.posterUrl,
@@ -170,7 +170,6 @@ private fun DetailContent(
                     )
                 }
 
-                // Scrim: sutil arriba → opaco abajo (hacia bgColor)
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
@@ -186,7 +185,6 @@ private fun DetailContent(
                         ),
                 )
 
-                // Info superpuesta: badges + título + géneros
                 Column(
                     modifier = Modifier
                         .align(Alignment.BottomStart)
@@ -223,12 +221,10 @@ private fun DetailContent(
                 }
             }
 
-            // ── Contenido bajo el hero ────────────────────────────────────
             Column(
                 modifier = Modifier.padding(horizontal = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
-                // Status chips + Remove
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(4.dp),
                     modifier = Modifier.fillMaxWidth(),
@@ -247,32 +243,36 @@ private fun DetailContent(
                     }
                 }
 
-            // Favorite toggle
-            if (userItem != null) {
-                FavoriteToggle(
-                    isFavorite = userItem.favorite,
-                    onToggle = onToggleFavorite,
-                    enabled = userItem.status != ItemStatus.ABANDONED,
-                )
-            }
+                if (userItem != null) {
+                    FavoriteToggle(
+                        isFavorite = userItem.favorite,
+                        onToggle = onToggleFavorite,
+                        enabled = userItem.status != ItemStatus.ABANDONED,
+                    )
+                }
 
-            // Star rating
-            if (userItem != null) {
-                StarRatingBar(
-                    rating = userItem.userRating,
-                    onRatingChanged = onRatingChanged,
-                )
-            }
+                if (userItem != null) {
+                    StarRatingBar(
+                        rating = userItem.userRating,
+                        onRatingChanged = onRatingChanged,
+                    )
+                }
 
-            // Notes
-            if (userItem != null) {
-                NotesField(
-                    notes = userItem.notes.orEmpty(),
-                    onNotesChanged = onNotesChanged,
-                )
-            }
+                if (userItem != null) {
+                    NotesField(
+                        notes = userItem.notes.orEmpty(),
+                        onNotesChanged = onNotesChanged,
+                    )
+                }
 
-                // Sinopsis
+                if (userItem != null && item.mediaType == MediaType.SERIES && userItem.status == ItemStatus.IN_PROGRESS) {
+                    SeasonEpisodeStepper(
+                        season = userItem.currentSeason,
+                        episode = userItem.currentEpisode,
+                        onChanged = onSeasonEpisodeChanged,
+                    )
+                }
+
                 if (item.overview.isNotBlank()) {
                     Text(
                         text = item.overview,
@@ -282,14 +282,12 @@ private fun DetailContent(
                     )
                 }
 
-                // Datos extra (temporadas, duración, autor, etc.)
                 item.extraData?.let { ExtraInfo(extra = it, mediaType = item.mediaType) }
 
                 Spacer(Modifier.height(16.dp))
             }
         }
 
-        // ── Back button flotante ──────────────────────────────────────────
         Box(
             modifier = Modifier
                 .padding(12.dp)
@@ -406,45 +404,133 @@ private fun NotesField(
     }
 }
 
+@Composable
+private fun SeasonEpisodeStepper(
+    season: Int?,
+    episode: Int?,
+    onChanged: (Int?, Int?) -> Unit,
+) {
+    val s = season ?: 1
+    val e = episode ?: 1
+
+    Column {
+        Text(
+            text = stringResource(R.string.detail_tracking),
+            style = MaterialTheme.typography.labelLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Spacer(Modifier.height(8.dp))
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            StepperControl(
+                label = stringResource(R.string.detail_season),
+                value = s,
+                onDecrement = { onChanged(maxOf(1, s - 1), e) },
+                onIncrement = { onChanged(s + 1, 1) },
+                modifier = Modifier.weight(1f),
+            )
+            StepperControl(
+                label = stringResource(R.string.detail_episode),
+                value = e,
+                onDecrement = { onChanged(s, maxOf(1, e - 1)) },
+                onIncrement = { onChanged(s, e + 1) },
+                modifier = Modifier.weight(1f),
+            )
+        }
+    }
+}
+
+@Composable
+private fun StepperControl(
+    label: String,
+    value: Int,
+    onDecrement: () -> Unit,
+    onIncrement: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val fanColors = MaterialTheme.fanAppColors
+
+    Surface(
+        shape = RoundedCornerShape(14.dp),
+        color = fanColors.surfaceAlpha.copy(alpha = 0.5f),
+        border = BorderStroke(1.dp, fanColors.borderColor),
+        modifier = modifier,
+    ) {
+        Column(
+            modifier = Modifier.padding(10.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Spacer(Modifier.height(4.dp))
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                IconButton(onClick = onDecrement, enabled = value > 1) {
+                    Icon(Icons.Default.Remove, contentDescription = "-", modifier = Modifier.size(18.dp))
+                }
+                Text(
+                    text = "$value",
+                    style = MaterialTheme.typography.titleLarge.copy(
+                        fontFamily = DisplayFontFamily,
+                        fontWeight = FontWeight.Bold,
+                    ),
+                    color = fanColors.gradientAccent.first(),
+                )
+                IconButton(onClick = onIncrement) {
+                    Icon(Icons.Default.Add, contentDescription = "+", modifier = Modifier.size(18.dp))
+                }
+            }
+        }
+    }
+}
+
 @Preview(showBackground = true, heightDp = 700)
 @Composable
 private fun DetailContentPreview() {
     MediaTrackerTheme(appTheme = AppTheme.Fantasy) {
-    DetailContent(
-        state = DetailUiState(
-            item = MediaItem(
-                id = "preview_d1",
-                mediaType = MediaType.MOVIE,
-                title = "Inception",
-                overview = "Un ladrón especializado en extraer secretos del subconsciente a través de los sueños recibe la tarea de implantar una idea en la mente de un CEO.",
-                posterUrl = "",
-                releaseDate = "2010-07-16",
-                rating = 8.8f,
-                genres = listOf("Acción", "Sci-Fi", "Thriller"),
-                extraData = mapOf("runtime" to "148", "creators" to "Christopher Nolan"),
+        DetailContent(
+            state = DetailUiState(
+                item = MediaItem(
+                    id = "preview_d1",
+                    mediaType = MediaType.MOVIE,
+                    title = "Inception",
+                    overview = "Un ladrón especializado en extraer secretos del subconsciente a través de los sueños recibe la tarea de implantar una idea en la mente de un CEO.",
+                    posterUrl = "",
+                    releaseDate = "2010-07-16",
+                    rating = 8.8f,
+                    genres = listOf("Acción", "Sci-Fi", "Thriller"),
+                    extraData = mapOf("runtime" to "148", "creators" to "Christopher Nolan"),
+                ),
+                userItem = UserItem(
+                    id = "preview_u1",
+                    mediaType = MediaType.MOVIE,
+                    apiId = "mv_1",
+                    title = "Inception",
+                    posterUrl = null,
+                    status = ItemStatus.COMPLETED,
+                    favorite = true,
+                    addedAt = 0L,
+                    updatedAt = 0L,
+                    userRating = 4,
+                    notes = "Amazing movie!",
+                ),
+                isLoading = false,
             ),
-            userItem = UserItem(
-                id = "preview_u1",
-                mediaType = MediaType.MOVIE,
-                apiId = "mv_1",
-                title = "Inception",
-                posterUrl = null,
-                status = ItemStatus.COMPLETED,
-                favorite = true,
-                addedAt = 0L,
-                updatedAt = 0L,
-                userRating = 4,
-                notes = "Amazing movie!",
-            ),
-            isLoading = false,
-        ),
-        onBack = {},
-        onStatusSelected = {},
-        onRemoveFromList = {},
-        onToggleFavorite = {},
-        onRatingChanged = {},
-        onNotesChanged = {},
-    )
+            onBack = {},
+            onStatusSelected = {},
+            onRemoveFromList = {},
+            onToggleFavorite = {},
+            onRatingChanged = {},
+            onNotesChanged = {},
+            onSeasonEpisodeChanged = { _, _ -> },
+        )
     }
 }
 

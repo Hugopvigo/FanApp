@@ -113,14 +113,27 @@ class UserRepositoryImpl @Inject constructor(
         }.onFailure { Timber.e(it, "Update rating failed: $itemId") }
 
     override suspend fun updateUserNotes(itemId: String, notes: String): Result<Unit> =
-        runCatching {
-            val entity = userItemDao.getById(itemId)
-                ?: throw NoSuchElementException("Item $itemId not found")
-            userItemDao.insert(
-                entity.copy(
-                    notes = notes,
-                    updatedAt = System.currentTimeMillis(),
-                )
+    runCatching {
+        val entity = userItemDao.getById(itemId)
+            ?: throw NoSuchElementException("Item $itemId not found")
+        userItemDao.insert(
+            entity.copy(
+                notes = notes,
+                updatedAt = System.currentTimeMillis(),
             )
-        }.onFailure { Timber.e(it, "Update notes failed: $itemId") }
+        )
+    }.onFailure { Timber.e(it, "Update notes failed: $itemId") }
+
+    override suspend fun updateSeasonEpisode(itemId: String, season: Int?, episode: Int?): Result<Unit> =
+    runCatching {
+        val entity = userItemDao.getById(itemId)
+            ?: throw NoSuchElementException("Item $itemId not found")
+        userItemDao.insert(
+            entity.copy(
+                currentSeason = season,
+                currentEpisode = episode,
+                updatedAt = System.currentTimeMillis(),
+            )
+        )
+    }.onFailure { Timber.e(it, "Update season/episode failed: $itemId") }
 }

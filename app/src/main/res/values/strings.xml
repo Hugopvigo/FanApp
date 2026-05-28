@@ -215,4 +215,9 @@
     <string name="lb_tab_books">Books</string>
     <string name="lb_completed">completed</string>
     <string name="lb_you">You</string>
+
+    <!-- Season/Episode Tracking -->
+    <string name="detail_tracking">Season / Episode</string>
+    <string name="detail_season">Season</string>
+    <string name="detail_episode">Episode</string>
 </resources>

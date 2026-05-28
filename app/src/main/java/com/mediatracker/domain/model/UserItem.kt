@@ -12,6 +12,8 @@ data class UserItem(
     val updatedAt: Long,
     val userRating: Int? = null,
     val notes: String? = null,
+    val currentSeason: Int? = null,
+    val currentEpisode: Int? = null,
 )
 
 data class MediaItemWithUserStatus(

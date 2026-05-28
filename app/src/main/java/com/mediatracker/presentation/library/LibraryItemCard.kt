@@ -2,20 +2,26 @@ package com.mediatracker.presentation.library
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -24,6 +30,7 @@ import androidx.compose.ui.res.stringResource
 import com.mediatracker.R
 import com.mediatracker.domain.model.MediaType
 import com.mediatracker.domain.model.UserItem
+import com.mediatracker.domain.model.ItemStatus
 import com.mediatracker.presentation.components.GradientPoster
 import com.mediatracker.presentation.theme.fanAppColors
 
@@ -39,28 +46,51 @@ fun LibraryItemCard(
             .clickable(onClick = onClick),
         verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
-        if (!userItem.posterUrl.isNullOrBlank()) {
-            SubcomposeAsyncImage(
-                model = userItem.posterUrl,
-                contentDescription = userItem.title,
-                modifier = Modifier
-                    .size(width = 120.dp, height = 180.dp)
-                    .clip(MaterialTheme.shapes.medium),
-                contentScale = ContentScale.Crop,
-                error = {
-                    GradientPoster(
-                        title = userItem.title,
-                        kind = userItem.mediaType,
-                        modifier = Modifier.size(width = 120.dp, height = 180.dp),
+        Box {
+            if (!userItem.posterUrl.isNullOrBlank()) {
+                SubcomposeAsyncImage(
+                    model = userItem.posterUrl,
+                    contentDescription = userItem.title,
+                    modifier = Modifier
+                        .size(width = 120.dp, height = 180.dp)
+                        .clip(MaterialTheme.shapes.medium),
+                    contentScale = ContentScale.Crop,
+                    error = {
+                        GradientPoster(
+                            title = userItem.title,
+                            kind = userItem.mediaType,
+                            modifier = Modifier.size(width = 120.dp, height = 180.dp),
+                        )
+                    },
+                )
+            } else {
+                GradientPoster(
+                    title = userItem.title,
+                    kind = userItem.mediaType,
+                    modifier = Modifier.size(width = 120.dp, height = 180.dp),
+                )
+            }
+
+            if (userItem.mediaType == MediaType.SERIES &&
+                userItem.status == ItemStatus.IN_PROGRESS &&
+                userItem.currentSeason != null && userItem.currentEpisode != null
+            ) {
+                Surface(
+                    shape = RoundedCornerShape(6.dp),
+                    color = Color.Black.copy(alpha = 0.68f),
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(6.dp),
+                ) {
+                    Text(
+                        text = "T${userItem.currentSeason}E${userItem.currentEpisode}",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(horizontal = 5.dp, vertical = 2.dp),
                     )
-                },
-            )
-        } else {
-            GradientPoster(
-                title = userItem.title,
-                kind = userItem.mediaType,
-                modifier = Modifier.size(width = 120.dp, height = 180.dp),
-            )
+                }
+            }
         }
 
         Text(

@@ -15,6 +15,7 @@ import com.mediatracker.domain.usecase.ToggleFavoriteUseCase
 import com.mediatracker.domain.usecase.UpdateItemStatusUseCase
 import com.mediatracker.domain.usecase.UpdateUserRatingUseCase
 import com.mediatracker.domain.usecase.UpdateUserNotesUseCase
+import com.mediatracker.domain.usecase.UpdateSeasonEpisodeUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -42,6 +43,7 @@ class DetailViewModel @Inject constructor(
     private val removeUserItemUseCase: RemoveUserItemUseCase,
     private val updateUserRatingUseCase: UpdateUserRatingUseCase,
     private val updateUserNotesUseCase: UpdateUserNotesUseCase,
+    private val updateSeasonEpisodeUseCase: UpdateSeasonEpisodeUseCase,
 ) : ViewModel() {
 
     private val apiId: String = savedStateHandle["apiId"] ?: ""
@@ -129,6 +131,13 @@ class DetailViewModel @Inject constructor(
         val currentUserItem = _state.value.userItem ?: return
         viewModelScope.launch {
             updateUserNotesUseCase(currentUserItem.id, notes)
+        }
+    }
+
+    fun onSeasonEpisodeChanged(season: Int?, episode: Int?) {
+        val currentUserItem = _state.value.userItem ?: return
+        viewModelScope.launch {
+            updateSeasonEpisodeUseCase(currentUserItem.id, season, episode)
         }
     }
 }
