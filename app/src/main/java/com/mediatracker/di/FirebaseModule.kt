@@ -4,6 +4,7 @@ import android.content.Context
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.messaging.FirebaseMessaging
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -48,6 +49,19 @@ object FirebaseModule {
                 FirebaseFirestore.getInstance(it)
             } catch (e: Exception) {
                 Timber.e(e, "Failed to get FirebaseFirestore")
+                null
+            }
+        }
+    }
+
+    @Provides
+    @Singleton
+    fun provideFirebaseMessaging(firebaseApp: FirebaseApp?): FirebaseMessaging? {
+        return firebaseApp?.let {
+            try {
+                FirebaseMessaging.getInstance()
+            } catch (e: Exception) {
+                Timber.e(e, "Failed to get FirebaseMessaging")
                 null
             }
         }

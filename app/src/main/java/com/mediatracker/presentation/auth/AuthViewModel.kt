@@ -3,6 +3,7 @@ package com.mediatracker.presentation.auth
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mediatracker.data.auth.AuthDataSource
+import com.mediatracker.data.fcm.FcmTokenRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -30,6 +31,7 @@ data class AuthUiState(
 @HiltViewModel
 class AuthViewModel @Inject constructor(
     private val authDataSource: AuthDataSource,
+    private val fcmTokenRepository: FcmTokenRepository,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AuthUiState())
@@ -42,12 +44,16 @@ class AuthViewModel @Inject constructor(
     private fun observeAuthState() {
         viewModelScope.launch {
             authDataSource.authStateFlow().collect { result ->
+                val wasLoggedIn = _state.value.isLoggedIn
                 _state.update {
                     it.copy(
                         isLoggedIn = result.isLoggedIn,
                         userEmail = result.userEmail,
                         userName = result.userName,
                     )
+                }
+                if (!wasLoggedIn && result.isLoggedIn) {
+                    fcmTokenRepository.saveCurrentToken()
                 }
             }
         }

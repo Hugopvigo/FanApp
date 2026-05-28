@@ -1,9 +1,13 @@
 package com.mediatracker
 
 import android.app.Application
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
 import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseOptions
 import com.mediatracker.BuildConfig
+import com.mediatracker.service.FanAppMessagingService
 import dagger.hilt.android.HiltAndroidApp
 import timber.log.Timber
 
@@ -15,6 +19,19 @@ class MediaTrackerApp : Application() {
             Timber.plant(Timber.DebugTree())
         }
         initializeFirebaseIfNeeded()
+        createNotificationChannels()
+    }
+
+    private fun createNotificationChannels() {
+        val channel = NotificationChannel(
+            FanAppMessagingService.CHANNEL_ID,
+            FanAppMessagingService.CHANNEL_NAME,
+            NotificationManager.IMPORTANCE_DEFAULT,
+        ).apply {
+            description = "Push notifications from FanApp"
+        }
+        val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        manager.createNotificationChannel(channel)
     }
 
     private fun initializeFirebaseIfNeeded() {

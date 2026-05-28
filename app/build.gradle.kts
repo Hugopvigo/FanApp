@@ -105,6 +105,7 @@ dependencies {
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.auth.ktx)
     implementation(libs.firebase.firestore.ktx)
+    implementation(libs.firebase.messaging)
 
     // Room
     implementation(libs.room.runtime)
