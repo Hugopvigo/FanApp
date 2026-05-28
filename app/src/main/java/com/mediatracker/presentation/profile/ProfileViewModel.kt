@@ -55,13 +55,13 @@ class ProfileViewModel @Inject constructor(
     private val _isUpdating = MutableStateFlow(false)
     val isUpdating: StateFlow<Boolean> = _isUpdating.asStateFlow()
 
+    private val _streak = MutableStateFlow(UserStreak(0, 0, ""))
+    val streak: StateFlow<UserStreak> = _streak.asStateFlow()
+
     init {
         loadAvatar()
         loadStreak()
     }
-
-    private val _streak = MutableStateFlow(UserStreak(0, 0, ""))
-    val streak: StateFlow<UserStreak> = _streak.asStateFlow()
 
     private fun loadStreak() {
         viewModelScope.launch {
