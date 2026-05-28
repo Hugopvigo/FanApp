@@ -121,6 +121,9 @@ dependencies {
     // Images
     implementation(libs.coil.compose)
 
+    // Charts
+    implementation(libs.vico.compose.m3)
+
     // Logging
     implementation(libs.timber)
 

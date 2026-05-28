@@ -20,6 +20,7 @@ coreKtx = "1.18.0"
 googleServices = "4.4.2"
 dataStore = "1.1.7"
 playServicesAuth = "21.3.0"
+vico = "2.1.2"
 
 [libraries]
 # AndroidX Core
@@ -81,6 +82,9 @@ datastore-preferences = { group = "androidx.datastore", name = "datastore-prefer
 
 # Google Sign-In
 play-services-auth = { group = "com.google.android.gms", name = "play-services-auth", version.ref = "playServicesAuth" }
+
+# Vico Charts
+vico-compose-m3 = { group = "com.patrykandpatrick.vico", name = "compose-m3", version.ref = "vico" }
 
 # Testing
 compose-ui-test = { group = "androidx.compose.ui", name = "ui-test-junit4" }
