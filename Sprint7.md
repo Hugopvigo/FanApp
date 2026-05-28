@@ -186,11 +186,11 @@ Flujo:
 4. Para cada item: buscar en API para obtener poster y metadatos
 5. Resultado: "Importados 147 items (89 nuevos, 58 ya existían)"
 
-- [ ] Import CSV Letterboxd funcional
-- [ ] Import CSV Goodreads funcional
-- [ ] Preview antes de confirmar
-- [ ] Duplicados detectados y no re-importados
-- [ ] Import en background con barra de progreso
+- [x] Import CSV Letterboxd funcional
+- [x] Import CSV Goodreads funcional
+- [x] Preview antes de confirmar
+- [x] Duplicados detectados y no re-importados
+- [x] Import en background con barra de progreso
 
 ---
 
@@ -249,7 +249,7 @@ UI: 🔥 en HomeScreen + racha actual/récord en Profile.
 - [x] Racha se calcula correctamente al abrir la app
 - [x] HomeScreen muestra 🔥 racha actual
 - [x] Profile muestra racha actual + mejor racha
-- [ ] Bonus XP en hitos
+- [x] Bonus XP en hitos
 
 ---
 
@@ -324,21 +324,7 @@ Librería gráficos: **Vico** (`com.patrykandpatrick.vico`, Compose-first, MIT).
 
 ---
 
-#### T11: Language Toggle funcional
-Archivos afectados: `ProfileScreen.kt`, `ProfileViewModel.kt`
-
-```kotlin
-AppCompatDelegate.setApplicationLocales(
-    LocaleListCompat.forLanguageTags("es") // o "en"
-)
-// La Activity se recrea automáticamente
-```
-
-Persistir preferencia en DataStore. Las llamadas a API deben respetar el idioma seleccionado.
-
-- [ ] Diálogo con opciones: Español / English / Seguir sistema
-- [ ] La app cambia de idioma al seleccionar
-- [ ] Preferencia persiste entre sesiones
+#### T11: Language Toggle funcional → **Movido a Sprint 9**
 
 ---
 
@@ -346,35 +332,7 @@ Persistir preferencia en DataStore. Las llamadas a API deben respetar el idioma 
 
 ---
 
-#### T19: Widgets de Pantalla de Inicio
-**Uno de los factores más importantes para conseguir "Featured" en Google Play.**
-
-Dependencia: `androidx.glance:glance-appwidget:1.1.x`
-
-```kotlin
-class FanAppWidgetReceiver : GlanceAppWidgetReceiver() {
-    override val glanceAppWidget = FanAppWidget()
-}
-
-class FanAppWidget : GlanceAppWidget() {
-    override suspend fun provideGlance(context: Context, id: GlanceId) {
-        val items = userRepository.getInProgressItems()
-        provideContent { FanAppWidgetContent(items = items) }
-    }
-}
-```
-
-Tipos de widget:
-- **2x2** — Item en progreso actual + badge T/E. Tap → DetailScreen.
-- **4x2** — 3 items en progreso. Tap → item correspondiente.
-- **4x4** — Items completados esta semana + racha + nivel.
-
-Actualización: al abrir la app con `GlanceAppWidgetManager.updateAll()`.
-
-- [ ] Widget 2x2 funcional
-- [ ] Widget 4x2 funcional
-- [ ] Tap abre la app en el item correcto
-- [ ] Estilo coherente con el tema
+#### T19: Widgets de Pantalla de Inicio → **Movido a Sprint 9**
 
 ---
 
@@ -382,107 +340,36 @@ Actualización: al abrir la app con `GlanceAppWidgetManager.updateAll()`.
 
 ---
 
-#### T10: Push Notifications (FCM)
-Archivos a crear: `FcmService.kt`
-
-Fase mínima (sin Cloud Functions):
-- Registrar FCM token en Firestore al abrir app
-- Solicitar permiso `POST_NOTIFICATIONS` (Android 13+)
-- Notificaciones locales para logros desbloqueados y rachas en riesgo
-
-Fase completa (con Cloud Functions):
-- Detectar nueva temporada de series en watchlist → push al usuario
-
-- [ ] FCM token registrado en Firestore
-- [ ] Permiso solicitado en Android 13+
-- [ ] Notificaciones de logros funcionales
+#### T10: Push Notifications (FCM) → **Movido a Sprint 9**
 
 ---
 
-#### T9: Avatar Personalizado (Firebase Storage)
-Archivos a crear: `StorageDataSource.kt`
-
-```kotlin
-suspend fun uploadAvatar(userId: String, uri: Uri): Result<String>
-// Comprimir a máx 200KB / 256×256 antes de subir
-// Path: /avatars/{userId}.jpg
-// Android 13+: usar PickVisualMedia (sin permiso adicional)
-```
-
-- [ ] Selección de foto desde galería
-- [ ] Compresión antes de subir
-- [ ] Avatar cargado en Profile desde Storage
+#### T9: Avatar Personalizado (Firebase Storage) → **Movido a Sprint 9**
 
 ---
 
-#### T12: Auto Theme Switch
-Archivos afectados: `Theme.kt`, `ThemeScreen.kt`
-
-```kotlin
-// El switch "Auto" en ThemeScreen está vacío → implementar
-val effectiveTheme = if (useSystemTheme) {
-    if (isSystemInDarkTheme()) AppTheme.Dark else AppTheme.Light
-} else appTheme
-```
-
-- [ ] Switch "Auto" activa follow system dark mode
-- [ ] Preferencia persiste entre sesiones
+#### T12: Auto Theme Switch → **Movido a Sprint 9**
 
 ---
 
-#### T13: Email Verification
-```kotlin
-suspend fun sendEmailVerification() = firebaseAuth.currentUser?.sendEmailVerification()
-fun isEmailVerified() = firebaseAuth.currentUser?.isEmailVerified ?: false
-```
-
-Banner en Profile si el email no está verificado. Botón "Reenviar verificación".
-
-- [ ] Email enviado al registrarse
-- [ ] Banner en Profile si no verificado
-- [ ] Banner desaparece al verificar
+#### T13: Email Verification → **Movido a Sprint 9**
 
 ---
 
-#### T14: Tests Unitarios
-Herramientas ya configuradas: MockK 1.14.5, Turbine 1.2.0, Coroutines Test 1.11.0
-
-| Clase a testear | Tests |
-|-----------------|-------|
-| `ProfileViewModel` | Stats reactivos, cambio nombre |
-| `DiscoverViewModel` | Búsqueda, cambio tab, trending |
-| `LibraryViewModel` | Filtros por status y tipo |
-| `DetailViewModel` | Load detail, cambiar status, rating |
-| `CheckAchievementsUseCase` | Desbloqueo automático, condiciones |
-| `GetUserStatsUseCase` | Contadores, XP/level |
-| `MediaRepositoryImpl` | Search, trending, caché TTL |
-
-- [ ] 8+ clases con tests
-- [ ] Happy path + error cases cubiertos
-- [ ] `./gradlew test` pasa sin fallos
+#### T14: Tests Unitarios → **Movido a Sprint 9**
 
 ---
 
-### Sprint 8 — Social (diseño preparatorio)
+### Tareas diferidas a Sprint 9
 
-No implementar en Sprint 7. Solo definir modelos para no bloquear el desarrollo futuro.
-
-```kotlin
-data class PublicProfile(
-    val userId: String,
-    val displayName: String,
-    val avatarUrl: String?,
-    val level: Int,
-    val stats: UserStats,
-    val recentCompleted: List<MinimalMediaItem>, // últimos 5
-    val isPublic: Boolean,
-)
-
-// /community/trending_items/{itemId}/
-// addedCount: Int, completedCount: Int (agregado por Cloud Functions)
-```
-
-FanWrapped: generar imagen anual con Canvas + `Intent.ACTION_SEND` (igual que FanCard).
+Las siguientes tareas se han movido a **Sprint 9 — Plataforma, Pulido y Preparación para Producción**:
+- T9 Avatar → S9
+- T10 FCM → S9
+- T11 Language Toggle → S9
+- T12 Auto Theme → S9
+- T13 Email Verification → S9
+- T14 Tests → S9
+- T19 Widgets → S9
 
 ---
 
@@ -540,10 +427,11 @@ Migration v6→v7 (T8: currentSeason, currentEpisode — posición real)
 - [x] Achievements se desbloquean automáticamente
 - [x] FanCard generada y compartible
 - [ ] Import desde Letterboxd/Goodreads funcional
-- [ ] Widget 2x2 instalable
-- [ ] `./gradlew assembleDebug` sin warnings
-- [ ] `./gradlew test` pasa
+- [ ] Bonus XP en hitos de racha
+- [ ] Estadísticas detalladas accesibles desde Profile
 - [x] Strings EN/ES en archivos nuevos
+
+*(Widget 2x2, FCM, Language, Avatar, Auto Theme, Email Verification y Tests movidos a Sprint 9)*
 
 ---
 
@@ -551,6 +439,6 @@ Migration v6→v7 (T8: currentSeason, currentEpisode — posición real)
 
 Si el tiempo aprieta:
 
-**Imprescindible:** T7 + T6 + T4 + T18 + T2
-**Muy recomendable:** T3 + T1 + T20 + T19
-**Diferir a Sprint 8:** T9 + T10 + T12 + T13
+**Imprescindible:** T7 ✅ + T6 ✅ + T4 ✅ + T18 ✅ + T2 ✅
+**Muy recomendable:** T3 (bonus XP) + T1 ✅ + T20 (Import) + T5 (Stats)
+**Movidos a Sprint 9:** T9 + T10 + T11 + T12 + T13 + T14 + T19
