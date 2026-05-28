@@ -220,4 +220,13 @@
     <string name="detail_tracking">Season / Episode</string>
     <string name="detail_season">Season</string>
     <string name="detail_episode">Episode</string>
+
+    <!-- Import -->
+    <string name="import_title">Import</string>
+
+    <!-- Stats -->
+    <string name="stats_title">Statistics</string>
+    <string name="stats_estimated_hours">Est. hours</string>
+    <string name="stats_distribution">Distribution by type</string>
+    <string name="stats_monthly_activity">Monthly activity</string>
 </resources>

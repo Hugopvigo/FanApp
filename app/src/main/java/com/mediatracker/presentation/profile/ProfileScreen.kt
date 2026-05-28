@@ -64,6 +64,8 @@ fun ProfileScreen(
     onNavigateToFanCard: () -> Unit = {},
     onNavigateToAchievements: () -> Unit = {},
     onNavigateToLeaderboard: () -> Unit = {},
+    onNavigateToImport: () -> Unit = {},
+    onNavigateToStats: () -> Unit = {},
     viewModel: ProfileViewModel = hiltViewModel(),
 ) {
     val fanColors = MaterialTheme.fanAppColors
@@ -315,6 +317,13 @@ fun ProfileScreen(
         )
 
         SettingRow(
+            icon = "📈",
+            label = stringResource(R.string.stats_title),
+            highlight = true,
+            onClick = onNavigateToStats,
+        )
+
+        SettingRow(
             icon = "🎨",
             label = stringResource(R.string.profile_theme),
             value = appTheme.name,
@@ -330,6 +339,15 @@ fun ProfileScreen(
         )
         SettingRow(icon = "🔒", label = stringResource(R.string.profile_privacy), onClick = onNavigateToPrivacy)
         SettingRow(icon = "🔑", label = stringResource(R.string.change_password), onClick = onNavigateToChangePassword)
+
+        Spacer(Modifier.height(8.dp))
+
+        SettingRow(
+            icon = "📥",
+            label = "Importar",
+            highlight = true,
+            onClick = onNavigateToImport,
+        )
 
         Spacer(Modifier.height(24.dp))
 

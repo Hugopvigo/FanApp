@@ -41,6 +41,8 @@ import com.mediatracker.presentation.leaderboard.LeaderboardScreen
 import com.mediatracker.presentation.discover.DiscoverScreen
 import com.mediatracker.presentation.fancard.FanCardScreen
 import com.mediatracker.presentation.home.HomeScreen
+import com.mediatracker.presentation.csvimport.ImportScreen
+import com.mediatracker.presentation.stats.StatsScreen
 import com.mediatracker.presentation.library.LibraryScreen
 import com.mediatracker.presentation.profile.ChangePasswordScreen
 import com.mediatracker.presentation.profile.NotificationsScreen
@@ -103,7 +105,9 @@ private fun MainScreen(
         currentDestination?.hasRoute(Route.ChangePassword::class) != true &&
         currentDestination?.hasRoute(Route.FanCard::class) != true &&
         currentDestination?.hasRoute(Route.Achievements::class) != true &&
-        currentDestination?.hasRoute(Route.Leaderboard::class) != true
+        currentDestination?.hasRoute(Route.Leaderboard::class) != true &&
+        currentDestination?.hasRoute(Route.Import::class) != true &&
+        currentDestination?.hasRoute(Route.Stats::class) != true
 
     var showQuickAdd by remember { mutableStateOf(false) }
 
@@ -157,16 +161,18 @@ private fun MainScreen(
                     )
                 }
                 composable<BottomNavRoute.Profile> {
-            ProfileScreen(
-                onLogout = { authViewModel.logout() },
-                onNavigateToTheme = { navController.navigate(Route.Theme) },
-                onNavigateToChangePassword = { navController.navigate(Route.ChangePassword) },
-                onNavigateToNotifications = { navController.navigate(Route.Notifications) },
-                onNavigateToPrivacy = { navController.navigate(Route.Privacy) },
-                onNavigateToFanCard = { navController.navigate(Route.FanCard) },
-                onNavigateToAchievements = { navController.navigate(Route.Achievements) },
-                onNavigateToLeaderboard = { navController.navigate(Route.Leaderboard) },
-            )
+        ProfileScreen(
+            onLogout = { authViewModel.logout() },
+            onNavigateToTheme = { navController.navigate(Route.Theme) },
+            onNavigateToChangePassword = { navController.navigate(Route.ChangePassword) },
+            onNavigateToNotifications = { navController.navigate(Route.Notifications) },
+            onNavigateToPrivacy = { navController.navigate(Route.Privacy) },
+            onNavigateToFanCard = { navController.navigate(Route.FanCard) },
+            onNavigateToAchievements = { navController.navigate(Route.Achievements) },
+            onNavigateToLeaderboard = { navController.navigate(Route.Leaderboard) },
+            onNavigateToImport = { navController.navigate(Route.Import) },
+        onNavigateToStats = { navController.navigate(Route.Stats) },
+        )
                 }
                 // Detail: slide desde la derecha + fade
                 composable<Route.Detail>(
@@ -280,6 +286,26 @@ private fun MainScreen(
             },
         ) {
             LeaderboardScreen(onBack = { navController.popBackStack() })
+        }
+        composable<Route.Import>(
+            enterTransition = {
+                fadeIn(tween(260)) + slideInVertically(tween(260, easing = FastOutSlowInEasing)) { it / 2 }
+            },
+            popExitTransition = {
+                fadeOut(tween(200)) + slideOutVertically(tween(200)) { it / 2 }
+            },
+        ) {
+            ImportScreen(onBack = { navController.popBackStack() })
+        }
+        composable<Route.Stats>(
+            enterTransition = {
+                fadeIn(tween(260)) + slideInVertically(tween(260, easing = FastOutSlowInEasing)) { it / 2 }
+            },
+            popExitTransition = {
+                fadeOut(tween(200)) + slideOutVertically(tween(200)) { it / 2 }
+            },
+        ) {
+            StatsScreen(onBack = { navController.popBackStack() })
         }
         }
 

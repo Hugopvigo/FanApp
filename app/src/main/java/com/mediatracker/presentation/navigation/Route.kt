@@ -14,6 +14,8 @@ sealed interface Route {
     @Serializable data object FanCard : Route
     @Serializable data object Achievements : Route
     @Serializable data object Leaderboard : Route
+    @Serializable data object Import : Route
+    @Serializable data object Stats : Route
 }
 
 sealed interface BottomNavRoute {
