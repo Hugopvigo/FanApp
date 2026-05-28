@@ -1,5 +1,6 @@
 package com.mediatracker.domain.usecase
 
+import com.mediatracker.data.local.StreakDao
 import com.mediatracker.domain.model.ItemStatus
 import com.mediatracker.domain.model.MediaType
 import com.mediatracker.domain.model.UserItem
@@ -7,11 +8,13 @@ import com.mediatracker.domain.model.UserStats
 import com.mediatracker.domain.model.UserLevel
 import com.mediatracker.domain.repository.UserRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class GetUserStatsUseCase @Inject constructor(
     private val userRepository: UserRepository,
+    private val streakDao: StreakDao,
 ) {
     operator fun invoke(): Flow<UserStats> =
         userRepository.getUserItemsFlow().map { items ->
@@ -19,7 +22,9 @@ class GetUserStatsUseCase @Inject constructor(
             val completedCount = activeItems.count { it.status == ItemStatus.COMPLETED }
             val inProgressCount = activeItems.count { it.status == ItemStatus.IN_PROGRESS }
             val favoriteCount = activeItems.count { it.favorite }
-            val totalXp = calculateRetroactiveXp(items)
+            val baseXp = calculateRetroactiveXp(items)
+            val streakBonusXp = streakDao.get()?.bonusXp ?: 0
+            val totalXp = baseXp + streakBonusXp
             val userLevel = calculateLevel(completedCount, totalXp)
             UserStats(
                 seriesInProgress = activeItems.count { it.mediaType == MediaType.SERIES && it.status == ItemStatus.IN_PROGRESS },

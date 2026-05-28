@@ -32,6 +32,7 @@ data class UserStreak(
     val currentStreak: Int,
     val longestStreak: Int,
     val lastActiveDate: String,
+    val bonusXp: Int = 0,
 )
 
 data class Achievement(

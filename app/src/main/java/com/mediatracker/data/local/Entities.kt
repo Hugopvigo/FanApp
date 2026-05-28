@@ -60,4 +60,6 @@ data class StreakEntity(
     val currentStreak: Int = 0,
     val longestStreak: Int = 0,
     val lastActiveDate: String = "",
+    val bonusXp: Int = 0,
+    val milestonesHit: String = "",
 )
