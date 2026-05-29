@@ -79,8 +79,4 @@ class FanCardViewModel @Inject constructor(
             userName = name,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), FanCardUiState())
-
-    fun setCardType(type: FanCardType) {
-        // handled in UI via state hoisting
-    }
 }
