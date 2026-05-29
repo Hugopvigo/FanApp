@@ -6,7 +6,9 @@ import com.mediatracker.data.auth.AuthDataSource
 import com.mediatracker.domain.model.ItemStatus
 import com.mediatracker.domain.model.MediaType
 import com.mediatracker.domain.model.UserItem
+import com.mediatracker.domain.model.DetailedStats
 import com.mediatracker.domain.model.UserStats
+import com.mediatracker.domain.usecase.GetDetailedStatsUseCase
 import com.mediatracker.domain.usecase.GetUserItemsUseCase
 import com.mediatracker.domain.usecase.GetUserStatsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,7 +22,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-enum class FanCardType { RATING, TOP_MONTH, PROFILE }
+enum class FanCardType { RATING, TOP_MONTH, PROFILE, STATS }
 
 data class FanCardRatingData(
     val item: UserItem,
@@ -32,6 +34,7 @@ data class FanCardRatingData(
 data class FanCardUiState(
     val cardType: FanCardType = FanCardType.RATING,
     val stats: UserStats = UserStats(),
+    val detailedStats: DetailedStats = DetailedStats(),
     val topCompleted: List<UserItem> = emptyList(),
     val ratingData: FanCardRatingData? = null,
     val avgRating: Float = 0f,
@@ -41,6 +44,7 @@ data class FanCardUiState(
 @HiltViewModel
 class FanCardViewModel @Inject constructor(
     getUserStatsUseCase: GetUserStatsUseCase,
+    getDetailedStatsUseCase: GetDetailedStatsUseCase,
     getUserItemsUseCase: GetUserItemsUseCase,
     private val authDataSource: AuthDataSource,
 ) : ViewModel() {
@@ -58,9 +62,10 @@ class FanCardViewModel @Inject constructor(
 
     val state: StateFlow<FanCardUiState> = combine(
         getUserStatsUseCase(),
+        getDetailedStatsUseCase(),
         getUserItemsUseCase.observeAll(),
         _userName,
-    ) { stats, items, name ->
+    ) { stats, detailed, items, name ->
         val completed = items
             .filter { it.status == ItemStatus.COMPLETED }
             .sortedByDescending { it.userRating ?: 0 }
@@ -68,6 +73,7 @@ class FanCardViewModel @Inject constructor(
         val avg = if (rated.isNotEmpty()) rated.map { it.userRating!!.toFloat() }.average().toFloat() else 0f
         FanCardUiState(
             stats = stats,
+            detailedStats = detailed,
             topCompleted = completed.take(5),
             avgRating = avg,
             userName = name,
