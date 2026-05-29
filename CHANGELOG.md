@@ -37,7 +37,7 @@
 ## Sprint 7 — Engagement, Social y Gamificación (2026-05-27–29)
 
 > Objetivo del sprint: engagement, viralidad (FanCard, import) y gamificación social.
-> Estado: **completado** — tareas de plataforma diferidas a Sprint 9.
+> Estado: **completado** — tareas de plataforma diferidas a Sprint 9. T5 estadísticas cerrada en esta revisión.
 
 ### T7 — Google Sign-In
 - `AuthDataSource.signInWithGoogle(idToken)` con `GoogleAuthProvider`
@@ -84,10 +84,15 @@
 - `LetterboxdCsvParser`, `GoodreadsCsvParser`, `ImportUseCase`
 - `ImportScreen` + `ImportViewModel`: flujo en 4 pasos (origen → archivo → preview → resultado)
 - Detección de duplicados; import en background con progreso; navegación desde Profile
+- Fix: `getUserItemsFlow().first()` en lugar de `collect` infinito; títulos añadidos al set durante el batch
 
-### T5 — Estadísticas detalladas
-- `StatsScreen`, `StatsViewModel`, `Route.Stats`
-- Métricas desde Room; gráficos con **Vico** (distribución por tipo + actividad mensual 12 meses)
+### T5 — Estadísticas detalladas (completada)
+- `StatsScreen`, `StatsViewModel`, `GetDetailedStatsUseCase`, `Route.Stats`
+- Métricas desde Room: completados, en progreso, abandonados, watchlist, horas estimadas
+- Gráficos **Vico**: distribución por tipo + actividad mensual (12 meses, por `updatedAt` al completar)
+- Top 5 géneros desde caché `media_items`
+- Horas estimadas con runtime TMDB y páginas Google Books
+- Botón compartir → FanCard tipo `STATS`
 - Acceso desde Profile
 
 ### T10 — Push Notifications (FCM, adelantado)
