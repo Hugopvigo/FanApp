@@ -22,4 +22,5 @@ interface UserRepository {
     suspend fun updateUserNotes(itemId: String, notes: String): Result<Unit>
     suspend fun updateSeasonEpisode(itemId: String, season: Int?, episode: Int?): Result<Unit>
     suspend fun updatePageProgress(itemId: String, currentPage: Int?, totalPages: Int?): Result<Unit>
+    suspend fun updateWatchedEpisodes(itemId: String, watchedEpisodes: Map<Int, List<Int>>): Result<Unit>
 }

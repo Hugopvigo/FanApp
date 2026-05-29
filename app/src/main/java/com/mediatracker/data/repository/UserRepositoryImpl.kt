@@ -11,6 +11,8 @@ import com.mediatracker.domain.model.UserItem
 import com.mediatracker.domain.repository.UserRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.Json
 import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -149,4 +151,17 @@ class UserRepositoryImpl @Inject constructor(
                 )
             )
         }.onFailure { Timber.e(it, "Update page progress failed: $itemId") }
+
+    override suspend fun updateWatchedEpisodes(itemId: String, watchedEpisodes: Map<Int, List<Int>>): Result<Unit> =
+        runCatching {
+            val entity = userItemDao.getById(itemId)
+                ?: throw NoSuchElementException("Item $itemId not found")
+            val json = if (watchedEpisodes.isEmpty()) "" else Json.encodeToString(watchedEpisodes)
+            userItemDao.insert(
+                entity.copy(
+                    watchedEpisodes = json,
+                    updatedAt = System.currentTimeMillis(),
+                )
+            )
+        }.onFailure { Timber.e(it, "Update watched episodes failed: $itemId") }
 }

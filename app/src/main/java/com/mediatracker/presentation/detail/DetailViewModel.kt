@@ -17,6 +17,7 @@ import com.mediatracker.domain.usecase.UpdateUserRatingUseCase
 import com.mediatracker.domain.usecase.UpdateUserNotesUseCase
 import com.mediatracker.domain.usecase.UpdateSeasonEpisodeUseCase
 import com.mediatracker.domain.usecase.UpdatePageProgressUseCase
+import com.mediatracker.domain.usecase.UpdateWatchedEpisodesUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -49,6 +50,7 @@ class DetailViewModel @Inject constructor(
     private val updateUserNotesUseCase: UpdateUserNotesUseCase,
     private val updateSeasonEpisodeUseCase: UpdateSeasonEpisodeUseCase,
     private val updatePageProgressUseCase: UpdatePageProgressUseCase,
+    private val updateWatchedEpisodesUseCase: UpdateWatchedEpisodesUseCase,
 ) : ViewModel() {
 
     private val apiId: String = savedStateHandle["apiId"] ?: ""
@@ -208,5 +210,53 @@ class DetailViewModel @Inject constructor(
 
     fun onDismissSeriesComplete() {
         _state.update { it.copy(suggestSeriesComplete = false) }
+    }
+
+    fun onEpisodeToggle(season: Int, episode: Int) {
+        val currentUserItem = _state.value.userItem ?: return
+        val watched = currentUserItem.watchedEpisodes.toMutableMap()
+        val seasonEps = watched[season]?.toMutableList() ?: mutableListOf()
+
+        if (episode in seasonEps) {
+            seasonEps.remove(episode)
+        } else {
+            seasonEps.add(episode)
+            seasonEps.sort()
+        }
+
+        if (seasonEps.isEmpty()) {
+            watched.remove(season)
+        } else {
+            watched[season] = seasonEps
+        }
+
+        val maxWatched = seasonEps.maxOrNull()
+        val newEpisode = if (season == (currentUserItem.currentSeason ?: 1)) {
+            maxWatched ?: 1
+        } else {
+            currentUserItem.currentEpisode ?: 1
+        }
+
+        viewModelScope.launch {
+            updateWatchedEpisodesUseCase(currentUserItem.id, watched)
+            if (newEpisode != currentUserItem.currentEpisode || season != currentUserItem.currentSeason) {
+                updateSeasonEpisodeUseCase(currentUserItem.id, season, newEpisode)
+            }
+
+            val item = _state.value.item ?: return@launch
+            val numberOfSeasons = item.extraData?.get("numberOfSeasons")?.toIntOrNull()
+            val numberOfEpisodes = item.extraData?.get("numberOfEpisodes")?.toIntOrNull()
+            val avgEpsPerSeason = if (numberOfSeasons != null && numberOfEpisodes != null && numberOfSeasons > 0) {
+                numberOfEpisodes / numberOfSeasons
+            } else 0
+
+            if (avgEpsPerSeason > 0 && seasonEps.size >= avgEpsPerSeason) {
+                if (numberOfSeasons != null && season >= numberOfSeasons) {
+                    _state.update { it.copy(suggestSeriesComplete = true) }
+                } else {
+                    _state.update { it.copy(suggestSeasonAdvance = true) }
+                }
+            }
+        }
     }
 }

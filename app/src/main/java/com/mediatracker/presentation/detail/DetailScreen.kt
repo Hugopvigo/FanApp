@@ -95,17 +95,18 @@ fun DetailScreen(
         when {
             state.isLoading -> DetailScreenSkeleton()
             state.error != null -> ErrorState(state.error ?: stringResource(R.string.error_unknown))
-        state.item != null -> DetailContent(
-            state = state,
-            onBack = onBack,
-            onStatusSelected = viewModel::onStatusSelected,
-            onRemoveFromList = viewModel::onRemoveFromList,
-            onToggleFavorite = viewModel::onToggleFavorite,
-            onRatingChanged = viewModel::onRatingChanged,
-            onNotesChanged = viewModel::onNotesChanged,
-            onSeasonEpisodeChanged = viewModel::onSeasonEpisodeChanged,
-            onPageProgressChanged = viewModel::onPageProgressChanged,
-        )
+            state.item != null -> DetailContent(
+                state = state,
+                onBack = onBack,
+                onStatusSelected = viewModel::onStatusSelected,
+                onRemoveFromList = viewModel::onRemoveFromList,
+                onToggleFavorite = viewModel::onToggleFavorite,
+                onRatingChanged = viewModel::onRatingChanged,
+                onNotesChanged = viewModel::onNotesChanged,
+                onSeasonEpisodeChanged = viewModel::onSeasonEpisodeChanged,
+                onPageProgressChanged = viewModel::onPageProgressChanged,
+                onEpisodeToggle = viewModel::onEpisodeToggle,
+            )
         }
 
     if (showRatingCardPrompt && onNavigateToFanCard != null) {
@@ -194,6 +195,7 @@ private fun DetailContent(
     onNotesChanged: (String) -> Unit,
     onSeasonEpisodeChanged: (Int?, Int?) -> Unit,
     onPageProgressChanged: (Int?, Int?) -> Unit,
+    onEpisodeToggle: (Int, Int) -> Unit,
 ) {
     val item = state.item ?: return
     val userItem = state.userItem
@@ -327,6 +329,21 @@ private fun DetailContent(
                     season = userItem.currentSeason,
                     episode = userItem.currentEpisode,
                     onChanged = onSeasonEpisodeChanged,
+                )
+
+                val currentSeason = userItem.currentSeason ?: 1
+                val numberOfEpisodes = item.extraData?.get("numberOfEpisodes")?.toIntOrNull()
+                val numberOfSeasons = item.extraData?.get("numberOfSeasons")?.toIntOrNull()
+                val epsPerSeason = if (numberOfEpisodes != null && numberOfSeasons != null && numberOfSeasons > 0) {
+                    numberOfEpisodes / numberOfSeasons
+                } else 10
+                val seasonWatched = userItem.watchedEpisodes[currentSeason] ?: emptyList()
+
+                EpisodeTracker(
+                    season = currentSeason,
+                    numberOfEpisodes = epsPerSeason,
+                    watchedEpisodes = seasonWatched,
+                    onEpisodeToggle = { ep -> onEpisodeToggle(currentSeason, ep) },
                 )
             }
 

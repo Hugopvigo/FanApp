@@ -5,6 +5,8 @@ import com.mediatracker.domain.model.MediaItem
 import com.mediatracker.domain.model.MediaType
 import com.mediatracker.domain.model.UserItem
 import com.mediatracker.domain.model.MediaItemWithUserStatus
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import timber.log.Timber
 
@@ -63,6 +65,7 @@ fun UserItemEntity.toDomain(): UserItem = UserItem(
     currentEpisode = currentEpisode,
     currentPage = currentPage,
     totalPages = totalPages,
+    watchedEpisodes = if (watchedEpisodes.isBlank()) emptyMap() else json.decodeFromString<Map<Int, List<Int>>>(watchedEpisodes),
 )
 
 fun UserItem.toEntity(): UserItemEntity = UserItemEntity(
@@ -81,6 +84,7 @@ fun UserItem.toEntity(): UserItemEntity = UserItemEntity(
     currentEpisode = currentEpisode,
     currentPage = currentPage,
     totalPages = totalPages,
+    watchedEpisodes = if (watchedEpisodes.isEmpty()) "" else json.encodeToString(watchedEpisodes),
 )
 
 fun Pair<MediaItemEntity, UserItemEntity?>.toMediaItemWithUserStatus(): MediaItemWithUserStatus =
