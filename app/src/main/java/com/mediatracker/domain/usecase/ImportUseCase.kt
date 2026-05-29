@@ -39,6 +39,7 @@ class ImportUseCase @Inject constructor(
             val existingItems = try {
                 userRepository.getUserItemsFlow().first()
             } catch (e: Exception) {
+                Timber.e(e, "Failed to load existing items for duplicate check")
                 emptyList()
             }
 
