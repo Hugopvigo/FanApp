@@ -27,6 +27,7 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -94,37 +95,92 @@ fun DetailScreen(
         when {
             state.isLoading -> DetailScreenSkeleton()
             state.error != null -> ErrorState(state.error ?: stringResource(R.string.error_unknown))
-            state.item != null -> DetailContent(
-                state = state,
-                onBack = onBack,
-                onStatusSelected = viewModel::onStatusSelected,
-                onRemoveFromList = viewModel::onRemoveFromList,
-                onToggleFavorite = viewModel::onToggleFavorite,
-                onRatingChanged = viewModel::onRatingChanged,
-                onNotesChanged = viewModel::onNotesChanged,
-                onSeasonEpisodeChanged = viewModel::onSeasonEpisodeChanged,
-            )
+        state.item != null -> DetailContent(
+            state = state,
+            onBack = onBack,
+            onStatusSelected = viewModel::onStatusSelected,
+            onRemoveFromList = viewModel::onRemoveFromList,
+            onToggleFavorite = viewModel::onToggleFavorite,
+            onRatingChanged = viewModel::onRatingChanged,
+            onNotesChanged = viewModel::onNotesChanged,
+            onSeasonEpisodeChanged = viewModel::onSeasonEpisodeChanged,
+            onPageProgressChanged = viewModel::onPageProgressChanged,
+        )
         }
 
-        if (showRatingCardPrompt && onNavigateToFanCard != null) {
-            Snackbar(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(16.dp),
-                action = {
-                    TextButton(onClick = {
-                        showRatingCardPrompt = false
-                        onNavigateToFanCard()
-                    }) { Text(stringResource(R.string.fancard_share), color = fanColors.gradientAccent.first()) }
-                },
-                dismissAction = {
-                    IconButton(onClick = { showRatingCardPrompt = false }) {
-                        Icon(Icons.Filled.Close, contentDescription = null, modifier = Modifier.size(18.dp))
-                    }
-                },
-            ) { Text(stringResource(R.string.fancard_rating_prompt)) }
-        }
+    if (showRatingCardPrompt && onNavigateToFanCard != null) {
+        Snackbar(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(16.dp),
+            action = {
+                TextButton(onClick = {
+                    showRatingCardPrompt = false
+                    onNavigateToFanCard()
+                }) { Text(stringResource(R.string.fancard_share), color = fanColors.gradientAccent.first()) }
+            },
+            dismissAction = {
+                IconButton(onClick = { showRatingCardPrompt = false }) {
+                    Icon(Icons.Filled.Close, contentDescription = null, modifier = Modifier.size(18.dp))
+                }
+            },
+        ) { Text(stringResource(R.string.fancard_rating_prompt)) }
     }
+
+    if (state.suggestBookComplete) {
+        Snackbar(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(16.dp),
+            action = {
+                TextButton(onClick = viewModel::onConfirmBookComplete) {
+                    Text(stringResource(R.string.detail_action_complete), color = fanColors.gradientAccent.first())
+                }
+            },
+            dismissAction = {
+                IconButton(onClick = viewModel::onDismissBookComplete) {
+                    Icon(Icons.Filled.Close, contentDescription = null, modifier = Modifier.size(18.dp))
+                }
+            },
+        ) { Text(stringResource(R.string.detail_book_complete_prompt)) }
+    }
+
+    if (state.suggestSeasonAdvance) {
+        Snackbar(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(16.dp),
+            action = {
+                TextButton(onClick = viewModel::onConfirmSeasonAdvance) {
+                    Text(stringResource(R.string.detail_action_advance), color = fanColors.gradientAccent.first())
+                }
+            },
+            dismissAction = {
+                IconButton(onClick = viewModel::onDismissSeasonAdvance) {
+                    Icon(Icons.Filled.Close, contentDescription = null, modifier = Modifier.size(18.dp))
+                }
+            },
+        ) { Text(stringResource(R.string.detail_season_advance_prompt)) }
+    }
+
+    if (state.suggestSeriesComplete) {
+        Snackbar(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(16.dp),
+            action = {
+                TextButton(onClick = viewModel::onConfirmSeriesComplete) {
+                    Text(stringResource(R.string.detail_action_complete), color = fanColors.gradientAccent.first())
+                }
+            },
+            dismissAction = {
+                IconButton(onClick = viewModel::onDismissSeriesComplete) {
+                    Icon(Icons.Filled.Close, contentDescription = null, modifier = Modifier.size(18.dp))
+                }
+            },
+        ) { Text(stringResource(R.string.detail_series_complete_prompt)) }
+    }
+}
 }
 
 @Composable
@@ -137,6 +193,7 @@ private fun DetailContent(
     onRatingChanged: (Int?) -> Unit,
     onNotesChanged: (String) -> Unit,
     onSeasonEpisodeChanged: (Int?, Int?) -> Unit,
+    onPageProgressChanged: (Int?, Int?) -> Unit,
 ) {
     val item = state.item ?: return
     val userItem = state.userItem
@@ -265,13 +322,22 @@ private fun DetailContent(
                     )
                 }
 
-                if (userItem != null && item.mediaType == MediaType.SERIES && userItem.status == ItemStatus.IN_PROGRESS) {
-                    SeasonEpisodeStepper(
-                        season = userItem.currentSeason,
-                        episode = userItem.currentEpisode,
-                        onChanged = onSeasonEpisodeChanged,
-                    )
-                }
+            if (userItem != null && item.mediaType == MediaType.SERIES && userItem.status == ItemStatus.IN_PROGRESS) {
+                SeasonEpisodeStepper(
+                    season = userItem.currentSeason,
+                    episode = userItem.currentEpisode,
+                    onChanged = onSeasonEpisodeChanged,
+                )
+            }
+
+            if (userItem != null && item.mediaType == MediaType.BOOK && userItem.status == ItemStatus.IN_PROGRESS) {
+                PageProgressStepper(
+                    currentPage = userItem.currentPage,
+                    totalPages = userItem.totalPages,
+                    apiPageCount = item.extraData?.get("pageCount")?.toIntOrNull(),
+                    onChanged = onPageProgressChanged,
+                )
+            }
 
                 if (item.overview.isNotBlank()) {
                     Text(
@@ -443,14 +509,76 @@ private fun SeasonEpisodeStepper(
 }
 
 @Composable
+private fun PageProgressStepper(
+    currentPage: Int?,
+    totalPages: Int?,
+    apiPageCount: Int?,
+    onChanged: (Int?, Int?) -> Unit,
+) {
+    val t = totalPages ?: apiPageCount ?: 0
+    val c = currentPage ?: if (t > 0) 0 else 0
+    val fanColors = MaterialTheme.fanAppColors
+
+    Column {
+        Text(
+            text = stringResource(R.string.detail_page_tracking),
+            style = MaterialTheme.typography.labelLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Spacer(Modifier.height(8.dp))
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            StepperControl(
+                label = stringResource(R.string.detail_current_page),
+                value = c,
+                onDecrement = { onChanged(maxOf(0, c - 1), t) },
+                onIncrement = { onChanged(minOf(if (t > 0) t else c + 1, c + 1), t) },
+                modifier = Modifier.weight(1f),
+                allowZero = true,
+            )
+            StepperControl(
+                label = stringResource(R.string.detail_total_pages),
+                value = t,
+                onDecrement = { onChanged(minOf(c, maxOf(1, t - 1)), maxOf(1, t - 1)) },
+                onIncrement = { onChanged(c, t + 1) },
+                modifier = Modifier.weight(1f),
+                allowZero = true,
+            )
+        }
+        if (t > 0 && c > 0) {
+            Spacer(Modifier.height(8.dp))
+            LinearProgressIndicator(
+                progress = { c.toFloat() / t.toFloat() },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(6.dp)
+                    .clip(RoundedCornerShape(3.dp)),
+                color = fanColors.gradientAccent.first(),
+                trackColor = fanColors.surfaceAlpha.copy(alpha = 0.3f),
+            )
+            Spacer(Modifier.height(4.dp))
+            Text(
+                text = "${(c.toFloat() / t.toFloat() * 100).toInt()}%",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+    }
+}
+
+@Composable
 private fun StepperControl(
     label: String,
     value: Int,
     onDecrement: () -> Unit,
     onIncrement: () -> Unit,
     modifier: Modifier = Modifier,
+    allowZero: Boolean = false,
 ) {
     val fanColors = MaterialTheme.fanAppColors
+    val minValue = if (allowZero) 0 else 1
 
     Surface(
         shape = RoundedCornerShape(14.dp),
@@ -472,7 +600,7 @@ private fun StepperControl(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
             ) {
-                IconButton(onClick = onDecrement, enabled = value > 1) {
+                IconButton(onClick = onDecrement, enabled = value > minValue) {
                     Icon(Icons.Default.Remove, contentDescription = "-", modifier = Modifier.size(18.dp))
                 }
                 Text(
@@ -530,6 +658,7 @@ private fun DetailContentPreview() {
             onRatingChanged = {},
             onNotesChanged = {},
             onSeasonEpisodeChanged = { _, _ -> },
+    onPageProgressChanged = { _, _ -> },
         )
     }
 }

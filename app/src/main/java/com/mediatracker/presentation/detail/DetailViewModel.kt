@@ -16,6 +16,7 @@ import com.mediatracker.domain.usecase.UpdateItemStatusUseCase
 import com.mediatracker.domain.usecase.UpdateUserRatingUseCase
 import com.mediatracker.domain.usecase.UpdateUserNotesUseCase
 import com.mediatracker.domain.usecase.UpdateSeasonEpisodeUseCase
+import com.mediatracker.domain.usecase.UpdatePageProgressUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -30,6 +31,9 @@ data class DetailUiState(
     val isLoading: Boolean = true,
     val error: String? = null,
     val isUpdating: Boolean = false,
+    val suggestBookComplete: Boolean = false,
+    val suggestSeasonAdvance: Boolean = false,
+    val suggestSeriesComplete: Boolean = false,
 )
 
 @HiltViewModel
@@ -44,6 +48,7 @@ class DetailViewModel @Inject constructor(
     private val updateUserRatingUseCase: UpdateUserRatingUseCase,
     private val updateUserNotesUseCase: UpdateUserNotesUseCase,
     private val updateSeasonEpisodeUseCase: UpdateSeasonEpisodeUseCase,
+    private val updatePageProgressUseCase: UpdatePageProgressUseCase,
 ) : ViewModel() {
 
     private val apiId: String = savedStateHandle["apiId"] ?: ""
@@ -134,10 +139,74 @@ class DetailViewModel @Inject constructor(
         }
     }
 
+    fun onPageProgressChanged(currentPage: Int?, totalPages: Int?) {
+        val currentUserItem = _state.value.userItem ?: return
+        viewModelScope.launch {
+            updatePageProgressUseCase(currentUserItem.id, currentPage, totalPages)
+            val tp = totalPages ?: _state.value.item?.extraData?.get("pageCount")?.toIntOrNull()
+            if (tp != null && tp > 0 && currentPage != null && currentPage >= tp) {
+                _state.update { it.copy(suggestBookComplete = true) }
+            }
+        }
+    }
+
+    fun onConfirmBookComplete() {
+        val currentUserItem = _state.value.userItem ?: return
+        viewModelScope.launch {
+            updateItemStatusUseCase(currentUserItem.id, ItemStatus.COMPLETED)
+            _state.update { it.copy(suggestBookComplete = false) }
+        }
+    }
+
+    fun onDismissBookComplete() {
+        _state.update { it.copy(suggestBookComplete = false) }
+    }
+
     fun onSeasonEpisodeChanged(season: Int?, episode: Int?) {
         val currentUserItem = _state.value.userItem ?: return
         viewModelScope.launch {
             updateSeasonEpisodeUseCase(currentUserItem.id, season, episode)
+            val item = _state.value.item ?: return@launch
+            val numberOfSeasons = item.extraData?.get("numberOfSeasons")?.toIntOrNull()
+            val numberOfEpisodes = item.extraData?.get("numberOfEpisodes")?.toIntOrNull()
+            val s = season ?: return@launch
+            val e = episode ?: return@launch
+            if (numberOfSeasons != null && s >= numberOfSeasons && numberOfEpisodes != null) {
+                val avgEpsPerSeason = numberOfEpisodes / numberOfSeasons
+                if (e >= avgEpsPerSeason) {
+                    _state.update { it.copy(suggestSeriesComplete = true) }
+                }
+            } else if (numberOfSeasons != null && s < numberOfSeasons && numberOfEpisodes != null) {
+                val avgEpsPerSeason = numberOfEpisodes / numberOfSeasons
+                if (e >= avgEpsPerSeason) {
+                    _state.update { it.copy(suggestSeasonAdvance = true) }
+                }
+            }
         }
+    }
+
+    fun onConfirmSeasonAdvance() {
+        val currentUserItem = _state.value.userItem ?: return
+        val nextSeason = (currentUserItem.currentSeason ?: 1) + 1
+        viewModelScope.launch {
+            updateSeasonEpisodeUseCase(currentUserItem.id, nextSeason, 1)
+            _state.update { it.copy(suggestSeasonAdvance = false) }
+        }
+    }
+
+    fun onDismissSeasonAdvance() {
+        _state.update { it.copy(suggestSeasonAdvance = false) }
+    }
+
+    fun onConfirmSeriesComplete() {
+        val currentUserItem = _state.value.userItem ?: return
+        viewModelScope.launch {
+            updateItemStatusUseCase(currentUserItem.id, ItemStatus.COMPLETED)
+            _state.update { it.copy(suggestSeriesComplete = false) }
+        }
+    }
+
+    fun onDismissSeriesComplete() {
+        _state.update { it.copy(suggestSeriesComplete = false) }
     }
 }

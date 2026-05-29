@@ -221,6 +221,16 @@
     <string name="detail_season">Season</string>
     <string name="detail_episode">Episode</string>
 
+    <!-- Page Tracking -->
+    <string name="detail_page_tracking">Reading progress</string>
+    <string name="detail_current_page">Current page</string>
+    <string name="detail_total_pages">Total pages</string>
+    <string name="detail_book_complete_prompt">You\'ve reached the last page! Mark as completed?</string>
+    <string name="detail_season_advance_prompt">Season complete! Advance to next season?</string>
+    <string name="detail_series_complete_prompt">You\'ve finished the last season! Mark series as completed?</string>
+    <string name="detail_action_complete">Complete</string>
+    <string name="detail_action_advance">Advance</string>
+
     <!-- Import -->
     <string name="import_title">Import</string>
 

@@ -209,6 +209,16 @@
     <string name="detail_season">Temporada</string>
     <string name="detail_episode">Episodio</string>
 
+    <!-- Seguimiento de páginas -->
+    <string name="detail_page_tracking">Progreso de lectura</string>
+    <string name="detail_current_page">Página actual</string>
+    <string name="detail_total_pages">Páginas totales</string>
+    <string name="detail_book_complete_prompt">¡Has llegado a la última página! ¿Marcar como completado?</string>
+    <string name="detail_season_advance_prompt">¡Temporada completada! ¿Avanzar a la siguiente?</string>
+    <string name="detail_series_complete_prompt">¡Has terminado la última temporada! ¿Marcar serie como completada?</string>
+    <string name="detail_action_complete">Completar</string>
+    <string name="detail_action_advance">Avanzar</string>
+
     <!-- Importar -->
     <string name="import_title">Importar</string>
 

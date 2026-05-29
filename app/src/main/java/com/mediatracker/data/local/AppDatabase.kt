@@ -7,7 +7,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 
 @Database(
     entities = [MediaItemEntity::class, UserItemEntity::class, NotificationEntity::class, AchievementEntity::class, StreakEntity::class],
-    version = 8,
+    version = 9,
     exportSchema = false,
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -85,6 +85,13 @@ abstract class AppDatabase : RoomDatabase() {
         override fun migrate(db: SupportSQLiteDatabase) {
             db.execSQL("ALTER TABLE streaks ADD COLUMN bonusXp INTEGER NOT NULL DEFAULT 0")
             db.execSQL("ALTER TABLE streaks ADD COLUMN milestonesHit TEXT NOT NULL DEFAULT ''")
+        }
+    }
+
+    val MIGRATION_8_9 = object : Migration(8, 9) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL("ALTER TABLE user_items ADD COLUMN currentPage INTEGER DEFAULT NULL")
+            db.execSQL("ALTER TABLE user_items ADD COLUMN totalPages INTEGER DEFAULT NULL")
         }
     }
 }

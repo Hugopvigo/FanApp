@@ -49,6 +49,8 @@ fun UserItemEntity.toDomain(): UserItem = UserItem(
     notes = notes,
     currentSeason = currentSeason,
     currentEpisode = currentEpisode,
+    currentPage = currentPage,
+    totalPages = totalPages,
 )
 
 fun UserItem.toEntity(): UserItemEntity = UserItemEntity(
@@ -65,6 +67,8 @@ fun UserItem.toEntity(): UserItemEntity = UserItemEntity(
     notes = notes,
     currentSeason = currentSeason,
     currentEpisode = currentEpisode,
+    currentPage = currentPage,
+    totalPages = totalPages,
 )
 
 fun Pair<MediaItemEntity, UserItemEntity?>.toMediaItemWithUserStatus(): MediaItemWithUserStatus =

@@ -33,6 +33,8 @@ data class UserItemEntity(
     val notes: String? = null,
     val currentSeason: Int? = null,
     val currentEpisode: Int? = null,
+    val currentPage: Int? = null,
+    val totalPages: Int? = null,
 )
 
 @Entity(tableName = "notifications")
