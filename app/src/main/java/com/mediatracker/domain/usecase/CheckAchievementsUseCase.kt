@@ -9,8 +9,8 @@ import com.mediatracker.domain.model.ACHIEVEMENT_DEFS
 import com.mediatracker.domain.model.AchievementCondition
 import com.mediatracker.domain.model.ItemStatus
 import com.mediatracker.domain.model.MediaType
-import com.mediatracker.domain.model.UserItem
 import com.mediatracker.domain.repository.UserRepository
+import kotlinx.coroutines.flow.first
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -22,11 +22,7 @@ class CheckAchievementsUseCase @Inject constructor(
 ) {
     suspend operator fun invoke() {
         val items = try {
-            userRepository.getUserItemsFlow().let { flow ->
-                var result: List<UserItem> = emptyList()
-                flow.collect { result = it }
-                result
-            }
+            userRepository.getUserItemsFlow().first()
         } catch (e: Exception) {
             Timber.e(e, "Failed to load items for achievement check")
             return
@@ -50,7 +46,7 @@ class CheckAchievementsUseCase @Inject constructor(
             val existing = achievementDao.getById(def.id)
             if (existing?.unlockedAt != null) continue
 
-        val (unlocked, progress) = evaluateCondition(
+            val (unlocked, progress) = evaluateCondition(
             condition = def.condition,
             target = def.target,
             totalItems = activeItems.size,
