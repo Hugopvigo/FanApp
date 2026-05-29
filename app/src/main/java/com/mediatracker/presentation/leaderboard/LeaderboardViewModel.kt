@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -72,7 +73,7 @@ class LeaderboardViewModel @Inject constructor(
     private fun syncRanking() {
         viewModelScope.launch {
             try {
-                val snapshot = stats.value
+                val snapshot = stats.first()
                 val displayName = authDataSource.getUserName() ?: "Anonymous"
                 val avatarId = try {
                     firestoreDataSource.getAvatarId().getOrDefault(null)
