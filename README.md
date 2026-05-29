@@ -16,6 +16,7 @@ Una app Android que unifica el seguimiento de **series**, **películas** y **lib
 
 | 🎬 Series | 🎥 Películas | 📖 Libros |
 |-----------|-------------|-----------|
+| Temporadas y episodios | Historial de visionado | Páginas y progreso de lectura |
 
 Olvídate de tener 3 apps distintas. Todo tu contenido, un solo sitio.
 
@@ -35,6 +36,7 @@ Olvídate de tener 3 apps distintas. Todo tu contenido, un solo sitio.
 |----------|----------|
 | 🏠 **Home** | Resumen: continúa donde lo dejaste, novedades, favoritos, últimos guardados |
 | 🔍 **Discover** | Busca series, películas o libros por separado + ranking de trending |
+| ➕ **Quick Add** | Añade contenido a tus listas rápidamente desde los resultados de búsqueda |
 | 📚 **Library** | Tus listas filtradas por estado: quiero ver, en progreso, completado, abandonado |
 | 👤 **Profile** | Stats, logros, ranking, import CSV, FanCard, racha 🔥, nivel XP, tema, notificaciones, privacidad |
 
@@ -45,7 +47,7 @@ Olvídate de tener 3 apps distintas. Todo tu contenido, un solo sitio.
 ## ⚙️ Stack Técnico
 
 | Componente | Tecnología |
-|------------|-----------|
+|------------|------------|
 | 🧠 Lenguaje | Kotlin |
 | 🎨 UI | Jetpack Compose + Material 3 |
 | 🏗️ Arquitectura | Clean Architecture + MVVM |
@@ -150,11 +152,15 @@ Para el detalle técnico por tarea, consulta `CHANGELOG.md`.
 ```bash
 git clone <repo>
 # Abrir en Android Studio
-# Añadir tus API keys en local.properties
-TMDB_API_KEY=tu_key
-GOOGLE_BOOKS_API_KEY=tu_key
 # Poner google-services.json en app/
 ./gradlew assembleDebug
+```
+
+Añadir en `local.properties`:
+
+```properties
+TMDB_API_KEY=tu_key
+GOOGLE_BOOKS_API_KEY=tu_key
 ```
 
 ---
