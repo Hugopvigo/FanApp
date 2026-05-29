@@ -26,9 +26,9 @@ Olvídate de tener 3 apps distintas. Todo tu contenido, un solo sitio.
 ## 🧭 Pantallas
 
 ```
-┌───────────────────────────────────────────────────────────┐
-│   🏠 Home    🔍 Discover    📚 Library    👤 Profile    │
-└───────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────┐
+│   🏠 Home   🔍 Discover   ➕ Quick Add   📚 Library   👤 Profile   │
+└──────────────────────────────────────────────────────────────┘
 ```
 
 | Pantalla | Qué hace |
@@ -36,7 +36,7 @@ Olvídate de tener 3 apps distintas. Todo tu contenido, un solo sitio.
 | 🏠 **Home** | Resumen: continúa donde lo dejaste, novedades, favoritos, últimos guardados |
 | 🔍 **Discover** | Busca series, películas o libros por separado + ranking de trending |
 | 📚 **Library** | Tus listas filtradas por estado: quiero ver, en progreso, completado, abandonado |
-| 👤 **Profile** | Contadores, nivel de gamificación, ajustes de tema, notificaciones, privacidad, cerrar sesión |
+| 👤 **Profile** | Stats, logros, ranking, import CSV, FanCard, racha 🔥, nivel XP, tema, notificaciones, privacidad |
 
 > 🚧 Pantallas, nombres y flujos pueden cambiar durante el desarrollo.
 
@@ -92,25 +92,30 @@ Cada serie, película o libro puede estar en un estado. Y puedes marcarlo como f
 ## 🗺️ Roadmap
 
 ```
-📦 Fase 1 — MVP (en desarrollo)
+📦 Fase 1 — MVP ✅
 ├── Auth + setup del proyecto
 ├── Búsqueda + detalle de contenido
 ├── Listas del usuario sincronizadas
 ├── Home + Perfil con contadores
-└── ¡Primera build funcional!
+└── Primera build funcional
 
-🚀 Fase 2 — Engagement
-├── Botón Add rápido
-├── Trackeo de temporadas en series
-├── Notificaciones
-├── Valoraciones y notas
-└── Estadísticas
+🚀 Fase 2 — Engagement (en progreso)
+├── ✅ Botón Add rápido (Quick Add)
+├── ✅ Trackeo temporada/episodio en series
+├── ✅ Valoraciones (1-5) y notas
+├── ✅ Progreso de página en libros
+├── ✅ Estadísticas con gráficos (Vico)
+├── ✅ Rachas diarias + bonus XP
+├── ✅ 12 logros con desbloqueo automático
+├── 🔜 Logros expandidos, retos y niveles avanzados (Sprint 9)
+└── 🔜 Widgets, idioma en runtime, tests (Sprint 9)
 
-🤝 Fase 3 — Social
-├── Perfiles públicos
-├── Comparar listas con amigos
-├── Recomendaciones
-└── Compartir
+🤝 Fase 3 — Social (parcial)
+├── ✅ Ranking / Leaderboard (Firestore)
+├── ✅ Import Letterboxd + Goodreads (CSV)
+├── ✅ FanCard compartible
+├── 🔜 Perfiles públicos y actividad social
+└── 🔜 Recomendaciones y comparar listas
 ```
 
 > 🚧 Fechas, fases y features pueden cambiar.
@@ -121,18 +126,22 @@ Cada serie, película o libro puede estar en un estado. Y puedes marcarlo como f
 ## 🔑 Estado actual
 
 ```
-████████████████████ 95% — Sprint 5 completado · Sprint 6 planificado
+████████████████░░░░ ~80% MVP+ — Sprint 7 completado · Sprint 8 parcial · Sprint 9 en preparación
 ```
 
-| Sprint | Estado |
-|--------|--------|
-| Sprint 1 — Setup + Auth | ✅ Completado |
-| Sprint 2 — Upgrade de Versiones | ✅ Completado |
-| Sprint 3 — APIs + Data Layer + Library | ✅ Completado |
-| Sprint 4 — Temas + Home + Pulido | ✅ Completado |
-| Sprint 5 — Bugs, Mejoras y Pendientes | ✅ Completado |
+| Sprint | Estado | Highlights |
+|--------|--------|------------|
+| Sprint 1 — Setup + Auth | ✅ | Firebase, navegación, placeholders |
+| Sprint 2 — Upgrade de Versiones | ✅ | Gradle 9, Kotlin 2.3, Retrofit 3 |
+| Sprint 3 — APIs + Data Layer | ✅ | TMDB, Google Books, Room, Library |
+| Sprint 4 — Temas + Home + Pulido | ✅ | 4 temas, Discover, Detail |
+| Sprint 5 — Bugs y Pendientes | ✅ | Notificaciones, privacidad, gamificación base |
+| Sprint 6 — Diseño Visual | ✅ | Glass iOS26, hero Detail, featured Home, Open Library |
+| Sprint 7 — Engagement y Social | ✅ | Google Sign-In, Quick Add, logros, ranking, import CSV, FanCard, stats |
+| Sprint 8 — Progreso Detallado | 🔄 Parcial | Páginas en libros, badges de progreso, auto-completar/avance (snackbars) |
+| Sprint 9 — Plataforma y Pulido | 📋 Planificado | Widgets, idioma, avatar, email verify, tests, logros/retos expandidos |
 
-Para seguir el progreso en detalle, consulta `CHANGELOG.md` y los archivos `Sprint*.md`.
+Para el detalle técnico por tarea, consulta `CHANGELOG.md`.
 
 ---
 

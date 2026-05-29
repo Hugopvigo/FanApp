@@ -1,5 +1,129 @@
 # Changelog
 
+## Sprint 8 — Progreso Detallado (parcial, 2026-05-29–…)
+
+> Objetivo del sprint: progreso granular en libros/series, logros expandidos, niveles avanzados y retos.
+> Estado: **en curso** — núcleo de progreso implementado; expansión de gamificación y retos pendientes para Sprint 9.
+
+### T1 — Progreso de página en libros (completada salvo XP bonus)
+- `UserItem` / `UserItemEntity`: campos `currentPage`, `totalPages`
+- `AppDatabase`: versión 8→9, migración `MIGRATION_8_9`
+- `UpdatePageProgressUseCase`: actualiza progreso y sincroniza con Room/Firestore
+- `DetailScreen`: stepper de páginas, barra de % y copia de `pageCount` al pasar a `IN_PROGRESS`
+- `LibraryItemCard`: badge `📄 37%` o `247/662` para libros en progreso
+- Pendiente: XP bonus por páginas leídas
+
+### T2 — Progreso visual de series (parcial)
+- `LibraryItemCard`: badge `📺 T3E7` o % de progreso; barra de progreso en tarjeta
+- Lógica de % desde `currentSeason` / `currentEpisode` vs totales TMDB
+- Auto-avance de temporada al superar el último episodio
+- Pendiente: barra y chips por temporada en `DetailScreen`, contador “X / Y episodios”
+
+### T3 — Auto-completar y auto-avance inteligente (completada)
+- `DetailViewModel` + `DetailScreen`: Snackbars al terminar libro, temporada o serie completa
+- Acciones: marcar libro como completado, avanzar a T+1E1, marcar serie como completada
+- Pendiente: XP de completado al confirmar desde la Snackbar
+
+### Pendiente en Sprint 8 (previsto Sprint 9)
+- T4: Expansión de logros (12 → 45) y logros secretos
+- T5: 15 niveles con multiplicadores de XP por racha
+- T6: Sesiones de lectura diarias y velocidad
+- T7: Resumen semanal (WorkManager)
+- T8: Badges expresivos en Library (Hoy, favorito, pulso)
+- T9: Sistema de retos (semanal, mensual, anual, personal)
+
+---
+
+## Sprint 7 — Engagement, Social y Gamificación (2026-05-27–29)
+
+> Objetivo del sprint: engagement, viralidad (FanCard, import) y gamificación social.
+> Estado: **completado** — tareas de plataforma diferidas a Sprint 9.
+
+### T7 — Google Sign-In
+- `AuthDataSource.signInWithGoogle(idToken)` con `GoogleAuthProvider`
+- `LoginScreen`: flujo `ActivityResult` + `GoogleSignInOptions` con `default_web_client_id`
+- Registro/login automático; `displayName` desde cuenta Google; manejo de cancelación y errores
+
+### T6 — Quick Add (FAB central)
+- `FloatingBottomNav`: botón ➕ central
+- `QuickAddSheet` + `QuickAddViewModel`: búsqueda en tiempo real, tabs Series/Pelis/Libros, añadir a watchlist sin pasar por Detail
+- Items existentes muestran estado actual
+
+### T4 — Valoraciones y notas
+- `UserItem`: `userRating` (1–5), `notes`
+- `AppDatabase`: migración `MIGRATION_3_4` (rating + notes)
+- `DetailScreen`: estrellas interactivas + campo de notas con guardado
+- `LibraryItemCard`: estrellas y icono de nota cuando aplican
+
+### T18 — FanCard compartible
+- `FanCardScreen`, `FanCardViewModel`, `FanCardShareHelper`: captura con `GraphicsLayer` + `FileProvider`
+- Tipos: perfil, top del mes, rating card (prompt al valorar)
+- Compartir vía intent del sistema; compatible con los 4 temas
+
+### T2 — Achievements (12 logros)
+- `AchievementEntity`, `AchievementDao`, `MIGRATION_4_5`
+- `CheckAchievementsUseCase`, `GetAchievementsUseCase`, `AchievementsScreen`
+- Desbloqueo automático + notificación local; grid con progreso; contador en Profile
+
+### T3 — Rachas (Streaks)
+- `StreakEntity`, `StreakDao`, `MIGRATION_5_6`; `UpdateStreakUseCase`
+- 🔥 en `HomeScreen`; racha actual y récord en Profile
+- Bonus XP en hitos 7d / 30d / 100d / 365d — `MIGRATION_7_8` (`bonusXp`, `milestonesHit`)
+
+### T1 — Ranking / Leaderboard
+- `LeaderboardScreen`, `LeaderboardViewModel`
+- Firestore `/rankings/…`; tabs All-Time, Anual, Series, Pelis, Libros
+- Top 50, medallas 🥇🥈🥉, posición del usuario sticky; acceso desde Profile
+
+### T8 — Trackeo temporada / episodio
+- `UserItem`: `currentSeason`, `currentEpisode`; `MIGRATION_6_7`
+- `UpdateSeasonEpisodeUseCase`; steppers en Detail para series `IN_PROGRESS`
+- Badge `TxE` en `LibraryItemCard`
+
+### T20 — Import Letterboxd / Goodreads
+- `LetterboxdCsvParser`, `GoodreadsCsvParser`, `ImportUseCase`
+- `ImportScreen` + `ImportViewModel`: flujo en 4 pasos (origen → archivo → preview → resultado)
+- Detección de duplicados; import en background con progreso; navegación desde Profile
+
+### T5 — Estadísticas detalladas
+- `StatsScreen`, `StatsViewModel`, `Route.Stats`
+- Métricas desde Room; gráficos con **Vico** (distribución por tipo + actividad mensual 12 meses)
+- Acceso desde Profile
+
+### T10 — Push Notifications (FCM, adelantado)
+- `FcmTokenRepository`, `FanAppMessagingService`, canal de notificaciones, permiso `POST_NOTIFICATIONS`
+
+### Diferido a Sprint 9
+- T9 Avatar (Firebase Storage), T11 Language toggle, T12 Auto theme, T13 Email verification, T14 Tests unitarios ampliados, T19 Widgets
+
+### Migraciones Room (cadena actual)
+```
+v1→v2 title/posterUrl · v2→v3 notifications · v3→v4 rating/notes · v4→v5 achievements
+v5→v6 streaks · v6→v7 season/episode · v7→v8 streak bonus · v8→v9 currentPage/totalPages
+```
+Base de datos en **versión 9**.
+
+---
+
+## Sprint 6 — Diseño Visual: Hero, Featured y UX (2026-05-16–26)
+
+### Rediseño glass / floating (iOS26-style)
+- `GlassSurface`, `FloatingBottomNav`, temas glass preservando los 4 esquemas de color
+- `Theme.kt` / `Color.kt`: paleta y superficies adaptadas al rediseño
+
+### Home y Discover
+- `HomeScreen`: featured card, saludo personalizado (`GreetingLine`), secciones con scroll
+- `ShimmerSkeleton`: loading skeleton compartido en Home, Discover y Library
+- Animaciones de transición en navegación
+
+### Detail
+- Hero image a pantalla completa, botón flotante de acción, layout renovado
+
+### Datos
+- Open Library como fuente de respaldo para libros (complemento a Google Books)
+
+---
+
 ## Sprint 5 — Bugs, Mejoras y Pendientes (2026-05-18–…)
 
 ### T8 — Gamificación (modelo + nivel en perfil)
