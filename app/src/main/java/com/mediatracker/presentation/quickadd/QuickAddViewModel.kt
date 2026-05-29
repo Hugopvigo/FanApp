@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 data class QuickAddUiState(
@@ -38,7 +39,7 @@ class QuickAddViewModel @Inject constructor(
     private val _state = MutableStateFlow(QuickAddUiState())
     val state: StateFlow<QuickAddUiState> = _state.asStateFlow()
 
-    private var searchResults: List<MediaItem> = emptyList()
+    private val _searchResults = MutableStateFlow<List<MediaItem>>(emptyList())
 
     init {
         observeUserItems()
@@ -58,7 +59,7 @@ class QuickAddViewModel @Inject constructor(
     fun onQueryChanged(query: String) {
         _state.update { it.copy(query = query, error = null) }
         if (query.isBlank()) {
-            searchResults = emptyList()
+            _searchResults.value = emptyList()
             _state.update { it.copy(results = emptyList(), isLoading = false) }
             return
         }
@@ -66,7 +67,7 @@ class QuickAddViewModel @Inject constructor(
             _state.update { it.copy(isLoading = true) }
             searchMediaUseCase(query, _state.value.selectedTab)
                 .onSuccess { items ->
-                    searchResults = items
+                    _searchResults.value = items
                     mergeResultsWithUserStatus()
                     _state.update { it.copy(isLoading = false) }
                 }
@@ -78,7 +79,7 @@ class QuickAddViewModel @Inject constructor(
 
     fun onTabSelected(tab: MediaType) {
         _state.update { it.copy(selectedTab = tab, results = emptyList(), isLoading = false, error = null) }
-        searchResults = emptyList()
+        _searchResults.value = emptyList()
         val q = _state.value.query
         if (q.isNotBlank()) onQueryChanged(q)
     }
@@ -92,8 +93,12 @@ class QuickAddViewModel @Inject constructor(
                 title = item.title,
                 posterUrl = item.posterUrl.ifBlank { null },
                 status = ItemStatus.WATCHLIST,
-            )
-            _state.update { it.copy(justAddedId = item.id) }
+            ).onSuccess {
+                _state.update { it.copy(justAddedId = item.id) }
+            }.onFailure { e ->
+                Timber.e(e, "Failed to add item to watchlist: ${item.title}")
+                _state.update { it.copy(error = e.message) }
+            }
         }
     }
 
@@ -103,7 +108,7 @@ class QuickAddViewModel @Inject constructor(
 
     private fun mergeResultsWithUserStatus() {
         val userMap = userItemsMap.value
-        val enriched = searchResults.map { media ->
+        val enriched = _searchResults.value.map { media ->
             val apiId = media.id.removePrefix("${media.mediaType.name.lowercase()}_")
             MediaItemWithUserStatus(media = media, userStatus = userMap[apiId])
         }
