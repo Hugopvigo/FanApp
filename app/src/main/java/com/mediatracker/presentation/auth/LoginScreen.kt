@@ -245,7 +245,7 @@ fun LoginScreen(
                             if (state.isRegisterMode) viewModel.register()
                             else viewModel.login()
                         },
-                        enabled = !hasErrors,
+                        enabled = !hasErrors && !state.isLoading,
                         modifier = Modifier.fillMaxSize(),
                         shape = RoundedCornerShape(16.dp),
                         colors = ButtonDefaults.buttonColors(
