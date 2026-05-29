@@ -227,4 +227,9 @@
     <string name="stats_estimated_hours">Horas est.</string>
     <string name="stats_distribution">Distribución por tipo</string>
     <string name="stats_monthly_activity">Actividad mensual</string>
-</resources>
+    <string name="stats_top_genres">Top géneros</string>
+    <string name="stats_top_genres_empty">Completa items con datos de género para ver tus favoritos.</string>
+    <string name="stats_share">Compartir estadísticas</string>
+    <string name="stats_total_tracked">Completados por tipo</string>
+    <string name="fancard_type_stats">Estadísticas</string>
+    <string name="fancard_stats_title">Mis estadísticas</string>
