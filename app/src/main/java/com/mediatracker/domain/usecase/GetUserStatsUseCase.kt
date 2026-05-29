@@ -7,8 +7,10 @@ import com.mediatracker.domain.model.UserItem
 import com.mediatracker.domain.model.UserStats
 import com.mediatracker.domain.model.UserLevel
 import com.mediatracker.domain.repository.UserRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
@@ -38,7 +40,7 @@ class GetUserStatsUseCase @Inject constructor(
                 levelTitle = userLevel.title,
                 levelIcon = userLevel.icon,
             )
-        }
+        }.flowOn(Dispatchers.IO)
 
     private fun calculateRetroactiveXp(items: List<UserItem>): Int {
         val activeItems = items.filter { it.status != ItemStatus.ABANDONED }

@@ -181,9 +181,13 @@ private fun TypeDistributionChart(state: StatsUiState) {
     val columnShape = remember { CorneredShape.rounded(6f) }
 
     LaunchedEffect(state.seriesCompleted, state.moviesCompleted, state.booksCompleted) {
-        modelProducer.runTransaction {
-            columnSeries {
-                series(state.seriesCompleted, state.moviesCompleted, state.booksCompleted)
+        if (state.seriesCompleted == 0 && state.moviesCompleted == 0 && state.booksCompleted == 0) {
+            modelProducer.runTransaction { columnSeries { series(0, 0, 0) } }
+        } else {
+            modelProducer.runTransaction {
+                columnSeries {
+                    series(state.seriesCompleted, state.moviesCompleted, state.booksCompleted)
+                }
             }
         }
     }
@@ -256,9 +260,14 @@ private fun MonthlyActivityChart(monthlyActivity: List<MonthlyActivity>) {
     val primaryColor = MaterialTheme.colorScheme.primary
 
     LaunchedEffect(monthlyActivity) {
-        modelProducer.runTransaction {
-            lineSeries {
-                series(monthlyActivity.map { it.count })
+        val counts = monthlyActivity.map { it.count }
+        if (counts.isEmpty()) {
+            modelProducer.runTransaction { lineSeries { series(List(1) { 0 }) } }
+        } else {
+            modelProducer.runTransaction {
+                lineSeries {
+                    series(counts)
+                }
             }
         }
     }

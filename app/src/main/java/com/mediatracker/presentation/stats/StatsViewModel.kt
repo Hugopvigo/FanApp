@@ -10,6 +10,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -47,7 +48,9 @@ class StatsViewModel @Inject constructor(
 
     private fun loadStats() {
         viewModelScope.launch {
-            getUserItemsUseCase.observeAll().collect { items ->
+            getUserItemsUseCase.observeAll()
+                .catch { _state.value = StatsUiState() }
+                .collect { items ->
                 val completed = items.filter { it.status == ItemStatus.COMPLETED }
                 val inProgress = items.filter { it.status == ItemStatus.IN_PROGRESS }
                 val abandoned = items.filter { it.status == ItemStatus.ABANDONED }

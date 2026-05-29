@@ -330,15 +330,16 @@ fun ProfileScreen(
             highlight = true,
             onClick = onNavigateToTheme,
         )
-        SettingRow(icon = "🌐", label = stringResource(R.string.profile_language), value = stringResource(R.string.profile_language_value))
-        SettingRow(
-            icon = "🔔",
-            label = stringResource(R.string.profile_notifications),
-            value = if (unreadCount > 0) "$unreadCount" else stringResource(R.string.profile_notif_enabled),
-            onClick = onNavigateToNotifications,
-        )
-        SettingRow(icon = "🔒", label = stringResource(R.string.profile_privacy), onClick = onNavigateToPrivacy)
-        SettingRow(icon = "🔑", label = stringResource(R.string.change_password), onClick = onNavigateToChangePassword)
+    SettingRow(icon = "🌐", label = stringResource(R.string.profile_language), value = stringResource(R.string.profile_language_value), highlight = true)
+    SettingRow(
+        icon = "🔔",
+        label = stringResource(R.string.profile_notifications),
+        value = if (unreadCount > 0) "$unreadCount" else stringResource(R.string.profile_notif_enabled),
+        highlight = true,
+        onClick = onNavigateToNotifications,
+    )
+    SettingRow(icon = "🔒", label = stringResource(R.string.profile_privacy), highlight = true, onClick = onNavigateToPrivacy)
+    SettingRow(icon = "🔑", label = stringResource(R.string.change_password), highlight = true, onClick = onNavigateToChangePassword)
 
         Spacer(Modifier.height(8.dp))
 
