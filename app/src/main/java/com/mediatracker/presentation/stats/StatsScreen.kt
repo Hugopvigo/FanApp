@@ -2,7 +2,6 @@ package com.mediatracker.presentation.stats
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -14,41 +13,43 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Share
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mediatracker.R
+import com.mediatracker.domain.model.GenreCount
 import com.mediatracker.presentation.components.GlassSurface
 import com.mediatracker.presentation.theme.DisplayFontFamily
 import com.mediatracker.presentation.theme.fanAppColors
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.Icons
 import com.patrykandpatrick.vico.compose.cartesian.CartesianChartHost
+import com.patrykandpatrick.vico.compose.cartesian.axis.rememberAxisLabelComponent
 import com.patrykandpatrick.vico.compose.cartesian.axis.rememberBottom
 import com.patrykandpatrick.vico.compose.cartesian.axis.rememberStart
 import com.patrykandpatrick.vico.compose.cartesian.layer.rememberColumnCartesianLayer
 import com.patrykandpatrick.vico.compose.cartesian.layer.rememberLineCartesianLayer
 import com.patrykandpatrick.vico.compose.cartesian.rememberCartesianChart
 import com.patrykandpatrick.vico.compose.cartesian.rememberVicoScrollState
-import com.patrykandpatrick.vico.compose.cartesian.axis.rememberAxisLabelComponent
-import com.patrykandpatrick.vico.compose.common.fill
 import com.patrykandpatrick.vico.compose.common.component.rememberLineComponent
-import com.patrykandpatrick.vico.core.cartesian.axis.VerticalAxis
+import com.patrykandpatrick.vico.compose.common.fill
+import com.patrykandpatrick.vico.core.cartesian.Scroll
 import com.patrykandpatrick.vico.core.cartesian.axis.HorizontalAxis
+import com.patrykandpatrick.vico.core.cartesian.axis.VerticalAxis
 import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
 import com.patrykandpatrick.vico.core.cartesian.data.CartesianValueFormatter
 import com.patrykandpatrick.vico.core.cartesian.data.columnSeries
@@ -56,17 +57,16 @@ import com.patrykandpatrick.vico.core.cartesian.data.lineSeries
 import com.patrykandpatrick.vico.core.cartesian.layer.ColumnCartesianLayer
 import com.patrykandpatrick.vico.core.cartesian.layer.LineCartesianLayer
 import com.patrykandpatrick.vico.core.common.shape.CorneredShape
-import com.patrykandpatrick.vico.core.cartesian.Scroll
-import com.patrykandpatrick.vico.core.cartesian.CartesianMeasuringContext
-import com.patrykandpatrick.vico.core.cartesian.axis.Axis
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.res.stringResource
 
 @Composable
 fun StatsScreen(
     onBack: () -> Unit,
+    onShareStats: () -> Unit,
     viewModel: StatsViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val fanColors = MaterialTheme.fanAppColors
 
     Column(
         modifier = Modifier
@@ -95,12 +95,21 @@ fun StatsScreen(
                     fontWeight = FontWeight.SemiBold,
                 ),
                 color = MaterialTheme.colorScheme.onBackground,
+                modifier = Modifier.weight(1f),
             )
         }
 
         Spacer(Modifier.height(8.dp))
 
         SummaryRow(state)
+
+        Spacer(Modifier.height(10.dp))
+
+        SummaryRowSecondary(state)
+
+        Spacer(Modifier.height(16.dp))
+
+        TopGenresSection(state.topGenres)
 
         Spacer(Modifier.height(16.dp))
 
@@ -109,6 +118,26 @@ fun StatsScreen(
         Spacer(Modifier.height(16.dp))
 
         MonthlyActivityChart(state.monthlyActivity)
+
+        Spacer(Modifier.height(16.dp))
+
+        FilledTonalButton(
+            onClick = onShareStats,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            shape = RoundedCornerShape(14.dp),
+        ) {
+            Icon(
+                imageVector = Icons.Filled.Share,
+                contentDescription = null,
+                modifier = Modifier.padding(end = 8.dp),
+            )
+            Text(
+                text = stringResource(R.string.stats_share),
+                fontWeight = FontWeight.Bold,
+            )
+        }
 
         Spacer(Modifier.height(24.dp))
     }
@@ -136,10 +165,93 @@ private fun SummaryRow(state: StatsUiState) {
         )
         SummaryTile(
             modifier = Modifier.weight(1f),
+            emoji = "🚫",
+            value = state.totalAbandoned.toString(),
+            label = stringResource(R.string.status_abandoned),
+        )
+    }
+}
+
+@Composable
+private fun SummaryRowSecondary(state: StatsUiState) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
+    ) {
+        SummaryTile(
+            modifier = Modifier.weight(1f),
+            emoji = "🔖",
+            value = state.totalWatchlist.toString(),
+            label = stringResource(R.string.status_watchlist),
+        )
+        SummaryTile(
+            modifier = Modifier.weight(1f),
             emoji = "⏱️",
             value = "${state.estimatedHours}h",
             label = stringResource(R.string.stats_estimated_hours),
         )
+        SummaryTile(
+            modifier = Modifier.weight(1f),
+            emoji = "📊",
+            value = (state.seriesCompleted + state.moviesCompleted + state.booksCompleted).toString(),
+            label = stringResource(R.string.stats_total_tracked),
+        )
+    }
+}
+
+@Composable
+private fun TopGenresSection(topGenres: List<GenreCount>) {
+    GlassSurface(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
+        radius = 18.dp,
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
+            Text(
+                text = stringResource(R.string.stats_top_genres),
+                style = MaterialTheme.typography.titleMedium.copy(
+                    fontFamily = DisplayFontFamily,
+                    fontWeight = FontWeight.SemiBold,
+                ),
+                color = MaterialTheme.colorScheme.onSurface,
+            )
+            if (topGenres.isEmpty()) {
+                Text(
+                    text = stringResource(R.string.stats_top_genres_empty),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            } else {
+                topGenres.forEachIndexed { index, genre ->
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Text(
+                            text = "${index + 1}. ${genre.genre}",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            modifier = Modifier.weight(1f),
+                        )
+                        Text(
+                            text = genre.count.toString(),
+                            style = MaterialTheme.typography.labelLarge,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.fanAppColors.gradientAccent.first(),
+                        )
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -181,12 +293,14 @@ private fun TypeDistributionChart(state: StatsUiState) {
     val columnShape = remember { CorneredShape.rounded(6f) }
 
     LaunchedEffect(state.seriesCompleted, state.moviesCompleted, state.booksCompleted) {
-        if (state.seriesCompleted == 0 && state.moviesCompleted == 0 && state.booksCompleted == 0) {
-            modelProducer.runTransaction { columnSeries { series(0, 0, 0) } }
-        } else {
-            modelProducer.runTransaction {
-                columnSeries {
-                    series(state.seriesCompleted, state.moviesCompleted, state.booksCompleted)
+        runCatching {
+            if (state.seriesCompleted == 0 && state.moviesCompleted == 0 && state.booksCompleted == 0) {
+                modelProducer.runTransaction { columnSeries { series(0, 0, 0) } }
+            } else {
+                modelProducer.runTransaction {
+                    columnSeries {
+                        series(state.seriesCompleted, state.moviesCompleted, state.booksCompleted)
+                    }
                 }
             }
         }
@@ -261,12 +375,14 @@ private fun MonthlyActivityChart(monthlyActivity: List<MonthlyActivity>) {
 
     LaunchedEffect(monthlyActivity) {
         val counts = monthlyActivity.map { it.count }
-        if (counts.isEmpty()) {
-            modelProducer.runTransaction { lineSeries { series(List(1) { 0 }) } }
-        } else {
-            modelProducer.runTransaction {
-                lineSeries {
-                    series(counts)
+        runCatching {
+            if (counts.isEmpty()) {
+                modelProducer.runTransaction { lineSeries { series(List(1) { 0 }) } }
+            } else {
+                modelProducer.runTransaction {
+                    lineSeries {
+                        series(counts)
+                    }
                 }
             }
         }
