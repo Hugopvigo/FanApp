@@ -30,6 +30,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import com.mediatracker.R
 import com.mediatracker.domain.model.MediaItem
 import com.mediatracker.domain.model.MediaType
@@ -167,7 +168,7 @@ private fun MainScreen(
             onNavigateToChangePassword = { navController.navigate(Route.ChangePassword) },
             onNavigateToNotifications = { navController.navigate(Route.Notifications) },
             onNavigateToPrivacy = { navController.navigate(Route.Privacy) },
-            onNavigateToFanCard = { navController.navigate(Route.FanCard) },
+            onNavigateToFanCard = { navController.navigate(Route.FanCard()) },
             onNavigateToAchievements = { navController.navigate(Route.Achievements) },
             onNavigateToLeaderboard = { navController.navigate(Route.Leaderboard) },
             onNavigateToImport = { navController.navigate(Route.Import) },
@@ -195,7 +196,7 @@ private fun MainScreen(
                 ) {
                     DetailScreen(
             onBack = { navController.popBackStack() },
-            onNavigateToFanCard = { navController.navigate(Route.FanCard) },
+            onNavigateToFanCard = { navController.navigate(Route.FanCard()) },
         )
                 }
                 // Sub-pantallas de Profile: slide hacia arriba (efecto sheet)
@@ -264,8 +265,16 @@ private fun MainScreen(
             popExitTransition = {
                 fadeOut(tween(200)) + slideOutVertically(tween(200)) { it / 2 }
             },
-        ) {
-        FanCardScreen(onBack = { navController.popBackStack() })
+        ) { backStackEntry ->
+            val fanCardRoute = backStackEntry.toRoute<Route.FanCard>()
+            val initialType = when (fanCardRoute.preset) {
+                "STATS" -> com.mediatracker.presentation.fancard.FanCardType.STATS
+                else -> com.mediatracker.presentation.fancard.FanCardType.PROFILE
+            }
+            FanCardScreen(
+                onBack = { navController.popBackStack() },
+                initialType = initialType,
+            )
         }
         composable<Route.Achievements>(
             enterTransition = {
@@ -305,7 +314,10 @@ private fun MainScreen(
                 fadeOut(tween(200)) + slideOutVertically(tween(200)) { it / 2 }
             },
         ) {
-            StatsScreen(onBack = { navController.popBackStack() })
+            StatsScreen(
+                onBack = { navController.popBackStack() },
+                onShareStats = { navController.navigate(Route.FanCard(preset = "STATS")) },
+            )
         }
         }
 
