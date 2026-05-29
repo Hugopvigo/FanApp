@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.padding
@@ -13,15 +15,16 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -71,29 +74,84 @@ fun LibraryItemCard(
                 )
             }
 
-            if (userItem.mediaType == MediaType.SERIES &&
-                userItem.status == ItemStatus.IN_PROGRESS &&
-                userItem.currentSeason != null && userItem.currentEpisode != null
+        if (userItem.mediaType == MediaType.SERIES &&
+            userItem.status == ItemStatus.IN_PROGRESS &&
+            userItem.currentSeason != null &&
+            userItem.currentEpisode != null
+        ) {
+            Surface(
+                shape = RoundedCornerShape(6.dp),
+                color = Color.Black.copy(alpha = 0.68f),
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(6.dp),
             ) {
-                Surface(
-                    shape = RoundedCornerShape(6.dp),
-                    color = Color.Black.copy(alpha = 0.68f),
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .padding(6.dp),
-                ) {
-                    Text(
-                        text = "T${userItem.currentSeason}E${userItem.currentEpisode}",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(horizontal = 5.dp, vertical = 2.dp),
-                    )
-                }
+                Text(
+                    text = "T${userItem.currentSeason}E${userItem.currentEpisode}",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(horizontal = 5.dp, vertical = 2.dp),
+                )
             }
         }
 
-        Text(
+        if (userItem.mediaType == MediaType.BOOK &&
+            userItem.status == ItemStatus.IN_PROGRESS &&
+            userItem.currentPage != null &&
+            userItem.currentPage > 0
+        ) {
+            Surface(
+                shape = RoundedCornerShape(6.dp),
+                color = Color.Black.copy(alpha = 0.68f),
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(6.dp),
+            ) {
+                Text(
+                    text = if (userItem.totalPages != null && userItem.totalPages > 0)
+                        "${userItem.currentPage}/${userItem.totalPages}"
+                    else
+                        "${userItem.currentPage}",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(horizontal = 5.dp, vertical = 2.dp),
+                )
+            }
+        }
+
+        if (userItem.status == ItemStatus.IN_PROGRESS) {
+            val progress = when (userItem.mediaType) {
+                MediaType.BOOK -> {
+                    val cp = userItem.currentPage ?: 0
+                    val tp = userItem.totalPages
+                    if (tp != null && tp > 0 && cp > 0) cp.toFloat() / tp.toFloat() else 0f
+                }
+                MediaType.SERIES -> {
+                    val cs = userItem.currentSeason ?: 0
+                    val ce = userItem.currentEpisode ?: 0
+                    if (cs > 0 && ce > 0) 1f else 0f
+                }
+                else -> 0f
+            }
+        if (progress > 0f) {
+            val fanColors = MaterialTheme.fanAppColors
+            LinearProgressIndicator(
+                progress = { progress.coerceIn(0f, 1f) },
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .fillMaxWidth()
+                    .height(3.dp)
+                    .clip(RoundedCornerShape(topStart = 0.dp, topEnd = 0.dp, bottomStart = 8.dp, bottomEnd = 8.dp)),
+                color = fanColors.gradientAccent.first(),
+                trackColor = Color.Transparent,
+            )
+        }
+    }
+}
+
+    Text(
             text = userItem.title,
             style = MaterialTheme.typography.bodySmall,
             fontWeight = FontWeight.SemiBold,
