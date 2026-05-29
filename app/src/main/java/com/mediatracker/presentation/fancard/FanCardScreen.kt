@@ -63,6 +63,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun FanCardScreen(
     onBack: () -> Unit,
+    initialType: FanCardType = FanCardType.PROFILE,
     viewModel: FanCardViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -70,7 +71,7 @@ fun FanCardScreen(
     val graphicsLayer = rememberGraphicsLayer()
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
-    var selectedType by remember { mutableStateOf(FanCardType.PROFILE) }
+    var selectedType by remember(initialType) { mutableStateOf(initialType) }
 
     Column(
         modifier = Modifier
@@ -123,6 +124,7 @@ fun FanCardScreen(
                     FanCardType.RATING -> stringResource(R.string.fancard_type_rating)
                     FanCardType.TOP_MONTH -> stringResource(R.string.fancard_type_top)
                     FanCardType.PROFILE -> stringResource(R.string.fancard_type_profile)
+                    FanCardType.STATS -> stringResource(R.string.fancard_type_stats)
                 }
                 val selected = type == selectedType
                 Surface(
@@ -170,6 +172,13 @@ fun FanCardScreen(
                     stats = state.stats,
                     fanColors = fanColors,
                 )
+                FanCardType.STATS -> StatsFanCard(
+                    graphicsLayer = graphicsLayer,
+                    userName = state.userName,
+                    stats = state.stats,
+                    detailed = state.detailedStats,
+                    fanColors = fanColors,
+                )
             }
 
             Spacer(Modifier.height(16.dp))
@@ -211,6 +220,78 @@ private fun Modifier.captureLayer(graphicsLayer: GraphicsLayer): Modifier =
         }
         drawLayer(graphicsLayer)
     }
+
+@Composable
+private fun StatsFanCard(
+    graphicsLayer: GraphicsLayer,
+    userName: String,
+    stats: com.mediatracker.domain.model.UserStats,
+    detailed: com.mediatracker.domain.model.DetailedStats,
+    fanColors: FanAppColors,
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(28.dp))
+            .captureLayer(graphicsLayer)
+            .background(Brush.linearGradient(fanColors.gradient2), RoundedCornerShape(28.dp))
+            .padding(24.dp),
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Text(text = "📊", fontSize = 28.sp)
+            Spacer(Modifier.height(8.dp))
+            Text(
+                text = userName,
+                style = MaterialTheme.typography.titleLarge.copy(
+                    fontFamily = DisplayFontFamily,
+                    fontWeight = FontWeight.Bold,
+                ),
+                color = Color.White,
+            )
+            Spacer(Modifier.height(4.dp))
+            Text(
+                text = stringResource(R.string.fancard_stats_title),
+                style = MaterialTheme.typography.labelLarge,
+                color = Color.White.copy(alpha = 0.85f),
+            )
+            Spacer(Modifier.height(14.dp))
+            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                StatPill("✅", detailed.totalCompleted)
+                StatPill("⏱️", detailed.estimatedHours)
+            }
+            Spacer(Modifier.height(12.dp))
+            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                StatPill("🎬", detailed.seriesCompleted)
+                StatPill("🎥", detailed.moviesCompleted)
+                StatPill("📖", detailed.booksCompleted)
+            }
+            if (detailed.topGenres.isNotEmpty()) {
+                Spacer(Modifier.height(14.dp))
+                Text(
+                    text = detailed.topGenres.take(3).joinToString(" · ") { it.genre },
+                    style = MaterialTheme.typography.labelMedium,
+                    color = Color.White.copy(alpha = 0.75f),
+                )
+            }
+            Spacer(Modifier.height(12.dp))
+            Text(
+                text = "${stats.levelIcon} Nv.${stats.level} · ${stats.levelTitle}",
+                style = MaterialTheme.typography.labelMedium,
+                color = Color.White.copy(alpha = 0.6f),
+            )
+            Spacer(Modifier.height(8.dp))
+            Text(
+                text = "FanApp",
+                style = MaterialTheme.typography.labelMedium,
+                color = Color.White.copy(alpha = 0.5f),
+                fontWeight = FontWeight.Bold,
+            )
+        }
+    }
+}
 
 @Composable
 private fun ProfileFanCard(
