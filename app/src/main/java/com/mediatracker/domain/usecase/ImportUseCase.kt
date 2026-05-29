@@ -10,6 +10,7 @@ import com.mediatracker.domain.model.MediaType
 import com.mediatracker.domain.repository.MediaRepository
 import com.mediatracker.domain.repository.UserRepository
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.InputStream
@@ -36,15 +37,12 @@ class ImportUseCase @Inject constructor(
             var failed = 0
             val errors = mutableListOf<String>()
             val existingItems = try {
-                val flow = userRepository.getUserItemsFlow()
-                var result: List<com.mediatracker.domain.model.UserItem> = emptyList()
-                flow.collect { result = it }
-                result
+                userRepository.getUserItemsFlow().first()
             } catch (e: Exception) {
                 emptyList()
             }
 
-            val existingTitles = existingItems.map { it.title.lowercase().trim() }.toSet()
+            val existingTitles = existingItems.map { it.title.lowercase().trim() }.toMutableSet()
 
             for ((index, item) in items.withIndex()) {
                 onProgress(index + 1, items.size)
@@ -66,14 +64,19 @@ class ImportUseCase @Inject constructor(
 
                     if (matched != null) {
                         val status = if (item.status == ItemStatus.ABANDONED) ItemStatus.WATCHLIST else item.status
-                        userRepository.addUserItem(
+                        val added = userRepository.addUserItem(
                             mediaType = matched.mediaType,
                             apiId = matched.id.removePrefix("${matched.mediaType.name.lowercase()}_"),
                             title = matched.title,
                             posterUrl = matched.posterUrl,
                             status = status,
                         )
-                        imported++
+                        if (added.isSuccess) {
+                            imported++
+                            existingTitles.add(item.title.lowercase().trim())
+                        } else {
+                            failed++
+                        }
                     } else {
                         userRepository.addUserItem(
                             mediaType = mediaType,
@@ -83,6 +86,7 @@ class ImportUseCase @Inject constructor(
                             status = if (item.status == ItemStatus.ABANDONED) ItemStatus.WATCHLIST else item.status,
                         )
                         imported++
+                        existingTitles.add(item.title.lowercase().trim())
                         errors.add("Linea ${item.originalLine}: '${item.title}' — no se encontro en la API, se agrego sin poster")
                     }
                 } catch (e: Exception) {
