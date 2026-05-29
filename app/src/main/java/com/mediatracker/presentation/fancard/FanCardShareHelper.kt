@@ -7,6 +7,8 @@ import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.layer.GraphicsLayer
 import androidx.core.content.FileProvider
 import com.mediatracker.R
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.File
 
 object FanCardShareHelper {
@@ -19,10 +21,14 @@ object FanCardShareHelper {
         shareBitmap(context, bitmap)
     }
 
-    private fun shareBitmap(context: Context, bitmap: Bitmap) {
-        val file = File(context.cacheDir, "fancard_${System.currentTimeMillis()}.png")
-        file.outputStream().use { out ->
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
+    private suspend fun shareBitmap(context: Context, bitmap: Bitmap) {
+        val file = withContext(Dispatchers.IO) {
+            cleanOldCache(context)
+            val f = File(context.cacheDir, "fancard_${System.currentTimeMillis()}.png")
+            f.outputStream().use { out ->
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
+            }
+            f
         }
         val uri = FileProvider.getUriForFile(
             context,
@@ -37,5 +43,13 @@ object FanCardShareHelper {
         context.startActivity(
             Intent.createChooser(shareIntent, context.getString(R.string.fancard_share_title))
         )
+    }
+
+    private fun cleanOldCache(context: Context) {
+        val cacheDir = context.cacheDir
+        val oneHourAgo = System.currentTimeMillis() - 3600_000
+        cacheDir.listFiles()
+            ?.filter { it.isFile && it.name.startsWith("fancard_") && it.lastModified() < oneHourAgo }
+            ?.forEach { it.delete() }
     }
 }
