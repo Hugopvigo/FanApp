@@ -58,7 +58,10 @@ import com.mediatracker.presentation.theme.AppTheme
 import com.mediatracker.presentation.theme.DisplayFontFamily
 import com.mediatracker.presentation.theme.MediaTrackerTheme
 import com.mediatracker.presentation.theme.fanAppColors
+import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 
 @Composable
 fun HomeScreen(
@@ -200,10 +203,9 @@ private fun HomeHeader() {
             )
             val today = remember {
                 val cal = Calendar.getInstance()
-                val days = listOf("dom", "lun", "mar", "mié", "jue", "vie", "sáb")
-                val months = listOf("ene", "feb", "mar", "abr", "may", "jun",
-                    "jul", "ago", "sep", "oct", "nov", "dic")
-                "${days[cal.get(Calendar.DAY_OF_WEEK) - 1]} · ${cal.get(Calendar.DAY_OF_MONTH)} ${months[cal.get(Calendar.MONTH)]}"
+                val dayFormat = SimpleDateFormat("EEE", Locale.getDefault())
+                val monthFormat = SimpleDateFormat("MMM", Locale.getDefault())
+                "${dayFormat.format(Date(cal.timeInMillis))} · ${cal.get(Calendar.DAY_OF_MONTH)} ${monthFormat.format(Date(cal.timeInMillis))}"
             }
             Text(
                 text = today,
