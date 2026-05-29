@@ -239,4 +239,10 @@
     <string name="stats_estimated_hours">Est. hours</string>
     <string name="stats_distribution">Distribution by type</string>
     <string name="stats_monthly_activity">Monthly activity</string>
+    <string name="stats_top_genres">Top genres</string>
+    <string name="stats_top_genres_empty">Complete items with genre data to see your top genres.</string>
+    <string name="stats_share">Share statistics</string>
+    <string name="stats_total_tracked">Completed by type</string>
+    <string name="fancard_type_stats">Statistics</string>
+    <string name="fancard_stats_title">My statistics</string>
 </resources>
