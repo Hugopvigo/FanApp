@@ -128,11 +128,7 @@ fun LibraryItemCard(
                     val tp = userItem.totalPages
                     if (tp != null && tp > 0 && cp > 0) cp.toFloat() / tp.toFloat() else 0f
                 }
-                MediaType.SERIES -> {
-                    val cs = userItem.currentSeason ?: 0
-                    val ce = userItem.currentEpisode ?: 0
-                    if (cs > 0 && ce > 0) 1f else 0f
-                }
+                MediaType.SERIES -> 0f
                 else -> 0f
             }
         if (progress > 0f) {
