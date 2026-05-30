@@ -1,9 +1,14 @@
 # Changelog
 
-## Sprint 8 — Progreso Detallado (parcial, 2026-05-29–…)
+## Sprint 8 — Progreso Detallado (T1–T3 completados, 2026-05-29–30)
 
 > Objetivo del sprint: progreso granular en libros/series, logros expandidos, niveles avanzados y retos.
-> Estado: **en curso** — núcleo de progreso implementado; expansión de gamificación y retos pendientes para Sprint 9.
+> Estado: **T1–T3 completados** — gamificación expandida (T4–T9) en Sprint 10; gaps Firestore/TMDB en Sprint 9.
+
+### Cierre 2026-05-30
+- `LibraryItemCard`: barra de progreso para series (ya no hardcoded `0f`)
+- `DetailViewModel`: copia `pageCount` al pasar libro a `IN_PROGRESS`
+- `Sprint7.md` y `Sprint8.md` añadidos al repo
 
 ### T1 — Progreso de página en libros (completada salvo XP bonus)
 - `UserItem` / `UserItemEntity`: campos `currentPage`, `totalPages`
@@ -13,11 +18,11 @@
 - `LibraryItemCard`: badge `📄 37%` o `247/662` para libros en progreso
 - Pendiente: XP bonus por páginas leídas
 
-### T2 — Progreso visual de series (parcial)
-- `LibraryItemCard`: badge `📺 T3E7` o % de progreso; barra de progreso en tarjeta
-- Lógica de % desde `currentSeason` / `currentEpisode` vs totales TMDB
-- Auto-avance de temporada al superar el último episodio
-- Pendiente: barra y chips por temporada en `DetailScreen`, contador “X / Y episodios”
+### T2 — Progreso visual de series (completado — refinamientos en Sprint 9)
+- `LibraryItemCard`: badge `📺 T3E7`, barra de progreso estimada
+- `EpisodeTracker` + `watchedEpisodes` (Room v10, `MIGRATION_9_10`)
+- Auto-avance de temporada al marcar último episodio
+- Pendiente Sprint 9: episodios reales TMDB por temporada, stats desde `watchedEpisodes`
 
 ### T3 — Auto-completar y auto-avance inteligente (completada)
 - `DetailViewModel` + `DetailScreen`: Snackbars al terminar libro, temporada o serie completa
@@ -34,10 +39,17 @@
 
 ---
 
-## Sprint 7 — Engagement, Social y Gamificación (2026-05-27–29)
+## Sprint 7 — Engagement, Social y Gamificación (2026-05-27–30)
 
 > Objetivo del sprint: engagement, viralidad (FanCard, import) y gamificación social.
-> Estado: **completado** — tareas de plataforma diferidas a Sprint 9. T5 estadísticas cerrada en esta revisión.
+> Estado: **completado** — tareas de plataforma diferidas a Sprint 9. Bugs de cierre corregidos 2026-05-30.
+
+### Cierre bugs 2026-05-30
+- Sync Firestore: merge preserva rating, notas, T/E, páginas y `watchedEpisodes` locales
+- Leaderboard: highlight por `userId`, tabs categoría por completados por tipo
+- FanCard RATING: navegación con item valorado correcto
+- Logros racha: progreso en UI + check tras streak/import
+- Profile actualiza racha al abrir (no solo Home)
 
 ### T7 — Google Sign-In
 - `AuthDataSource.signInWithGoogle(idToken)` con `GoogleAuthProvider`
@@ -106,7 +118,7 @@
 v1→v2 title/posterUrl · v2→v3 notifications · v3→v4 rating/notes · v4→v5 achievements
 v5→v6 streaks · v6→v7 season/episode · v7→v8 streak bonus · v8→v9 currentPage/totalPages
 ```
-Base de datos en **versión 9**.
+Base de datos en **versión 10** (`watchedEpisodes`).
 
 ---
 
