@@ -75,7 +75,7 @@ private val HERO_HEIGHT = 380.dp
 @Composable
 fun DetailScreen(
     onBack: () -> Unit,
-    onNavigateToFanCard: (() -> Unit)? = null,
+    onNavigateToFanCard: ((apiId: String, mediaType: MediaType, rating: Int?) -> Unit)? = null,
     viewModel: DetailViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -117,7 +117,10 @@ fun DetailScreen(
             action = {
                 TextButton(onClick = {
                     showRatingCardPrompt = false
-                    onNavigateToFanCard()
+                    val userItem = state.userItem
+                    if (userItem != null) {
+                        onNavigateToFanCard(userItem.apiId, userItem.mediaType, userItem.userRating)
+                    }
                 }) { Text(stringResource(R.string.fancard_share), color = fanColors.gradientAccent.first()) }
             },
             dismissAction = {

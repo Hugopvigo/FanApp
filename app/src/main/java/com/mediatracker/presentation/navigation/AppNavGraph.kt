@@ -196,7 +196,16 @@ private fun MainScreen(
                 ) {
                     DetailScreen(
             onBack = { navController.popBackStack() },
-            onNavigateToFanCard = { navController.navigate(Route.FanCard()) },
+            onNavigateToFanCard = { apiId, mediaType, rating ->
+                navController.navigate(
+                    Route.FanCard(
+                        preset = "RATING",
+                        ratingApiId = apiId,
+                        ratingMediaType = mediaType.name,
+                        ratingValue = rating,
+                    ),
+                )
+            },
         )
                 }
                 // Sub-pantallas de Profile: slide hacia arriba (efecto sheet)
@@ -269,6 +278,7 @@ private fun MainScreen(
             val fanCardRoute = backStackEntry.toRoute<Route.FanCard>()
             val initialType = when (fanCardRoute.preset) {
                 "STATS" -> com.mediatracker.presentation.fancard.FanCardType.STATS
+                "RATING" -> com.mediatracker.presentation.fancard.FanCardType.RATING
                 else -> com.mediatracker.presentation.fancard.FanCardType.PROFILE
             }
             FanCardScreen(

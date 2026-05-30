@@ -11,7 +11,12 @@ sealed interface Route {
     @Serializable data object ChangePassword : Route
     @Serializable data object Notifications : Route
     @Serializable data object Privacy : Route
-    @Serializable data class FanCard(val preset: String? = null) : Route
+    @Serializable data class FanCard(
+        val preset: String? = null,
+        val ratingApiId: String? = null,
+        val ratingMediaType: String? = null,
+        val ratingValue: Int? = null,
+    ) : Route
     @Serializable data object Achievements : Route
     @Serializable data object Leaderboard : Route
     @Serializable data object Import : Route
