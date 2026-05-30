@@ -674,9 +674,10 @@ private fun DetailContentPreview() {
             onToggleFavorite = {},
             onRatingChanged = {},
             onNotesChanged = {},
-            onSeasonEpisodeChanged = { _, _ -> },
+    onSeasonEpisodeChanged = { _, _ -> },
     onPageProgressChanged = { _, _ -> },
-        )
+    onEpisodeToggle = { _, _ -> },
+)
     }
 }
 

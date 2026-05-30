@@ -109,8 +109,8 @@ Cada serie, película o libro puede estar en un estado. Y puedes marcarlo como f
 ├── ✅ Estadísticas con gráficos (Vico)
 ├── ✅ Rachas diarias + bonus XP
 ├── ✅ 12 logros con desbloqueo automático
-├── 🔜 Logros expandidos, retos y niveles avanzados (Sprint 9)
-└── 🔜 Widgets, idioma en runtime, tests (Sprint 9)
+├── 🔜 Widgets, idioma en runtime, tests, release candidate (Sprint 9)
+└── 🔜 Logros expandidos, retos y niveles avanzados (Sprint 10)
 
 🤝 Fase 3 — Social (parcial)
 ├── ✅ Ranking / Leaderboard (Firestore)
@@ -128,7 +128,7 @@ Cada serie, película o libro puede estar en un estado. Y puedes marcarlo como f
 ## 🔑 Estado actual
 
 ```
-████████████████░░░░ ~80% MVP+ — Sprint 7 completado · Sprint 8 parcial · Sprint 9 en preparación
+████████████████░░░░ ~80% MVP+ — Sprint 8 parcial · Sprint 9 en curso (RC)
 ```
 
 | Sprint | Estado | Highlights |
@@ -141,7 +141,8 @@ Cada serie, película o libro puede estar en un estado. Y puedes marcarlo como f
 | Sprint 6 — Diseño Visual | ✅ | Glass iOS26, hero Detail, featured Home, Open Library |
 | Sprint 7 — Engagement y Social | ✅ | Google Sign-In, Quick Add, logros, ranking, import CSV, FanCard, stats completas |
 | Sprint 8 — Progreso Detallado | 🔄 Parcial | Páginas en libros, badges de progreso, auto-completar/avance (snackbars) |
-| Sprint 9 — Plataforma y Pulido | 📋 Planificado | Widgets, idioma, avatar, email verify, tests, logros/retos expandidos |
+| Sprint 9 — Estabilización y RC | 🔄 En curso | Progreso granular series/libros, widgets, idioma, FCM, tests, Play Console internal track |
+| Sprint 10 — Gamificación Expandida | 📋 Planificado | Logros 45, retos, niveles avanzados, resumen semanal, widget 4x4 |
 
 Para el detalle técnico por tarea, consulta `CHANGELOG.md`.
 

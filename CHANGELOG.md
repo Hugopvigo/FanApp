@@ -24,7 +24,7 @@
 - Acciones: marcar libro como completado, avanzar a T+1E1, marcar serie como completada
 - Pendiente: XP de completado al confirmar desde la Snackbar
 
-### Pendiente en Sprint 8 (previsto Sprint 9)
+### Pendiente en Sprint 8 (previsto Sprint 10 — gamificación diferida; Sprint 9 = RC)
 - T4: Expansión de logros (12 → 45) y logros secretos
 - T5: 15 niveles con multiplicadores de XP por racha
 - T6: Sesiones de lectura diarias y velocidad
