@@ -41,4 +41,11 @@ interface TmdbApi {
         @Path("movie_id") movieId: Int,
         @Query("language") language: String = "es-ES",
     ): TmdbMovieDetailDto
+
+    @GET("tv/{tv_id}/season/{season_number}")
+    suspend fun getTvSeason(
+        @Path("tv_id") tvId: Int,
+        @Path("season_number") seasonNumber: Int,
+        @Query("language") language: String = "es-ES",
+    ): TmdbSeasonDetailDto
 }

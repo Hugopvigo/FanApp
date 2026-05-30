@@ -4,6 +4,7 @@ import android.app.Activity
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.SideEffect
@@ -11,11 +12,19 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
+import com.mediatracker.R
 
 enum class AppTheme {
     Fantasy, Light, Purple, Dark;
 
     val isDark get() = this == Purple || this == Dark
+
+    fun displayNameRes(): Int = when (this) {
+        Fantasy -> R.string.theme_name_fantasy
+        Light   -> R.string.theme_name_light
+        Purple  -> R.string.theme_name_purple
+        Dark    -> R.string.theme_name_dark
+    }
 }
 
 data class FanAppColors(
@@ -265,15 +274,21 @@ private val DarkFanAppColors = FanAppColors(
 @Composable
 fun MediaTrackerTheme(
     appTheme: AppTheme = AppTheme.Fantasy,
+    useSystemTheme: Boolean = false,
     content: @Composable () -> Unit,
 ) {
-    val colorScheme = when (appTheme) {
+    val effectiveTheme = if (useSystemTheme) {
+        if (isSystemInDarkTheme()) AppTheme.Dark else AppTheme.Light
+    } else {
+        appTheme
+    }
+    val colorScheme = when (effectiveTheme) {
         AppTheme.Fantasy -> FantasyColorScheme
         AppTheme.Light   -> LightColorScheme
         AppTheme.Purple  -> PurpleColorScheme
         AppTheme.Dark    -> DarkColorScheme
     }
-    val fanAppColors = when (appTheme) {
+    val fanAppColors = when (effectiveTheme) {
         AppTheme.Fantasy -> FantasyFanAppColors
         AppTheme.Light   -> LightFanAppColors
         AppTheme.Purple  -> PurpleFanAppColors
@@ -284,12 +299,12 @@ fun MediaTrackerTheme(
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
-            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !appTheme.isDark
+            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !effectiveTheme.isDark
         }
     }
 
     CompositionLocalProvider(
-        LocalAppTheme provides appTheme,
+        LocalAppTheme provides effectiveTheme,
         LocalFanAppColors provides fanAppColors,
     ) {
         MaterialTheme(

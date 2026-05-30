@@ -1,6 +1,7 @@
 package com.mediatracker.data.repository
 
 import com.mediatracker.BuildConfig
+import com.mediatracker.data.local.LocaleRepository
 import com.mediatracker.data.local.MediaItemDao
 import com.mediatracker.data.local.toDomain
 import com.mediatracker.data.local.toEntity
@@ -8,7 +9,7 @@ import com.mediatracker.data.remote.books.GoogleBooksApi
 import com.mediatracker.data.remote.books.OpenLibraryApi
 import com.mediatracker.data.remote.books.buildGoogleBooksQuery
 import com.mediatracker.data.remote.books.filterQualityBooks
-import com.mediatracker.data.remote.books.getBookSearchLang
+
 import com.mediatracker.data.remote.books.toMediaItem
 import com.mediatracker.data.remote.books.toMediaItems
 import com.mediatracker.data.remote.tmdb.TmdbApi
@@ -26,6 +27,7 @@ class MediaRepositoryImpl @Inject constructor(
     private val googleBooksApi: GoogleBooksApi,
     private val openLibraryApi: OpenLibraryApi,
     private val mediaItemDao: MediaItemDao,
+    private val localeRepository: LocaleRepository,
 ) : MediaRepository {
 
     companion object {
@@ -49,20 +51,25 @@ class MediaRepositoryImpl @Inject constructor(
         }
     }
 
+    private suspend fun tmdbLang(): String =
+        localeRepository.tmdbLanguage(localeRepository.getLanguageCode())
+
     override suspend fun search(query: String, mediaType: MediaType): Result<List<MediaItem>> =
         runCatching {
+            val lang = tmdbLang()
             when (mediaType) {
-                MediaType.SERIES -> tmdbApi.searchTv(query).results.map { it.toMediaItem(MediaType.SERIES) }
-                MediaType.MOVIE  -> tmdbApi.searchMovie(query).results.map { it.toMediaItem(MediaType.MOVIE) }
+                MediaType.SERIES -> tmdbApi.searchTv(query, language = lang).results.map { it.toMediaItem(MediaType.SERIES) }
+                MediaType.MOVIE  -> tmdbApi.searchMovie(query, language = lang).results.map { it.toMediaItem(MediaType.MOVIE) }
                 MediaType.BOOK   -> searchBooks(query)
             }.also { cacheItems(it) }
         }.onFailure { Timber.e(it, "Search failed: $query ($mediaType)") }
 
     override suspend fun getTrending(mediaType: MediaType): Result<List<MediaItem>> =
         runCatching {
+            val lang = tmdbLang()
             when (mediaType) {
-                MediaType.SERIES -> tmdbApi.getTrendingTv().results.map { it.toMediaItem(MediaType.SERIES) }
-                MediaType.MOVIE  -> tmdbApi.getTrendingMovies().results.map { it.toMediaItem(MediaType.MOVIE) }
+                MediaType.SERIES -> tmdbApi.getTrendingTv(language = lang).results.map { it.toMediaItem(MediaType.SERIES) }
+                MediaType.MOVIE  -> tmdbApi.getTrendingMovies(language = lang).results.map { it.toMediaItem(MediaType.MOVIE) }
                 MediaType.BOOK   -> getTrendingBooks()
             }.also { cacheItems(it) }
         }.onFailure { Timber.e(it, "Trending failed: $mediaType") }
@@ -79,7 +86,7 @@ class MediaRepositoryImpl @Inject constructor(
     // ── Books helpers ─────────────────────────────────────────────────────────
 
     private suspend fun getTrendingBooks(): List<MediaItem> {
-        val lang = getBookSearchLang()
+        val lang = localeRepository.googleBooksLang(localeRepository.getLanguageCode())
         return try {
             val googleItems = googleBooksApi.getPopularBooks(
                 query = trendingBooksQuery(),
@@ -109,7 +116,7 @@ class MediaRepositoryImpl @Inject constructor(
     }
 
     private suspend fun searchBooks(query: String): List<MediaItem> {
-        val lang = getBookSearchLang()
+        val lang = localeRepository.googleBooksLang(localeRepository.getLanguageCode())
         return try {
             val googleItems = googleBooksApi.searchBooks(
                 query = buildGoogleBooksQuery(query),
@@ -141,16 +148,17 @@ class MediaRepositoryImpl @Inject constructor(
     // ── Detail ────────────────────────────────────────────────────────────────
 
     private suspend fun fetchAndCacheDetail(id: String, mediaType: MediaType): MediaItem {
+        val lang = tmdbLang()
         val item = when (mediaType) {
             MediaType.SERIES -> {
                 val apiId = id.removePrefix("series_").toIntOrNull()
                     ?: throw IllegalArgumentException("Invalid series id: $id")
-                tmdbApi.getTvDetail(apiId).toMediaItem()
+                tmdbApi.getTvDetail(apiId, language = lang).toMediaItem()
             }
             MediaType.MOVIE -> {
                 val apiId = id.removePrefix("movie_").toIntOrNull()
                     ?: throw IllegalArgumentException("Invalid movie id: $id")
-                tmdbApi.getMovieDetail(apiId).toMediaItem()
+                tmdbApi.getMovieDetail(apiId, language = lang).toMediaItem()
             }
             MediaType.BOOK -> {
                 // Open Library books have id "book_ol_OL..." — use cached item, no detail API yet
@@ -174,6 +182,14 @@ class MediaRepositoryImpl @Inject constructor(
         val now = System.currentTimeMillis()
         mediaItemDao.insertAll(items.map { it.toEntity(now) })
     }
+
+    override suspend fun getTvSeasonEpisodeCount(tvApiId: String, seasonNumber: Int): Result<Int> =
+        runCatching {
+            val tvId = tvApiId.toIntOrNull() ?: throw IllegalArgumentException("Invalid tv id: $tvApiId")
+            val lang = localeRepository.tmdbLanguage(localeRepository.getLanguageCode())
+            val season = tmdbApi.getTvSeason(tvId, seasonNumber, language = lang)
+            season.episodes.size.coerceAtLeast(1)
+        }.onFailure { Timber.w(it, "TV season fetch failed: $tvApiId S$seasonNumber") }
 
     private fun isExpired(cachedAt: Long, ttlMs: Long): Boolean =
         System.currentTimeMillis() - cachedAt > ttlMs

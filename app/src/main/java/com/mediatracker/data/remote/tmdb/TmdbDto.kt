@@ -70,3 +70,14 @@ data class TmdbCreatorDto(
     val name: String = "",
     @SerialName("profile_path") val profilePath: String? = null,
 )
+
+@Serializable
+data class TmdbSeasonDetailDto(
+    @SerialName("season_number") val seasonNumber: Int = 0,
+    val episodes: List<TmdbEpisodeDto> = emptyList(),
+)
+
+@Serializable
+data class TmdbEpisodeDto(
+    @SerialName("episode_number") val episodeNumber: Int = 0,
+)

@@ -25,7 +25,18 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.ContextCompat
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -69,6 +80,26 @@ fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+    var notificationPermissionAsked by rememberSaveable { mutableStateOf(false) }
+    val notificationPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+    ) { notificationPermissionAsked = true }
+
+    LaunchedEffect(state.currentStreak) {
+        if (notificationPermissionAsked || state.currentStreak < 7) return@LaunchedEffect
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            val granted = ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.POST_NOTIFICATIONS,
+            ) == PackageManager.PERMISSION_GRANTED
+            if (!granted) {
+                notificationPermissionAsked = true
+                notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            }
+        }
+    }
+
     HomeScreenContent(state = state, onItemClick = onItemClick)
 }
 
@@ -194,7 +225,7 @@ private fun HomeHeader() {
 
         Column(modifier = Modifier.weight(1f)) {
             Text(
-                text = "FanApp",
+                text = stringResource(R.string.login_title),
                 style = MaterialTheme.typography.titleLarge.copy(
                     fontFamily = DisplayFontFamily,
                     letterSpacing = (-0.3).sp,
@@ -235,10 +266,10 @@ private fun HomeHeader() {
 private fun GreetingLine(userName: String?, currentStreak: Int = 0) {
     val hour = remember { Calendar.getInstance().get(Calendar.HOUR_OF_DAY) }
     val greeting = when {
-        hour < 6 -> "Buenas noches"
-        hour < 12 -> "Buenos días"
-        hour < 20 -> "Buenas tardes"
-        else -> "Buenas noches"
+        hour < 6 -> stringResource(R.string.greeting_night)
+        hour < 12 -> stringResource(R.string.greeting_morning)
+        hour < 20 -> stringResource(R.string.greeting_afternoon)
+        else -> stringResource(R.string.greeting_night)
     }
     val firstName = userName?.takeIf { it.isNotBlank() }?.split(" ")?.firstOrNull()
     val displayText = if (firstName != null) "$greeting, $firstName" else greeting
@@ -261,7 +292,7 @@ private fun GreetingLine(userName: String?, currentStreak: Int = 0) {
                 color = MaterialTheme.fanAppColors.gradientAccent.first().copy(alpha = 0.15f),
             ) {
                 Text(
-                    text = "🔥 $currentStreak",
+                    text = stringResource(R.string.streak_format, currentStreak),
                     style = MaterialTheme.typography.labelLarge,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.fanAppColors.gradientAccent.first(),
@@ -345,7 +376,7 @@ private fun FeaturedCard(
                 color = MaterialTheme.colorScheme.primary.copy(alpha = 0.88f),
             ) {
                 Text(
-                    text = "TRENDING",
+                    text = stringResource(R.string.home_trending_badge),
                     style = MaterialTheme.typography.labelSmall,
                     color = Color.White,
                     fontWeight = FontWeight.Bold,
@@ -476,11 +507,13 @@ private fun ContinueCard(
                     color = MaterialTheme.colorScheme.onSurface,
                 )
                 Text(
-                    text = when (item.mediaType) {
-                        MediaType.SERIES -> "🎬 En progreso"
-                        MediaType.MOVIE  -> "🎥 En progreso"
-                        MediaType.BOOK   -> "📖 Leyendo"
-                    },
+                    text = stringResource(
+                        when (item.mediaType) {
+                            MediaType.SERIES -> R.string.home_continue_series
+                            MediaType.MOVIE  -> R.string.home_continue_movie
+                            MediaType.BOOK   -> R.string.home_continue_book
+                        },
+                    ),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )

@@ -42,8 +42,8 @@ import androidx.compose.ui.tooling.preview.Preview
 
 private data class ThemeOption(
     val theme: AppTheme,
-    val name: String,
-    val blurb: String,
+    val nameResId: Int,
+    val blurbResId: Int,
     val isDark: Boolean,
     val bgColor: Color,
     val surfaceColor: Color,
@@ -55,8 +55,8 @@ private data class ThemeOption(
 private val themeOptions = listOf(
     ThemeOption(
         theme          = AppTheme.Fantasy,
-        name           = "Fantasy",
-        blurb          = "Lila, rosa y un toque de magia ✨",
+        nameResId      = R.string.theme_name_fantasy,
+        blurbResId     = R.string.theme_blurb_fantasy,
         isDark         = false,
         bgColor        = FantasyBg,
         surfaceColor   = FantasySurfaceSolid,
@@ -66,8 +66,8 @@ private val themeOptions = listOf(
     ),
     ThemeOption(
         theme          = AppTheme.Light,
-        name           = "Light",
-        blurb          = "Cálida y limpia. Perfecta para el día.",
+        nameResId      = R.string.theme_name_light,
+        blurbResId     = R.string.theme_blurb_light,
         isDark         = false,
         bgColor        = LightBg,
         surfaceColor   = LightSurface,
@@ -77,8 +77,8 @@ private val themeOptions = listOf(
     ),
     ThemeOption(
         theme          = AppTheme.Purple,
-        name           = "Purple",
-        blurb          = "Morados profundos con su pizca de rosa. Cozy nocturno.",
+        nameResId      = R.string.theme_name_purple,
+        blurbResId     = R.string.theme_blurb_purple,
         isDark         = true,
         bgColor        = PurpleBg,
         surfaceColor   = PurpleSurface,
@@ -88,8 +88,8 @@ private val themeOptions = listOf(
     ),
     ThemeOption(
         theme          = AppTheme.Dark,
-        name           = "Dark",
-        blurb          = "Negro profundo, acento azul acero. Sobrio y enfocado.",
+        nameResId      = R.string.theme_name_dark,
+        blurbResId     = R.string.theme_blurb_dark,
         isDark         = true,
         bgColor        = DarkBg,
         surfaceColor   = DarkSurface,
@@ -103,7 +103,9 @@ private val themeOptions = listOf(
 @Composable
 fun ThemeScreen(
     currentTheme: AppTheme,
+    useSystemTheme: Boolean = false,
     onThemeSelected: (AppTheme) -> Unit,
+    onUseSystemThemeChange: (Boolean) -> Unit = {},
     onBack: () -> Unit,
 ) {
     Scaffold(
@@ -157,7 +159,10 @@ fun ThemeScreen(
 
             item {
                 Spacer(Modifier.height(4.dp))
-                AutoSwitchRow()
+                AutoSwitchRow(
+                    checked = useSystemTheme,
+                    onCheckedChange = onUseSystemThemeChange,
+                )
             }
         }
     }
@@ -197,7 +202,7 @@ private fun ThemeCard(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     Text(
-                        text = option.name,
+                        text = stringResource(option.nameResId),
                         style = MaterialTheme.typography.titleLarge,
                         color = MaterialTheme.colorScheme.onSurface,
                     )
@@ -218,7 +223,7 @@ private fun ThemeCard(
                 }
                 Spacer(Modifier.height(4.dp))
                 Text(
-                    text = option.blurb,
+                    text = stringResource(option.blurbResId),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -308,7 +313,10 @@ private fun MiniPhonePreview(option: ThemeOption) {
 }
 
 @Composable
-private fun AutoSwitchRow() {
+private fun AutoSwitchRow(
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -332,7 +340,7 @@ private fun AutoSwitchRow() {
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
-        Switch(checked = false, onCheckedChange = {})
+        Switch(checked = checked, onCheckedChange = onCheckedChange)
     }
 }
 
