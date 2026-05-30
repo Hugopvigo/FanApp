@@ -17,6 +17,7 @@ import com.mediatracker.domain.usecase.UpdateUserRatingUseCase
 import com.mediatracker.domain.usecase.UpdateUserNotesUseCase
 import com.mediatracker.domain.usecase.UpdateSeasonEpisodeUseCase
 import com.mediatracker.domain.usecase.UpdatePageProgressUseCase
+import com.mediatracker.domain.usecase.GetTvSeasonEpisodeCountUseCase
 import com.mediatracker.domain.usecase.UpdateWatchedEpisodesUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -35,6 +36,8 @@ data class DetailUiState(
     val suggestBookComplete: Boolean = false,
     val suggestSeasonAdvance: Boolean = false,
     val suggestSeriesComplete: Boolean = false,
+    val seasonEpisodeCount: Int? = null,
+    val showGoToPageDialog: Boolean = false,
 )
 
 @HiltViewModel
@@ -51,7 +54,11 @@ class DetailViewModel @Inject constructor(
     private val updateSeasonEpisodeUseCase: UpdateSeasonEpisodeUseCase,
     private val updatePageProgressUseCase: UpdatePageProgressUseCase,
     private val updateWatchedEpisodesUseCase: UpdateWatchedEpisodesUseCase,
+    private val getTvSeasonEpisodeCountUseCase: GetTvSeasonEpisodeCountUseCase,
 ) : ViewModel() {
+
+    private var watchedBackfillDone = false
+    private var lastLoadedSeason: Int? = null
 
     private val apiId: String = savedStateHandle["apiId"] ?: ""
     private val mediaType: MediaType = runCatching {
@@ -87,7 +94,62 @@ class DetailViewModel @Inject constructor(
             getUserItemsUseCase.observeAll().collect { items ->
                 val userItem = items.find { it.apiId == apiId && it.mediaType == mediaType }
                 _state.update { it.copy(userItem = userItem) }
+                userItem?.let {
+                    maybeBackfillWatchedEpisodes(it)
+                    loadSeasonEpisodeCount(it)
+                }
             }
+        }
+    }
+
+    private suspend fun maybeBackfillWatchedEpisodes(userItem: UserItem) {
+        if (watchedBackfillDone || userItem.mediaType != MediaType.SERIES) return
+        if (userItem.status != ItemStatus.IN_PROGRESS) return
+        val season = userItem.currentSeason ?: return
+        val episode = userItem.currentEpisode ?: return
+        if (episode <= 0 || userItem.watchedEpisodes[season]?.isNotEmpty() == true) {
+            watchedBackfillDone = true
+            return
+        }
+        watchedBackfillDone = true
+        val backfill = (1..episode).toList()
+        val updated = userItem.watchedEpisodes.toMutableMap().apply { put(season, backfill) }
+        updateWatchedEpisodesUseCase(userItem.id, updated)
+        updateSeasonEpisodeUseCase(userItem.id, season, episode)
+    }
+
+    private fun loadSeasonEpisodeCount(userItem: UserItem) {
+        if (userItem.mediaType != MediaType.SERIES || userItem.status != ItemStatus.IN_PROGRESS) return
+        val season = userItem.currentSeason ?: 1
+        if (season == lastLoadedSeason && _state.value.seasonEpisodeCount != null) return
+        lastLoadedSeason = season
+        viewModelScope.launch {
+            getTvSeasonEpisodeCountUseCase(apiId, season)
+                .onSuccess { count ->
+                    _state.update { it.copy(seasonEpisodeCount = count.coerceAtLeast(1)) }
+                }
+                .onFailure {
+                    val item = _state.value.item
+                    val numberOfSeasons = item?.extraData?.get("numberOfSeasons")?.toIntOrNull()
+                    val numberOfEpisodes = item?.extraData?.get("numberOfEpisodes")?.toIntOrNull()
+                    val fallback = if (numberOfSeasons != null && numberOfEpisodes != null && numberOfSeasons > 0) {
+                        numberOfEpisodes / numberOfSeasons
+                    } else null
+                    _state.update { it.copy(seasonEpisodeCount = fallback) }
+                }
+        }
+    }
+
+    private fun episodesPerSeasonForSeason(season: Int, seasonEps: List<Int>): Int {
+        val fromApi = _state.value.seasonEpisodeCount
+        if (fromApi != null && fromApi > 0) return fromApi
+        val item = _state.value.item ?: return 0
+        val numberOfSeasons = item.extraData?.get("numberOfSeasons")?.toIntOrNull()
+        val numberOfEpisodes = item.extraData?.get("numberOfEpisodes")?.toIntOrNull()
+        return if (numberOfSeasons != null && numberOfEpisodes != null && numberOfSeasons > 0) {
+            numberOfEpisodes / numberOfSeasons
+        } else {
+            seasonEps.maxOrNull() ?: 1
         }
     }
 
@@ -149,6 +211,26 @@ class DetailViewModel @Inject constructor(
         }
     }
 
+    fun onOpenGoToPageDialog() {
+        _state.update { it.copy(showGoToPageDialog = true) }
+    }
+
+    fun onDismissGoToPageDialog() {
+        _state.update { it.copy(showGoToPageDialog = false) }
+    }
+
+    fun onGoToPageConfirm(pageInput: String) {
+        val page = pageInput.trim().toIntOrNull() ?: return
+        val userItem = _state.value.userItem ?: return
+        val total = userItem.totalPages
+            ?: _state.value.item?.extraData?.get("pageCount")?.toIntOrNull()
+            ?: 0
+        if (page < 0) return
+        if (total > 0 && page > total) return
+        onDismissGoToPageDialog()
+        onPageProgressChanged(page, total.takeIf { it > 0 })
+    }
+
     fun onPageProgressChanged(currentPage: Int?, totalPages: Int?) {
         val currentUserItem = _state.value.userItem ?: return
         viewModelScope.launch {
@@ -174,6 +256,10 @@ class DetailViewModel @Inject constructor(
 
     fun onSeasonEpisodeChanged(season: Int?, episode: Int?) {
         val currentUserItem = _state.value.userItem ?: return
+        if (season != null && season != lastLoadedSeason) {
+            lastLoadedSeason = null
+            _state.update { it.copy(seasonEpisodeCount = null) }
+        }
         viewModelScope.launch {
             updateSeasonEpisodeUseCase(currentUserItem.id, season, episode)
             val item = _state.value.item ?: return@launch
@@ -256,9 +342,7 @@ class DetailViewModel @Inject constructor(
             val item = _state.value.item ?: return@launch
             val numberOfSeasons = item.extraData?.get("numberOfSeasons")?.toIntOrNull()
             val numberOfEpisodes = item.extraData?.get("numberOfEpisodes")?.toIntOrNull()
-            val epsPerSeason = if (numberOfSeasons != null && numberOfEpisodes != null && numberOfSeasons > 0) {
-                numberOfEpisodes / numberOfSeasons
-            } else 0
+            val epsPerSeason = episodesPerSeasonForSeason(season, seasonEps)
 
             val allSeasonWatched = epsPerSeason > 0 && (1..epsPerSeason).all { it in seasonEps }
             if (allSeasonWatched) {

@@ -29,8 +29,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -39,6 +42,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -80,8 +84,8 @@ fun DetailScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val fanColors = MaterialTheme.fanAppColors
-    var showRatingCardPrompt by remember { mutableStateOf(false) }
-    val previousRating = remember { mutableStateOf<Int?>(null) }
+    var showRatingCardPrompt by rememberSaveable { mutableStateOf(false) }
+    val previousRating = rememberSaveable { mutableStateOf<Int?>(null) }
 
     LaunchedEffect(state.userItem?.userRating) {
         val currentRating = state.userItem?.userRating
@@ -106,8 +110,17 @@ fun DetailScreen(
                 onSeasonEpisodeChanged = viewModel::onSeasonEpisodeChanged,
                 onPageProgressChanged = viewModel::onPageProgressChanged,
                 onEpisodeToggle = viewModel::onEpisodeToggle,
+                onOpenGoToPageDialog = viewModel::onOpenGoToPageDialog,
             )
+            else -> DetailScreenSkeleton()
         }
+
+    if (state.showGoToPageDialog) {
+        GoToPageDialog(
+            onConfirm = viewModel::onGoToPageConfirm,
+            onDismiss = viewModel::onDismissGoToPageDialog,
+        )
+    }
 
     if (showRatingCardPrompt && onNavigateToFanCard != null) {
         Snackbar(
@@ -199,6 +212,7 @@ private fun DetailContent(
     onSeasonEpisodeChanged: (Int?, Int?) -> Unit,
     onPageProgressChanged: (Int?, Int?) -> Unit,
     onEpisodeToggle: (Int, Int) -> Unit,
+    onOpenGoToPageDialog: () -> Unit,
 ) {
     val item = state.item ?: return
     val userItem = state.userItem
@@ -327,39 +341,41 @@ private fun DetailContent(
                     )
                 }
 
-            if (userItem != null && item.mediaType == MediaType.SERIES && userItem.status == ItemStatus.IN_PROGRESS) {
-                SeasonEpisodeStepper(
-                    season = userItem.currentSeason,
-                    episode = userItem.currentEpisode,
-                    onChanged = onSeasonEpisodeChanged,
-                )
+                if (userItem != null && item.mediaType == MediaType.SERIES && userItem.status == ItemStatus.IN_PROGRESS) {
+                    SeasonEpisodeStepper(
+                        season = userItem.currentSeason,
+                        episode = userItem.currentEpisode,
+                        onChanged = onSeasonEpisodeChanged,
+                    )
 
-                val currentSeason = userItem.currentSeason ?: 1
-                val numberOfEpisodes = item.extraData?.get("numberOfEpisodes")?.toIntOrNull()
-                val numberOfSeasons = item.extraData?.get("numberOfSeasons")?.toIntOrNull()
-                val epsPerSeason = if (numberOfEpisodes != null && numberOfSeasons != null && numberOfSeasons > 0) {
-                    numberOfEpisodes / numberOfSeasons
-                } else null
-                val seasonWatched = userItem.watchedEpisodes[currentSeason] ?: emptyList()
+                    val currentSeason = userItem.currentSeason ?: 1
+                    val numberOfEpisodes = item.extraData?.get("numberOfEpisodes")?.toIntOrNull()
+                    val numberOfSeasons = item.extraData?.get("numberOfSeasons")?.toIntOrNull()
+                    val epsPerSeason = state.seasonEpisodeCount
+                        ?: if (numberOfEpisodes != null && numberOfSeasons != null && numberOfSeasons > 0) {
+                            numberOfEpisodes / numberOfSeasons
+                        } else null
+                    val seasonWatched = userItem.watchedEpisodes[currentSeason] ?: emptyList()
 
-                if (epsPerSeason != null && epsPerSeason > 0) {
-                    EpisodeTracker(
-                        season = currentSeason,
-                        numberOfEpisodes = epsPerSeason,
-                        watchedEpisodes = seasonWatched,
-                        onEpisodeToggle = { ep -> onEpisodeToggle(currentSeason, ep) },
+                    if (epsPerSeason != null && epsPerSeason > 0) {
+                        EpisodeTracker(
+                            season = currentSeason,
+                            numberOfEpisodes = epsPerSeason,
+                            watchedEpisodes = seasonWatched,
+                            onEpisodeToggle = { ep -> onEpisodeToggle(currentSeason, ep) },
+                        )
+                    }
+                }
+
+                if (userItem != null && item.mediaType == MediaType.BOOK && userItem.status == ItemStatus.IN_PROGRESS) {
+                    PageProgressStepper(
+                        currentPage = userItem.currentPage,
+                        totalPages = userItem.totalPages,
+                        apiPageCount = item.extraData?.get("pageCount")?.toIntOrNull(),
+                        onChanged = onPageProgressChanged,
+                        onGoToPageClick = onOpenGoToPageDialog,
                     )
                 }
-            }
-
-            if (userItem != null && item.mediaType == MediaType.BOOK && userItem.status == ItemStatus.IN_PROGRESS) {
-                PageProgressStepper(
-                    currentPage = userItem.currentPage,
-                    totalPages = userItem.totalPages,
-                    apiPageCount = item.extraData?.get("pageCount")?.toIntOrNull(),
-                    onChanged = onPageProgressChanged,
-                )
-            }
 
                 if (item.overview.isNotBlank()) {
                     Text(
@@ -531,14 +547,49 @@ private fun SeasonEpisodeStepper(
 }
 
 @Composable
+private fun GoToPageDialog(
+    onConfirm: (String) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    var pageInput by rememberSaveable { mutableStateOf("") }
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.detail_go_to_page_title)) },
+        text = {
+            OutlinedTextField(
+                value = pageInput,
+                onValueChange = { pageInput = it.filter { ch -> ch.isDigit() } },
+                label = { Text(stringResource(R.string.detail_go_to_page_label)) },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                singleLine = true,
+            )
+        },
+        confirmButton = {
+            TextButton(
+                onClick = { onConfirm(pageInput) },
+                enabled = pageInput.trim().toIntOrNull() != null && (pageInput.trim().toIntOrNull() ?: 0) > 0,
+            ) {
+                Text(stringResource(R.string.detail_go_to_page_confirm))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.profile_cancel))
+            }
+        },
+    )
+}
+
+@Composable
 private fun PageProgressStepper(
     currentPage: Int?,
     totalPages: Int?,
     apiPageCount: Int?,
     onChanged: (Int?, Int?) -> Unit,
+    onGoToPageClick: () -> Unit,
 ) {
     val t = totalPages ?: apiPageCount ?: 0
-    val c = currentPage ?: if (t > 0) 0 else 0
+    val c = currentPage ?: 0
     val fanColors = MaterialTheme.fanAppColors
 
     Column {
@@ -587,6 +638,13 @@ private fun PageProgressStepper(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
+        Spacer(Modifier.height(8.dp))
+        Text(
+            text = stringResource(R.string.detail_go_to_page_hint),
+            style = MaterialTheme.typography.labelMedium,
+            color = fanColors.gradientAccent.first(),
+            modifier = Modifier.clickable(onClick = onGoToPageClick),
+        )
     }
 }
 
@@ -682,6 +740,7 @@ private fun DetailContentPreview() {
     onSeasonEpisodeChanged = { _, _ -> },
     onPageProgressChanged = { _, _ -> },
     onEpisodeToggle = { _, _ -> },
+    onOpenGoToPageDialog = {},
 )
     }
 }

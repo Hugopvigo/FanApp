@@ -24,25 +24,7 @@ class FirestoreDataSource @Inject constructor(
         val uid = authProvider.userId ?: throw IllegalStateException("User not logged in")
         val path = "/users/$uid/items"
         val snapshot = db.collection(path).get().await()
-        snapshot.documents.mapNotNull { doc ->
-            try {
-                val apiId = doc.getString("apiId") ?: ""
-                UserItem(
-                    id = doc.id,
-                    mediaType = MediaType.valueOf(doc.getString("mediaType") ?: "SERIES"),
-                    apiId = apiId,
-                    title = doc.getString("title")?.ifBlank { null } ?: apiId,
-                    posterUrl = doc.getString("posterUrl"),
-                    status = ItemStatus.valueOf(doc.getString("status") ?: "WATCHLIST"),
-                    favorite = doc.getBoolean("favorite") ?: false,
-                    addedAt = doc.getLong("addedAt") ?: 0L,
-                    updatedAt = doc.getLong("updatedAt") ?: 0L,
-                )
-            } catch (e: Exception) {
-                Timber.e(e, "Error parsing Firestore document ${doc.id}")
-                null
-            }
-        }
+        snapshot.documents.mapNotNull { doc -> parseUserItem(doc.id, doc.data) }
     }
 
     suspend fun addItem(
@@ -56,16 +38,16 @@ class FirestoreDataSource @Inject constructor(
         val uid = authProvider.userId ?: throw IllegalStateException("User not logged in")
         val path = "/users/$uid/items"
         val now = System.currentTimeMillis()
-        val data = mutableMapOf(
-            "mediaType" to mediaType.name,
-            "apiId" to apiId,
-            "title" to title,
-            "status" to status.name,
-            "favorite" to false,
-            "addedAt" to now,
-            "updatedAt" to now,
+        val data = baseItemMap(
+            mediaType = mediaType,
+            apiId = apiId,
+            title = title,
+            posterUrl = posterUrl,
+            status = status,
+            favorite = false,
+            addedAt = now,
+            updatedAt = now,
         )
-        if (!posterUrl.isNullOrBlank()) data["posterUrl"] = posterUrl
         val docRef = db.collection(path).add(data).await()
         UserItem(
             id = docRef.id,
@@ -78,6 +60,25 @@ class FirestoreDataSource @Inject constructor(
             addedAt = now,
             updatedAt = now,
         )
+    }
+
+    suspend fun upsertUserItem(item: UserItem): Result<Unit> = runCatching {
+        val db = firestore ?: throw IllegalStateException("Firestore not configured")
+        val uid = authProvider.userId ?: throw IllegalStateException("User not logged in")
+        val path = "/users/$uid/items"
+        val data = baseItemMap(
+            mediaType = item.mediaType,
+            apiId = item.apiId,
+            title = item.title,
+            posterUrl = item.posterUrl,
+            status = item.status,
+            favorite = item.favorite,
+            addedAt = item.addedAt,
+            updatedAt = item.updatedAt,
+        ) + progressFieldsMap(item)
+        db.collection(path).document(item.id)
+            .set(data, com.google.firebase.firestore.SetOptions.merge())
+            .await()
     }
 
     suspend fun updateStatus(itemId: String, status: ItemStatus): Result<Unit> = runCatching {
@@ -172,16 +173,18 @@ class FirestoreDataSource @Inject constructor(
             "yearly" -> "/rankings/yearly/${java.time.Year.now().value}/users"
             else -> "/rankings/all_time/users"
         }
-        val query = db.collection(path).let { col ->
-            if (category in listOf("series", "movies", "books")) {
-                col.limit(500L)
-            } else {
-                col.orderBy("xp", com.google.firebase.firestore.Query.Direction.DESCENDING)
-                    .limit(limit.toLong())
-            }
+        val orderField = when (category) {
+            "series" -> "seriesCompleted"
+            "movies" -> "moviesCompleted"
+            "books" -> "booksCompleted"
+            else -> "xp"
         }
-        val snapshot = query.get().await()
-        snapshot.documents.map { doc ->
+        val snapshot = db.collection(path)
+            .orderBy(orderField, com.google.firebase.firestore.Query.Direction.DESCENDING)
+            .limit(limit.toLong())
+            .get()
+            .await()
+        snapshot.documents.mapIndexed { index, doc ->
             Ranking(
                 id = doc.id,
                 userId = doc.getString("userId") ?: doc.id,
@@ -190,26 +193,91 @@ class FirestoreDataSource @Inject constructor(
                 xp = doc.getLong("xp")?.toInt() ?: 0,
                 level = doc.getLong("level")?.toInt() ?: 1,
                 totalCompleted = doc.getLong("totalCompleted")?.toInt() ?: 0,
-                seriesCompleted = doc.getLong("seriesCompleted")?.toInt() ?: 0,
-                moviesCompleted = doc.getLong("moviesCompleted")?.toInt() ?: 0,
-                booksCompleted = doc.getLong("booksCompleted")?.toInt() ?: 0,
-                rank = 0,
+                rank = index + 1,
             )
-        }.sortedByDescending {
-            when (category) {
-                "series" -> it.seriesCompleted
-                "movies" -> it.moviesCompleted
-                "books" -> it.booksCompleted
-                else -> it.xp
-            }
-        }.take(limit).mapIndexed { index, ranking ->
-            ranking.copy(rank = index + 1)
         }
     }
 
     suspend fun getUserRank(category: String): Result<Int?> = runCatching {
+        val db = firestore ?: throw IllegalStateException("Firestore not configured")
         val uid = authProvider.userId ?: throw IllegalStateException("User not logged in")
-        getLeaderboard(category).getOrThrow().find { it.userId == uid }?.rank
+        val path = when (category) {
+            "yearly" -> "/rankings/yearly/${java.time.Year.now().value}/users"
+            else -> "/rankings/all_time/users"
+        }
+        val snapshot = db.collection(path)
+            .orderBy("xp", com.google.firebase.firestore.Query.Direction.DESCENDING)
+            .get()
+            .await()
+        snapshot.documents.indexOfFirst { it.id == uid }.takeIf { it >= 0 }?.plus(1)
+    }
+
+    private fun parseUserItem(id: String, data: Map<String, Any?>?): UserItem? = try {
+        if (data == null) return null
+        val apiId = data["apiId"] as? String ?: ""
+        UserItem(
+            id = id,
+            mediaType = MediaType.valueOf(data["mediaType"] as? String ?: "SERIES"),
+            apiId = apiId,
+            title = (data["title"] as? String)?.ifBlank { null } ?: apiId,
+            posterUrl = data["posterUrl"] as? String,
+            status = ItemStatus.valueOf(data["status"] as? String ?: "WATCHLIST"),
+            favorite = data["favorite"] as? Boolean ?: false,
+            addedAt = (data["addedAt"] as? Number)?.toLong() ?: 0L,
+            updatedAt = (data["updatedAt"] as? Number)?.toLong() ?: 0L,
+            userRating = (data["userRating"] as? Number)?.toInt(),
+            notes = data["notes"] as? String,
+            currentSeason = (data["currentSeason"] as? Number)?.toInt(),
+            currentEpisode = (data["currentEpisode"] as? Number)?.toInt(),
+            currentPage = (data["currentPage"] as? Number)?.toInt(),
+            totalPages = (data["totalPages"] as? Number)?.toInt(),
+            watchedEpisodes = parseWatchedEpisodes(data["watchedEpisodes"] as? String),
+        )
+    } catch (e: Exception) {
+        Timber.e(e, "Error parsing Firestore document $id")
+        null
+    }
+
+    private fun parseWatchedEpisodes(raw: String?): Map<Int, List<Int>> {
+        if (raw.isNullOrBlank()) return emptyMap()
+        return try {
+            kotlinx.serialization.json.Json.decodeFromString<Map<Int, List<Int>>>(raw)
+        } catch (_: Exception) {
+            emptyMap()
+        }
+    }
+
+    private fun baseItemMap(
+        mediaType: MediaType,
+        apiId: String,
+        title: String,
+        posterUrl: String?,
+        status: ItemStatus,
+        favorite: Boolean,
+        addedAt: Long,
+        updatedAt: Long,
+    ): MutableMap<String, Any> = mutableMapOf<String, Any>(
+        "mediaType" to mediaType.name,
+        "apiId" to apiId,
+        "title" to title,
+        "status" to status.name,
+        "favorite" to favorite,
+        "addedAt" to addedAt,
+        "updatedAt" to updatedAt,
+    ).apply {
+        if (!posterUrl.isNullOrBlank()) this["posterUrl"] = posterUrl
+    }
+
+    private fun progressFieldsMap(item: UserItem): Map<String, Any?> = buildMap {
+        item.userRating?.let { put("userRating", it) }
+        item.notes?.let { put("notes", it) }
+        item.currentSeason?.let { put("currentSeason", it) }
+        item.currentEpisode?.let { put("currentEpisode", it) }
+        item.currentPage?.let { put("currentPage", it) }
+        item.totalPages?.let { put("totalPages", it) }
+        if (item.watchedEpisodes.isNotEmpty()) {
+            put("watchedEpisodes", kotlinx.serialization.json.Json.encodeToString(item.watchedEpisodes))
+        }
     }
 }
 

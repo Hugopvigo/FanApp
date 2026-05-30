@@ -96,10 +96,14 @@ class GetDetailedStatsUseCase @Inject constructor(
             val media = mediaItemDao.getById(mediaId)?.toDomain()
             when (item.mediaType) {
                 MediaType.SERIES -> {
-                    val season = item.currentSeason ?: 1
-                    val episode = item.currentEpisode ?: 1
-                    val watchedEpisodes = ((season - 1).coerceAtLeast(0) * 10) + episode
-                    minutes += watchedEpisodes * 45
+                    val watchedCount = item.watchedEpisodes.values.sumOf { eps -> eps.size }
+                    minutes += if (watchedCount > 0) {
+                        watchedCount * 45
+                    } else {
+                        val season = item.currentSeason ?: 1
+                        val episode = item.currentEpisode ?: 1
+                        ((season - 1).coerceAtLeast(0) * 10 + episode) * 45
+                    }
                 }
                 MediaType.MOVIE -> {
                     val runtime = media?.extraData?.get("runtime")?.toIntOrNull() ?: 120
