@@ -233,7 +233,8 @@ class DetailViewModel @Inject constructor(
 
         val isNowWatched = episode in seasonEps
         val newEpisode = if (isCurrentSeason) {
-            if (isNowWatched) episode else seasonEps.maxOrNull() ?: 1
+            if (isNowWatched) maxOf(episode, currentUserItem.currentEpisode ?: 1)
+            else seasonEps.maxOrNull() ?: 1
         } else {
             currentUserItem.currentEpisode ?: 1
         }
@@ -258,6 +259,8 @@ class DetailViewModel @Inject constructor(
                 } else {
                     _state.update { it.copy(suggestSeasonAdvance = true) }
                 }
+            } else {
+                _state.update { it.copy(suggestSeasonAdvance = false, suggestSeriesComplete = false) }
             }
         }
     }

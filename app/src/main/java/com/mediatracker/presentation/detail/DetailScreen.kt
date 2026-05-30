@@ -336,15 +336,17 @@ private fun DetailContent(
                 val numberOfSeasons = item.extraData?.get("numberOfSeasons")?.toIntOrNull()
                 val epsPerSeason = if (numberOfEpisodes != null && numberOfSeasons != null && numberOfSeasons > 0) {
                     numberOfEpisodes / numberOfSeasons
-                } else 10
+                } else null
                 val seasonWatched = userItem.watchedEpisodes[currentSeason] ?: emptyList()
 
-                EpisodeTracker(
-                    season = currentSeason,
-                    numberOfEpisodes = epsPerSeason,
-                    watchedEpisodes = seasonWatched,
-                    onEpisodeToggle = { ep -> onEpisodeToggle(currentSeason, ep) },
-                )
+                if (epsPerSeason != null && epsPerSeason > 0) {
+                    EpisodeTracker(
+                        season = currentSeason,
+                        numberOfEpisodes = epsPerSeason,
+                        watchedEpisodes = seasonWatched,
+                        onEpisodeToggle = { ep -> onEpisodeToggle(currentSeason, ep) },
+                    )
+                }
             }
 
             if (userItem != null && item.mediaType == MediaType.BOOK && userItem.status == ItemStatus.IN_PROGRESS) {
