@@ -4,10 +4,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mediatracker.data.auth.AuthDataSource
 import com.mediatracker.data.firestore.FirestoreDataSource
+import com.mediatracker.data.local.LocaleRepository
 import com.mediatracker.data.local.NotificationDao
-import com.mediatracker.domain.usecase.GetUserStatsUseCase
 import com.mediatracker.domain.model.UserStats
 import com.mediatracker.domain.model.UserStreak
+import com.mediatracker.domain.usecase.CheckAchievementsUseCase
+import com.mediatracker.domain.usecase.GetUserStatsUseCase
 import com.mediatracker.domain.usecase.UpdateStreakUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,7 +18,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -27,7 +28,16 @@ class ProfileViewModel @Inject constructor(
     private val firestoreDataSource: FirestoreDataSource,
     notificationDao: NotificationDao,
     private val updateStreakUseCase: UpdateStreakUseCase,
+    private val checkAchievementsUseCase: CheckAchievementsUseCase,
+    private val localeRepository: LocaleRepository,
 ) : ViewModel() {
+
+    companion object {
+        const val FOLLOW_SYSTEM = "system"
+    }
+
+    val languageCode: StateFlow<String> = localeRepository.languageCodeFlow
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), LocaleRepository.FOLLOW_SYSTEM)
 
     val stats: StateFlow<UserStats> = getUserStatsUseCase()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), UserStats())
@@ -58,14 +68,46 @@ class ProfileViewModel @Inject constructor(
     private val _streak = MutableStateFlow(UserStreak(0, 0, ""))
     val streak: StateFlow<UserStreak> = _streak.asStateFlow()
 
+    private val _showLanguageDialog = MutableStateFlow(false)
+    val showLanguageDialog: StateFlow<Boolean> = _showLanguageDialog.asStateFlow()
+
+    private val _emailVerificationSent = MutableStateFlow(false)
+    val emailVerificationSent: StateFlow<Boolean> = _emailVerificationSent.asStateFlow()
+
+    private val _isEmailVerified = MutableStateFlow(true)
+    val isEmailVerified: StateFlow<Boolean> = _isEmailVerified.asStateFlow()
+
     init {
         loadAvatar()
         loadStreak()
+        refreshEmailVerificationStatus()
+    }
+
+    fun refreshEmailVerificationStatus() {
+        _isEmailVerified.value = authDataSource.isEmailVerified()
+    }
+
+    fun sendVerificationEmail() {
+        viewModelScope.launch {
+            authDataSource.sendEmailVerification()
+                .onSuccess { _emailVerificationSent.value = true }
+        }
     }
 
     private fun loadStreak() {
         viewModelScope.launch {
-            _streak.value = updateStreakUseCase.getStreak()
+            _streak.value = updateStreakUseCase()
+            checkAchievementsUseCase()
+        }
+    }
+
+    fun openLanguageDialog() { _showLanguageDialog.value = true }
+    fun closeLanguageDialog() { _showLanguageDialog.value = false }
+
+    fun setLanguage(code: String) {
+        viewModelScope.launch {
+            localeRepository.setLanguageCode(code)
+            _showLanguageDialog.value = false
         }
     }
 
@@ -86,7 +128,7 @@ class ProfileViewModel @Inject constructor(
         viewModelScope.launch {
             _isUpdating.value = true
             authDataSource.updateUserName(trimmed)
-            _isUpdating.update { false }
+            _isUpdating.value = false
             _showEditNameDialog.value = false
         }
     }

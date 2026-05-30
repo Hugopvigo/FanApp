@@ -86,6 +86,16 @@ play-services-auth = { group = "com.google.android.gms", name = "play-services-a
 # Vico Charts
 vico-compose-m3 = { group = "com.patrykandpatrick.vico", name = "compose-m3", version.ref = "vico" }
 
+# In-App Review
+play-review-ktx = { group = "com.google.android.play", name = "review-ktx", version = "2.0.2" }
+
+# Glance Widget
+glance-appwidget = { group = "androidx.glance", name = "glance-appwidget", version = "1.1.0" }
+glance-material3 = { group = "androidx.glance", name = "glance-material3", version = "1.1.0" }
+
+# Firebase Storage
+firebase-storage = { group = "com.google.firebase", name = "firebase-storage" }
+
 # Testing
 compose-ui-test = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 compose-ui-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }

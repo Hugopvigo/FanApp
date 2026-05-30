@@ -74,6 +74,7 @@ dependencies {
     // Core
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity.compose)
+    implementation("androidx.appcompat:appcompat:1.7.1")
 
     // Compose
     implementation(platform(libs.compose.bom))
@@ -132,6 +133,16 @@ dependencies {
 
     // Google Sign-In
     implementation(libs.play.services.auth)
+
+    // In-App Review
+    implementation(libs.play.review.ktx)
+
+    // Glance Widget
+    implementation(libs.glance.appwidget)
+    implementation(libs.glance.material3)
+
+    // Firebase Storage
+    implementation(libs.firebase.storage)
 
     // Testing
     testImplementation("junit:junit:4.13.2")

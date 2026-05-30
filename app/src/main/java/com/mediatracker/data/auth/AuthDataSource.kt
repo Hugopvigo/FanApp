@@ -125,6 +125,13 @@ class AuthDataSource @Inject constructor(
         user.updateProfile(request).await()
     }
 
+    suspend fun sendEmailVerification(): Result<Unit> = runCatching {
+        val user = auth?.currentUser ?: throw IllegalStateException("No user logged in")
+        user.sendEmailVerification().await()
+    }
+
+    fun isEmailVerified(): Boolean = auth?.currentUser?.isEmailVerified ?: false
+
     fun logout() {
         auth?.signOut()
     }

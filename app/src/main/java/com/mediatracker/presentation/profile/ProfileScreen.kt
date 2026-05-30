@@ -78,7 +78,16 @@ fun ProfileScreen(
     val showAvatarDialog by viewModel.showAvatarDialog.collectAsStateWithLifecycle()
     val unreadCount by viewModel.unreadNotificationCount.collectAsStateWithLifecycle()
     val streak by viewModel.streak.collectAsStateWithLifecycle()
-    val displayName = userName?.takeIf { it.isNotBlank() }?.capitalizeWords() ?: "Usuario"
+    val languageCode by viewModel.languageCode.collectAsStateWithLifecycle()
+    val showLanguageDialog by viewModel.showLanguageDialog.collectAsStateWithLifecycle()
+    val isEmailVerified by viewModel.isEmailVerified.collectAsStateWithLifecycle()
+    val emailVerificationSent by viewModel.emailVerificationSent.collectAsStateWithLifecycle()
+    val languageLabel = when (languageCode) {
+        ProfileViewModel.FOLLOW_SYSTEM -> stringResource(R.string.profile_language_system)
+        "es" -> stringResource(R.string.profile_language_spanish)
+        else -> stringResource(R.string.profile_language_english)
+    }
+    val displayName = userName?.takeIf { it.isNotBlank() }?.capitalizeWords() ?: stringResource(R.string.profile_default_name)
     val initial = displayName.first().uppercaseChar().toString()
 
     Column(
@@ -116,7 +125,7 @@ fun ProfileScreen(
                     contentAlignment = Alignment.Center,
                 ) {
                     if (avatarId != null) {
-                        Text(text = avatarId!!, fontSize = 34.sp)
+                        Text(text = avatarId ?: "", fontSize = 34.sp)
                     } else {
                         Text(
                             text = initial,
@@ -173,7 +182,7 @@ fun ProfileScreen(
                         ) {
                             Text(text = stats.levelIcon, fontSize = 12.sp)
                             Text(
-                                text = "Nv.${stats.level} · ${stats.levelTitle}",
+                                text = stringResource(R.string.profile_level_format, stats.level, stats.levelTitle),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = Color.White.copy(alpha = 0.95f),
                                 fontWeight = FontWeight.Bold,
@@ -280,7 +289,47 @@ fun ProfileScreen(
         }
     }
 
-    Spacer(Modifier.height(24.dp))
+        if (!isEmailVerified && userEmail != null) {
+            Spacer(Modifier.height(12.dp))
+            GlassSurface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                radius = 18.dp,
+            ) {
+                Row(
+                    modifier = Modifier.padding(14.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                ) {
+                    Text("⚠️", fontSize = 20.sp)
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = stringResource(R.string.profile_verify_email_title),
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface,
+                        )
+                        Text(
+                            text = if (emailVerificationSent) stringResource(R.string.profile_verify_email_sent)
+                                   else stringResource(R.string.profile_verify_email_subtitle),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                    if (!emailVerificationSent) {
+                        OutlinedButton(
+                            onClick = { viewModel.sendVerificationEmail() },
+                            shape = RoundedCornerShape(12.dp),
+                        ) {
+                            Text(stringResource(R.string.profile_verify_email_button))
+                        }
+                    }
+                }
+            }
+        }
+
+        Spacer(Modifier.height(24.dp))
 
         // ── Settings section ──────────────────────────────────────────────────
         Text(
@@ -326,11 +375,17 @@ fun ProfileScreen(
         SettingRow(
             icon = "🎨",
             label = stringResource(R.string.profile_theme),
-            value = appTheme.name,
+            value = stringResource(appTheme.displayNameRes()),
             highlight = true,
             onClick = onNavigateToTheme,
         )
-    SettingRow(icon = "🌐", label = stringResource(R.string.profile_language), value = stringResource(R.string.profile_language_value), highlight = true)
+    SettingRow(
+        icon = "🌐",
+        label = stringResource(R.string.profile_language),
+        value = languageLabel,
+        highlight = true,
+        onClick = viewModel::openLanguageDialog,
+    )
     SettingRow(
         icon = "🔔",
         label = stringResource(R.string.profile_notifications),
@@ -345,7 +400,7 @@ fun ProfileScreen(
 
         SettingRow(
             icon = "📥",
-            label = "Importar",
+            label = stringResource(R.string.import_title),
             highlight = true,
             onClick = onNavigateToImport,
         )
@@ -428,6 +483,57 @@ fun ProfileScreen(
             },
         )
     }
+
+    if (showLanguageDialog) {
+        AlertDialog(
+            onDismissRequest = { viewModel.closeLanguageDialog() },
+            title = { Text(stringResource(R.string.profile_language_dialog_title)) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    LanguageOption(
+                        label = stringResource(R.string.profile_language_system),
+                        selected = languageCode == ProfileViewModel.FOLLOW_SYSTEM,
+                        onClick = { viewModel.setLanguage(ProfileViewModel.FOLLOW_SYSTEM) },
+                    )
+                    LanguageOption(
+                        label = stringResource(R.string.profile_language_spanish),
+                        selected = languageCode == "es",
+                        onClick = { viewModel.setLanguage("es") },
+                    )
+                    LanguageOption(
+                        label = stringResource(R.string.profile_language_english),
+                        selected = languageCode == "en",
+                        onClick = { viewModel.setLanguage("en") },
+                    )
+                }
+            },
+            confirmButton = {},
+            dismissButton = {
+                TextButton(onClick = { viewModel.closeLanguageDialog() }) {
+                    Text(stringResource(R.string.profile_cancel))
+                }
+            },
+        )
+    }
+}
+
+@Composable
+private fun LanguageOption(
+    label: String,
+    selected: Boolean,
+    onClick: () -> Unit,
+) {
+    Text(
+        text = if (selected) "✓ $label" else label,
+        style = MaterialTheme.typography.bodyLarge,
+        fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal,
+        color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(8.dp))
+            .clickable(onClick = onClick)
+            .padding(vertical = 10.dp, horizontal = 4.dp),
+    )
 }
 
 // ─── Settings row ─────────────────────────────────────────────────────────────

@@ -30,6 +30,13 @@
     <string name="home_trending">Novedades Trending</string>
     <string name="home_favorites">Tus Favoritos</string>
     <string name="home_recent">Tus Últimos Guardados</string>
+    <string name="home_see_all">Ver todo</string>
+    <string name="home_continue_series">🎬 En progreso</string>
+    <string name="home_continue_movie">🎥 En progreso</string>
+    <string name="home_continue_book">📖 Leyendo</string>
+    <string name="greeting_morning">Buenos días</string>
+    <string name="greeting_afternoon">Buenas tardes</string>
+    <string name="greeting_night">Buenas noches</string>
 
     <!-- Discover -->
     <string name="discover_title">Descubrir</string>
@@ -96,6 +103,14 @@
     <string name="theme_active">ACTIVO</string>
     <string name="theme_auto">Cambiar con el sistema</string>
     <string name="theme_auto_subtitle">Usa Light de día y Dark de noche</string>
+    <string name="theme_blurb_fantasy">Lila, rosa y un toque de magia ✨</string>
+    <string name="theme_blurb_light">Cálida y limpia. Perfecta para el día.</string>
+    <string name="theme_blurb_purple">Morados profundos con su pizca de rosa. Cozy nocturno.</string>
+    <string name="theme_blurb_dark">Negro profundo, acento azul acero. Sobrio y enfocado.</string>
+    <string name="theme_name_fantasy">Fantasy</string>
+    <string name="theme_name_light">Light</string>
+    <string name="theme_name_purple">Púrpura</string>
+    <string name="theme_name_dark">Oscuro</string>
 
     <!-- Forgot / change password -->
     <string name="forgot_password">¿Olvidaste tu contraseña?</string>
@@ -220,6 +235,48 @@
     <string name="detail_series_complete_prompt">¡Has terminado la última temporada! ¿Marcar serie como completada?</string>
     <string name="detail_action_complete">Completar</string>
     <string name="detail_action_advance">Avanzar</string>
+    <string name="detail_go_to_page_title">Ir a página</string>
+    <string name="detail_go_to_page_label">Número de página</string>
+    <string name="detail_go_to_page_hint">Toca para ir a página…</string>
+    <string name="detail_go_to_page_confirm">Ir</string>
+    <string name="profile_language_system">Seguir sistema</string>
+    <string name="profile_language_spanish">Español</string>
+    <string name="profile_language_english">English</string>
+    <string name="profile_language_dialog_title">Elegir idioma</string>
+
+    <!-- Quick Add -->
+    <string name="quick_add_title">Añadir rápido</string>
+    <string name="quick_add_search_hint">Buscar series, películas, libros…</string>
+    <string name="quick_add_added">Añadido</string>
+    <string name="quick_add_add">Añadir a la lista</string>
+    <string name="quick_add_status_watchlist">Quiero ver</string>
+    <string name="quick_add_status_in_progress">En progreso</string>
+    <string name="quick_add_status_completed">Completado</string>
+    <string name="quick_add_status_abandoned">Abandonado</string>
+    <string name="nav_add">Añadir</string>
+
+    <!-- Onboarding -->
+    <string name="onboarding_skip">Saltar</string>
+    <string name="onboarding_next">Siguiente</string>
+    <string name="onboarding_start">¡Empezar!</string>
+    <string name="onboarding_add_title">Añade contenido</string>
+    <string name="onboarding_add_desc">Busca tus series, películas y libros favoritos y añádelos a tu biblioteca con un toque.</string>
+    <string name="onboarding_track_title">Sigue tu progreso</string>
+    <string name="onboarding_track_desc">Marca episodios vistos, actualiza tu progreso de lectura y mantén un registro de todo lo que consumes.</string>
+    <string name="onboarding_xp_title">Gana XP y sube de nivel</string>
+    <string name="onboarding_xp_desc">Completa ítems, mantén rachas y desbloquea logros para escalar en la clasificación.</string>
+
+    <!-- Verificación de email -->
+    <string name="profile_verify_email_title">Verifica tu email</string>
+    <string name="profile_verify_email_subtitle">Confirma tu dirección de email para asegurar tu cuenta</string>
+    <string name="profile_verify_email_button">Enviar verificación</string>
+    <string name="profile_verify_email_sent">¡Email de verificación enviado! Revisa tu bandeja de entrada.</string>
+
+    <!-- Profile fallbacks & labels -->
+    <string name="profile_default_name">Usuario</string>
+    <string name="profile_level_format">Nv.%1$d · %2$s</string>
+    <string name="home_trending_badge">TRENDING</string>
+    <string name="streak_format">🔥 %1$d</string>
 
     <!-- Importar -->
     <string name="import_title">Importar</string>

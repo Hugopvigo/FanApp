@@ -26,11 +26,17 @@
     <!-- Home -->
     <string name="home_title">Home</string>
     <string name="home_subtitle">Continue where you left off, trending, favorites...</string>
-    <string name="home_continue">Continúa donde lo dejaste</string>
-    <string name="home_trending">Tendencias</string>
-    <string name="home_favorites">Tus favoritos</string>
-    <string name="home_recent">Añadidos recientemente</string>
-    <string name="home_see_all">Ver todo</string>
+    <string name="home_continue">Continue watching</string>
+    <string name="home_trending">Trending</string>
+    <string name="home_favorites">Your favorites</string>
+    <string name="home_recent">Recently added</string>
+    <string name="home_see_all">See all</string>
+    <string name="home_continue_series">🎬 Watching</string>
+    <string name="home_continue_movie">🎥 Watching</string>
+    <string name="home_continue_book">📖 Reading</string>
+    <string name="greeting_morning">Good morning</string>
+    <string name="greeting_afternoon">Good afternoon</string>
+    <string name="greeting_night">Good night</string>
 
     <!-- Discover -->
     <string name="discover_title">Discover</string>
@@ -97,6 +103,14 @@
     <string name="theme_active">ACTIVE</string>
     <string name="theme_auto">Follow system</string>
     <string name="theme_auto_subtitle">Use Light during the day and Dark at night</string>
+    <string name="theme_blurb_fantasy">Lilac, pink and a touch of magic ✨</string>
+    <string name="theme_blurb_light">Warm and clean. Perfect for daytime.</string>
+    <string name="theme_blurb_purple">Deep purples with a pinch of pink. Cozy nighttime.</string>
+    <string name="theme_blurb_dark">Deep black, steel blue accent. Sober and focused.</string>
+    <string name="theme_name_fantasy">Fantasy</string>
+    <string name="theme_name_light">Light</string>
+    <string name="theme_name_purple">Purple</string>
+    <string name="theme_name_dark">Dark</string>
 
     <!-- Forgot / change password -->
     <string name="forgot_password">Forgot password?</string>
@@ -232,6 +246,37 @@
     <string name="detail_series_complete_prompt">You\'ve finished the last season! Mark series as completed?</string>
     <string name="detail_action_complete">Complete</string>
     <string name="detail_action_advance">Advance</string>
+    <string name="detail_go_to_page_title">Go to page</string>
+    <string name="detail_go_to_page_label">Page number</string>
+    <string name="detail_go_to_page_hint">Tap to go to page…</string>
+    <string name="detail_go_to_page_confirm">Go</string>
+    <string name="profile_language_system">System default</string>
+    <string name="profile_language_spanish">Spanish</string>
+    <string name="profile_language_english">English</string>
+    <string name="profile_language_dialog_title">Choose language</string>
+
+    <!-- Onboarding -->
+    <string name="onboarding_skip">Skip</string>
+    <string name="onboarding_next">Next</string>
+    <string name="onboarding_start">Get started!</string>
+    <string name="onboarding_add_title">Add content</string>
+    <string name="onboarding_add_desc">Search for your favorite series, movies and books and add them to your library with one tap.</string>
+    <string name="onboarding_track_title">Track your progress</string>
+    <string name="onboarding_track_desc">Mark episodes as watched, update your reading progress and keep a record of everything you consume.</string>
+    <string name="onboarding_xp_title">Earn XP and level up</string>
+    <string name="onboarding_xp_desc">Complete items, maintain streaks and unlock achievements to climb the leaderboard.</string>
+
+    <!-- Email Verification -->
+    <string name="profile_verify_email_title">Verify your email</string>
+    <string name="profile_verify_email_subtitle">Confirm your email address to secure your account</string>
+    <string name="profile_verify_email_button">Send verification</string>
+    <string name="profile_verify_email_sent">Verification email sent! Check your inbox.</string>
+
+    <!-- Profile fallbacks & labels -->
+    <string name="profile_default_name">User</string>
+    <string name="profile_level_format">Lv.%1$d · %2$s</string>
+    <string name="home_trending_badge">TRENDING</string>
+    <string name="streak_format">🔥 %1$d</string>
 
     <!-- Import -->
     <string name="import_title">Import</string>
