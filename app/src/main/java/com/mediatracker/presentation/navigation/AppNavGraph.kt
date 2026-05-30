@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,12 +32,14 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import com.mediatracker.MainActivity
 import com.mediatracker.R
 import com.mediatracker.domain.model.MediaItem
 import com.mediatracker.domain.model.MediaType
 import com.mediatracker.presentation.auth.AuthViewModel
 import com.mediatracker.presentation.auth.LoginScreen
 import com.mediatracker.presentation.achievements.AchievementsScreen
+import com.mediatracker.presentation.onboarding.OnboardingScreen
 import com.mediatracker.presentation.detail.DetailScreen
 import com.mediatracker.presentation.leaderboard.LeaderboardScreen
 import com.mediatracker.presentation.discover.DiscoverScreen
@@ -62,6 +65,12 @@ import androidx.compose.material.icons.filled.Search
 @Composable
 fun AppNavGraph(
     onThemeChange: (AppTheme) -> Unit = {},
+    useSystemTheme: Boolean = false,
+    onUseSystemThemeChange: (Boolean) -> Unit = {},
+    pendingDetailDeepLink: MainActivity.DetailDeepLink? = null,
+    onDetailDeepLinkConsumed: () -> Unit = {},
+    onboardingNeeded: Boolean = false,
+    onOnboardingComplete: () -> Unit = {},
 ) {
     val rootNavController = rememberNavController()
     val authViewModel: AuthViewModel = viewModel()
@@ -69,13 +78,27 @@ fun AppNavGraph(
 
     NavHost(
         navController = rootNavController,
-        startDestination = if (uiState.isLoggedIn) Route.MainGraph else Route.Login,
+        startDestination = if (uiState.isLoggedIn) {
+            if (onboardingNeeded) Route.Onboarding else Route.MainGraph
+        } else Route.Login,
     ) {
         composable<Route.Login> {
             LoginScreen(
                 onLoginSuccess = {
-                    rootNavController.navigate(Route.MainGraph) {
+                    val destination = if (onboardingNeeded) Route.Onboarding else Route.MainGraph
+                    rootNavController.navigate(destination) {
                         popUpTo<Route.Login> { inclusive = true }
+                    }
+                },
+            )
+        }
+
+        composable<Route.Onboarding> {
+            OnboardingScreen(
+                onComplete = {
+                    onOnboardingComplete()
+                    rootNavController.navigate(Route.MainGraph) {
+                        popUpTo<Route.Onboarding> { inclusive = true }
                     }
                 },
             )
@@ -85,6 +108,10 @@ fun AppNavGraph(
             MainScreen(
                 authViewModel = authViewModel,
                 onThemeChange = onThemeChange,
+                useSystemTheme = useSystemTheme,
+                onUseSystemThemeChange = onUseSystemThemeChange,
+                pendingDetailDeepLink = pendingDetailDeepLink,
+                onDetailDeepLinkConsumed = onDetailDeepLinkConsumed,
             )
         }
     }
@@ -94,8 +121,18 @@ fun AppNavGraph(
 private fun MainScreen(
     authViewModel: AuthViewModel,
     onThemeChange: (AppTheme) -> Unit,
+    useSystemTheme: Boolean,
+    onUseSystemThemeChange: (Boolean) -> Unit,
+    pendingDetailDeepLink: MainActivity.DetailDeepLink?,
+    onDetailDeepLinkConsumed: () -> Unit,
 ) {
     val navController = rememberNavController()
+
+    LaunchedEffect(pendingDetailDeepLink) {
+        val link = pendingDetailDeepLink ?: return@LaunchedEffect
+        navController.navigate(Route.Detail(link.apiId, link.mediaType))
+        onDetailDeepLinkConsumed()
+    }
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
 
@@ -221,10 +258,12 @@ private fun MainScreen(
                 ) {
                     ThemeScreen(
                         currentTheme = LocalAppTheme.current,
+                        useSystemTheme = useSystemTheme,
                         onThemeSelected = { theme ->
                             onThemeChange(theme)
                             navController.popBackStack()
                         },
+                        onUseSystemThemeChange = onUseSystemThemeChange,
                         onBack = { navController.popBackStack() },
                     )
                 }
