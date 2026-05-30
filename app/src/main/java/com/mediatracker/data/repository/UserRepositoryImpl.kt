@@ -3,6 +3,7 @@ package com.mediatracker.data.repository
 import com.mediatracker.data.firestore.FirestoreDataSource
 import com.mediatracker.data.local.MediaItemDao
 import com.mediatracker.data.local.UserItemDao
+import com.mediatracker.data.local.UserItemEntity
 import com.mediatracker.data.local.toDomain
 import com.mediatracker.data.local.toEntity
 import com.mediatracker.domain.model.ItemStatus
@@ -27,29 +28,32 @@ class UserRepositoryImpl @Inject constructor(
         userItemDao.getAll().map { entities ->
             entities.map { entity ->
                 val domain = entity.toDomain()
-                // Backfill: if UserItem has no posterUrl, try to recover from media_items cache
-                if (domain.posterUrl.isNullOrBlank()) {
-                    val mediaId = "${domain.mediaType.name.lowercase()}_${domain.apiId}"
-                    val mediaEntity = mediaItemDao.getById(mediaId)
-                    if (mediaEntity != null && mediaEntity.posterUrl.isNotBlank()) {
-                        domain.copy(posterUrl = mediaEntity.posterUrl)
-                    } else {
-                        domain
-                    }
-                } else {
-                    domain
+                val mediaId = "${domain.mediaType.name.lowercase()}_${domain.apiId}"
+                val mediaEntity = mediaItemDao.getById(mediaId)
+                var enriched = domain
+                if (domain.posterUrl.isNullOrBlank() && mediaEntity?.posterUrl?.isNotBlank() == true) {
+                    enriched = enriched.copy(posterUrl = mediaEntity.posterUrl)
                 }
+                if (domain.title.isBlank() && mediaEntity?.title?.isNotBlank() == true) {
+                    enriched = enriched.copy(title = mediaEntity.title)
+                }
+                enriched
             }
         }
 
     override suspend fun syncUserItems(): Result<Unit> = runCatching {
         firestoreDataSource.getUserItems().onSuccess { items ->
-            items.forEach { item ->
-                val existing = userItemDao.getById(item.id)
-                if (existing == null) {
-                    userItemDao.insert(item.toEntity())
-                } else if (existing.updatedAt < item.updatedAt) {
-                    userItemDao.insert(item.copy(posterUrl = item.posterUrl ?: existing.posterUrl).toEntity())
+            items.forEach { remote ->
+                val existing = userItemDao.getById(remote.id)
+                when {
+                    existing == null -> userItemDao.insert(remote.toEntity())
+                    existing.updatedAt < remote.updatedAt -> {
+                        val merged = mergeRemoteOverLocal(remote, existing.toDomain())
+                        userItemDao.insert(merged.toEntity())
+                    }
+                    existing.updatedAt > remote.updatedAt -> {
+                        firestoreDataSource.upsertUserItem(existing.toDomain())
+                    }
                 }
             }
         }.onFailure { Timber.w(it, "Firestore sync failed, using local data") }
@@ -68,17 +72,7 @@ class UserRepositoryImpl @Inject constructor(
     }.onFailure { Timber.e(it, "Add user item failed") }
 
     override suspend fun updateItemStatus(itemId: String, status: ItemStatus): Result<Unit> =
-        runCatching {
-            firestoreDataSource.updateStatus(itemId, status)
-            val entity = userItemDao.getById(itemId)
-                ?: throw NoSuchElementException("Item $itemId not found")
-            userItemDao.insert(
-                entity.copy(
-                    status = status.name,
-                    updatedAt = System.currentTimeMillis(),
-                )
-            )
-        }.onFailure { Timber.e(it, "Update status failed: $itemId") }
+        updateEntity(itemId) { it.copy(status = status.name) }
 
     override suspend fun toggleFavorite(itemId: String): Result<Unit> = runCatching {
         val entity = userItemDao.getById(itemId)
@@ -86,14 +80,7 @@ class UserRepositoryImpl @Inject constructor(
         if (entity.status == ItemStatus.ABANDONED.name) {
             throw IllegalStateException("Cannot favorite abandoned items")
         }
-        val newFavorite = !entity.favorite
-        firestoreDataSource.toggleFavorite(itemId, newFavorite)
-        userItemDao.insert(
-            entity.copy(
-                favorite = newFavorite,
-                updatedAt = System.currentTimeMillis(),
-            )
-        )
+        updateEntity(itemId) { it.copy(favorite = !entity.favorite) }.getOrThrow()
     }.onFailure { Timber.e(it, "Toggle favorite failed: $itemId") }
 
     override suspend fun removeUserItem(itemId: String): Result<Unit> = runCatching {
@@ -102,65 +89,48 @@ class UserRepositoryImpl @Inject constructor(
     }.onFailure { Timber.e(it, "Remove user item failed: $itemId") }
 
     override suspend fun updateUserRating(itemId: String, rating: Int?): Result<Unit> =
-        runCatching {
-            val entity = userItemDao.getById(itemId)
-                ?: throw NoSuchElementException("Item $itemId not found")
-            userItemDao.insert(
-                entity.copy(
-                    userRating = rating,
-                    updatedAt = System.currentTimeMillis(),
-                )
-            )
-        }.onFailure { Timber.e(it, "Update rating failed: $itemId") }
+        updateEntity(itemId) { it.copy(userRating = rating) }
 
     override suspend fun updateUserNotes(itemId: String, notes: String): Result<Unit> =
-    runCatching {
-        val entity = userItemDao.getById(itemId)
-            ?: throw NoSuchElementException("Item $itemId not found")
-        userItemDao.insert(
-            entity.copy(
-                notes = notes,
-                updatedAt = System.currentTimeMillis(),
-            )
-        )
-    }.onFailure { Timber.e(it, "Update notes failed: $itemId") }
+        updateEntity(itemId) { it.copy(notes = notes) }
 
     override suspend fun updateSeasonEpisode(itemId: String, season: Int?, episode: Int?): Result<Unit> =
-        runCatching {
-            val entity = userItemDao.getById(itemId)
-                ?: throw NoSuchElementException("Item $itemId not found")
-            userItemDao.insert(
-                entity.copy(
-                    currentSeason = season,
-                    currentEpisode = episode,
-                    updatedAt = System.currentTimeMillis(),
-                )
-            )
-        }.onFailure { Timber.e(it, "Update season/episode failed: $itemId") }
+        updateEntity(itemId) {
+            it.copy(currentSeason = season, currentEpisode = episode)
+        }
 
     override suspend fun updatePageProgress(itemId: String, currentPage: Int?, totalPages: Int?): Result<Unit> =
-        runCatching {
-            val entity = userItemDao.getById(itemId)
-                ?: throw NoSuchElementException("Item $itemId not found")
-            userItemDao.insert(
-                entity.copy(
-                    currentPage = currentPage,
-                    totalPages = totalPages,
-                    updatedAt = System.currentTimeMillis(),
-                )
-            )
-        }.onFailure { Timber.e(it, "Update page progress failed: $itemId") }
+        updateEntity(itemId) {
+            it.copy(currentPage = currentPage, totalPages = totalPages)
+        }
 
     override suspend fun updateWatchedEpisodes(itemId: String, watchedEpisodes: Map<Int, List<Int>>): Result<Unit> =
         runCatching {
-            val entity = userItemDao.getById(itemId)
-                ?: throw NoSuchElementException("Item $itemId not found")
             val json = if (watchedEpisodes.isEmpty()) "" else Json.encodeToString(watchedEpisodes)
-            userItemDao.insert(
-                entity.copy(
-                    watchedEpisodes = json,
-                    updatedAt = System.currentTimeMillis(),
-                )
-            )
+            updateEntity(itemId) { it.copy(watchedEpisodes = json) }.getOrThrow()
         }.onFailure { Timber.e(it, "Update watched episodes failed: $itemId") }
+
+    private suspend fun updateEntity(
+        itemId: String,
+        transform: (UserItemEntity) -> UserItemEntity,
+    ): Result<Unit> = runCatching {
+        val entity = userItemDao.getById(itemId)
+            ?: throw NoSuchElementException("Item $itemId not found")
+        val updated = transform(entity).copy(updatedAt = System.currentTimeMillis())
+        userItemDao.insert(updated)
+        firestoreDataSource.upsertUserItem(updated.toDomain()).getOrThrow()
+    }.onFailure { Timber.e(it, "Update failed: $itemId") }
+
+    private fun mergeRemoteOverLocal(remote: UserItem, local: UserItem): UserItem =
+        remote.copy(
+            posterUrl = remote.posterUrl ?: local.posterUrl,
+            userRating = remote.userRating ?: local.userRating,
+            notes = remote.notes ?: local.notes,
+            currentSeason = remote.currentSeason ?: local.currentSeason,
+            currentEpisode = remote.currentEpisode ?: local.currentEpisode,
+            currentPage = remote.currentPage ?: local.currentPage,
+            totalPages = remote.totalPages ?: local.totalPages,
+            watchedEpisodes = remote.watchedEpisodes.ifEmpty { local.watchedEpisodes },
+            title = remote.title.ifBlank { local.title.ifBlank { remote.apiId } },
+        )
 }

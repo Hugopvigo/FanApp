@@ -5,6 +5,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -12,14 +13,10 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -47,6 +44,7 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -57,7 +55,6 @@ import com.mediatracker.domain.model.MediaType
 import com.mediatracker.presentation.components.EmptyState
 import com.mediatracker.presentation.components.ErrorState
 import com.mediatracker.presentation.components.GlassSurface
-import com.mediatracker.presentation.components.GradientPoster
 import com.mediatracker.presentation.components.DiscoverScreenSkeleton
 import com.mediatracker.presentation.components.MediaRowSkeleton
 import com.mediatracker.presentation.components.MediaCard
@@ -167,40 +164,25 @@ private fun DiscoverScreenContent(
                     state.isLoadingTrending -> MediaRowSkeleton()
                     state.error != null -> ErrorState(state.error ?: stringResource(R.string.error_unknown))
                     state.trending.isEmpty() -> EmptyState(stringResource(R.string.discover_no_trending))
-                    else -> {
-                        LazyRow(
-                            contentPadding = PaddingValues(horizontal = 16.dp),
-                            horizontalArrangement = Arrangement.spacedBy(14.dp),
-                        ) {
-                            items(state.trending.take(10).mapIndexed { i, item -> i + 1 to item }) { (rank, item) ->
-                                TrendingCard(rank = rank, item = item, onClick = { onItemClick(item) })
-                            }
-                        }
-                    }
+                    else -> AdaptiveGrid(
+                        items = state.trending.take(10),
+                        minCardWidth = 150.dp,
+                        horizontalPadding = 16.dp,
+                        spacing = 12.dp,
+                        onItemClick = onItemClick,
+                    )
                 }
                 Spacer(Modifier.height(24.dp))
             }
             else -> {
                 // ── Search results grid ───────────────────────────────────────
-                Column(
-                    modifier = Modifier.padding(horizontal = 16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
-                ) {
-                    state.searchResults.chunked(3).forEach { rowItems ->
-                        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                            rowItems.forEach { item ->
-                                MediaCard(
-                                    item = item,
-                                    onClick = { onItemClick(item) },
-                                    modifier = Modifier.weight(1f),
-                                )
-                            }
-                            repeat(3 - rowItems.size) {
-                                Spacer(Modifier.weight(1f))
-                            }
-                        }
-                    }
-                }
+                AdaptiveGrid(
+                    items = state.searchResults,
+                    minCardWidth = 150.dp,
+                    horizontalPadding = 16.dp,
+                    spacing = 12.dp,
+                    onItemClick = onItemClick,
+                )
                 Spacer(Modifier.height(16.dp))
             }
         }
@@ -306,52 +288,39 @@ private fun GlassChip(
     }
 }
 
-// ─── Trending card with hollow rank number ────────────────────────────────────
+// ─── Adaptive grid ────────────────────────────────────────────────────────────
 @Composable
-private fun TrendingCard(
-    rank: Int,
-    item: MediaItem,
-    onClick: () -> Unit,
+private fun AdaptiveGrid(
+    items: List<MediaItem>,
+    minCardWidth: Dp,
+    horizontalPadding: Dp,
+    spacing: Dp,
+    onItemClick: (MediaItem) -> Unit,
 ) {
-    val primary = MaterialTheme.colorScheme.primary
-
-    Box(
-        modifier = Modifier.clickable(onClick = onClick),
-        contentAlignment = Alignment.BottomStart,
-    ) {
-        if (item.posterUrl.isNotBlank()) {
-            AsyncImage(
-                model = item.posterUrl,
-                contentDescription = item.title,
-                modifier = Modifier
-                    .padding(start = 28.dp)
-                    .width(110.dp)
-                    .height(165.dp)
-                    .clip(RoundedCornerShape(14.dp)),
-                contentScale = ContentScale.Crop,
-            )
-        } else {
-            GradientPoster(
-                title = item.title,
-                kind = item.mediaType,
-                rating = item.rating,
-                modifier = Modifier
-                    .padding(start = 28.dp)
-                    .width(110.dp)
-                    .height(165.dp),
-            )
+    BoxWithConstraints {
+        val availableWidth = maxWidth - horizontalPadding * 2
+        val columns = maxOf(1, (availableWidth / (minCardWidth + spacing)).toInt())
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = horizontalPadding),
+            verticalArrangement = Arrangement.spacedBy(spacing),
+        ) {
+            items.chunked(columns).forEach { rowItems ->
+                Row(horizontalArrangement = Arrangement.spacedBy(spacing)) {
+                    rowItems.forEach { item ->
+                        MediaCard(
+                            item = item,
+                            onClick = { onItemClick(item) },
+                            modifier = Modifier.weight(1f),
+                        )
+                    }
+                    repeat(columns - rowItems.size) {
+                        Spacer(Modifier.weight(1f))
+                    }
+                }
+            }
         }
-        // Hollow outline rank number
-        Text(
-            text = rank.toString(),
-            style = MaterialTheme.typography.displaySmall.copy(
-                fontFamily = DisplayFontFamily,
-                letterSpacing = (-2).sp,
-            ),
-            fontWeight = FontWeight.Normal,
-            color = primary.copy(alpha = 0.80f),
-            modifier = Modifier.offset(x = (-4).dp, y = 8.dp),
-        )
     }
 }
 
