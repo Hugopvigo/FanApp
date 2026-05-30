@@ -44,6 +44,29 @@ Olvídate de tener 3 apps distintas. Todo tu contenido, un solo sitio.
 
 ---
 
+## 📱 Screenshots
+
+<table>
+  <tr>
+    <td align="center"><b>🏠 Home</b></td>
+    <td align="center"><b>🔍 Discover</b></td>
+  </tr>
+  <tr>
+    <td><img src="docs/screenshot_home.jpg" width="240"/></td>
+    <td><img src="docs/screenshot_discover.jpg" width="240"/></td>
+  </tr>
+  <tr>
+    <td align="center"><b>📚 Library</b></td>
+    <td align="center"><b>👤 Profile</b></td>
+  </tr>
+  <tr>
+    <td><img src="docs/screenshot_library.jpg" width="240"/></td>
+    <td><img src="docs/screenshot_profile.jpg" width="240"/></td>
+  </tr>
+</table>
+
+---
+
 ## ⚙️ Stack Técnico
 
 | Componente | Tecnología |
