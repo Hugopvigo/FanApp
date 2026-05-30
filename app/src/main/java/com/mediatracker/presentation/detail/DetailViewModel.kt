@@ -216,6 +216,7 @@ class DetailViewModel @Inject constructor(
         val currentUserItem = _state.value.userItem ?: return
         val watched = currentUserItem.watchedEpisodes.toMutableMap()
         val seasonEps = watched[season]?.toMutableList() ?: mutableListOf()
+        val isCurrentSeason = season == (currentUserItem.currentSeason ?: 1)
 
         if (episode in seasonEps) {
             seasonEps.remove(episode)
@@ -230,27 +231,28 @@ class DetailViewModel @Inject constructor(
             watched[season] = seasonEps
         }
 
-        val maxWatched = seasonEps.maxOrNull()
-        val newEpisode = if (season == (currentUserItem.currentSeason ?: 1)) {
-            maxWatched ?: 1
+        val isNowWatched = episode in seasonEps
+        val newEpisode = if (isCurrentSeason) {
+            if (isNowWatched) episode else seasonEps.maxOrNull() ?: 1
         } else {
             currentUserItem.currentEpisode ?: 1
         }
 
         viewModelScope.launch {
             updateWatchedEpisodesUseCase(currentUserItem.id, watched)
-            if (newEpisode != currentUserItem.currentEpisode || season != currentUserItem.currentSeason) {
+            if (isCurrentSeason && newEpisode != currentUserItem.currentEpisode) {
                 updateSeasonEpisodeUseCase(currentUserItem.id, season, newEpisode)
             }
 
             val item = _state.value.item ?: return@launch
             val numberOfSeasons = item.extraData?.get("numberOfSeasons")?.toIntOrNull()
             val numberOfEpisodes = item.extraData?.get("numberOfEpisodes")?.toIntOrNull()
-            val avgEpsPerSeason = if (numberOfSeasons != null && numberOfEpisodes != null && numberOfSeasons > 0) {
+            val epsPerSeason = if (numberOfSeasons != null && numberOfEpisodes != null && numberOfSeasons > 0) {
                 numberOfEpisodes / numberOfSeasons
             } else 0
 
-            if (avgEpsPerSeason > 0 && seasonEps.size >= avgEpsPerSeason) {
+            val allSeasonWatched = epsPerSeason > 0 && (1..epsPerSeason).all { it in seasonEps }
+            if (allSeasonWatched) {
                 if (numberOfSeasons != null && season >= numberOfSeasons) {
                     _state.update { it.copy(suggestSeriesComplete = true) }
                 } else {

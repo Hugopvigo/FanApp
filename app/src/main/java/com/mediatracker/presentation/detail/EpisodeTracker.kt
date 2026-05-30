@@ -21,9 +21,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.mediatracker.R
 import com.mediatracker.presentation.theme.fanAppColors
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -40,7 +42,7 @@ fun EpisodeTracker(
 
     Column {
         Text(
-            text = "T$season Episodios",
+            text = stringResource(R.string.detail_season_episodes, season),
             style = MaterialTheme.typography.labelLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
@@ -101,7 +103,12 @@ fun EpisodeTracker(
             )
             Spacer(Modifier.height(4.dp))
             Text(
-                text = "${(progress * 100).toInt()}% ($watchedCount/$numberOfEpisodes)",
+                text = stringResource(
+                    R.string.detail_episode_progress,
+                    (progress * 100).toInt(),
+                    watchedCount,
+                    numberOfEpisodes,
+                ),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )

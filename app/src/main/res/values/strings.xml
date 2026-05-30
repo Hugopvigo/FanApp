@@ -220,6 +220,8 @@
     <string name="detail_tracking">Season / Episode</string>
     <string name="detail_season">Season</string>
     <string name="detail_episode">Episode</string>
+    <string name="detail_season_episodes">S%d Episodes</string>
+    <string name="detail_episode_progress">%1$d%% (%2$d/%3$d)</string>
 
     <!-- Page Tracking -->
     <string name="detail_page_tracking">Reading progress</string>
