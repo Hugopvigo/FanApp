@@ -96,16 +96,24 @@ class DetailViewModel @Inject constructor(
         val currentItem = _state.value.item // capture at click time, not inside coroutine
         viewModelScope.launch {
             _state.update { it.copy(isUpdating = true) }
-            if (currentUserItem == null) {
+            val userItemId = if (currentUserItem == null) {
                 addUserItemUseCase(
                     mediaType = mediaType,
                     apiId = apiId,
                     title = currentItem?.title ?: "",
                     posterUrl = currentItem?.posterUrl,
                     status = status,
-                )
+                ).getOrNull()?.id
             } else {
                 updateItemStatusUseCase(currentUserItem.id, status)
+                currentUserItem.id
+            }
+            if (status == ItemStatus.IN_PROGRESS && mediaType == MediaType.BOOK && userItemId != null) {
+                val pageCount = currentItem?.extraData?.get("pageCount")?.toIntOrNull()
+                val existingTotal = currentUserItem?.totalPages
+                if (pageCount != null && pageCount > 0 && existingTotal == null) {
+                    updatePageProgressUseCase(userItemId, currentUserItem?.currentPage, pageCount)
+                }
             }
             _state.update { it.copy(isUpdating = false) }
         }
