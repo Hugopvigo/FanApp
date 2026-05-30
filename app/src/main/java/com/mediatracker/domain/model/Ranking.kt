@@ -8,5 +8,8 @@ data class Ranking(
     val xp: Int,
     val level: Int,
     val totalCompleted: Int,
+    val seriesCompleted: Int = 0,
+    val moviesCompleted: Int = 0,
+    val booksCompleted: Int = 0,
     val rank: Int,
 )

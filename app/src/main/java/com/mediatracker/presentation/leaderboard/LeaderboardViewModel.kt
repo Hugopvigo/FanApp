@@ -22,6 +22,8 @@ import javax.inject.Inject
 data class LeaderboardUiState(
     val rankings: List<Ranking> = emptyList(),
     val userRank: Int? = null,
+    val userEntry: Ranking? = null,
+    val currentUserId: String? = null,
     val selectedTab: Int = 0,
     val isLoading: Boolean = true,
     val error: String? = null,
@@ -60,8 +62,19 @@ class LeaderboardViewModel @Inject constructor(
             firestoreDataSource.getLeaderboard(category)
                 .onSuccess { list ->
                     val currentUid = authProvider.userId
-                    val userRank = list.indexOfFirst { it.userId == currentUid }.takeIf { it >= 0 }?.plus(1)
-                    _state.update { it.copy(rankings = list, userRank = userRank, isLoading = false, error = null) }
+                    val userIndex = list.indexOfFirst { it.userId == currentUid }
+                    val userRank = userIndex.takeIf { it >= 0 }?.plus(1)
+                    val userEntry = userIndex.takeIf { it >= 0 }?.let { list[it] }
+                    _state.update {
+                        it.copy(
+                            rankings = list,
+                            userRank = userRank,
+                            userEntry = userEntry,
+                            currentUserId = currentUid,
+                            isLoading = false,
+                            error = null,
+                        )
+                    }
                 }
                 .onFailure { e ->
                     Timber.e(e, "Failed to load leaderboard")
@@ -82,6 +95,9 @@ class LeaderboardViewModel @Inject constructor(
                     displayName = displayName,
                     avatarId = avatarId,
                     totalCompleted = snapshot.seriesCompleted + snapshot.moviesCompleted + snapshot.booksCompleted,
+                    seriesCompleted = snapshot.seriesCompleted,
+                    moviesCompleted = snapshot.moviesCompleted,
+                    booksCompleted = snapshot.booksCompleted,
                     xp = snapshot.totalXp,
                     level = snapshot.level,
                 )

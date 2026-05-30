@@ -11,6 +11,7 @@ import com.mediatracker.domain.model.UserItem
 import com.mediatracker.domain.repository.UserRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.serialization.json.Json
 import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -45,10 +46,10 @@ class UserRepositoryImpl @Inject constructor(
         firestoreDataSource.getUserItems().onSuccess { items ->
             items.forEach { item ->
                 val existing = userItemDao.getById(item.id)
-                if (existing == null || existing.updatedAt < item.updatedAt) {
-                    // Preserve existing posterUrl from Room if Firestore has none
-                    val mergedPosterUrl = item.posterUrl ?: existing?.posterUrl
-                    userItemDao.insert(item.copy(posterUrl = mergedPosterUrl).toEntity())
+                if (existing == null) {
+                    userItemDao.insert(item.toEntity())
+                } else if (existing.updatedAt < item.updatedAt) {
+                    userItemDao.insert(item.copy(posterUrl = item.posterUrl ?: existing.posterUrl).toEntity())
                 }
             }
         }.onFailure { Timber.w(it, "Firestore sync failed, using local data") }
@@ -149,4 +150,17 @@ class UserRepositoryImpl @Inject constructor(
                 )
             )
         }.onFailure { Timber.e(it, "Update page progress failed: $itemId") }
+
+    override suspend fun updateWatchedEpisodes(itemId: String, watchedEpisodes: Map<Int, List<Int>>): Result<Unit> =
+        runCatching {
+            val entity = userItemDao.getById(itemId)
+                ?: throw NoSuchElementException("Item $itemId not found")
+            val json = if (watchedEpisodes.isEmpty()) "" else Json.encodeToString(watchedEpisodes)
+            userItemDao.insert(
+                entity.copy(
+                    watchedEpisodes = json,
+                    updatedAt = System.currentTimeMillis(),
+                )
+            )
+        }.onFailure { Timber.e(it, "Update watched episodes failed: $itemId") }
 }

@@ -75,7 +75,7 @@ private val HERO_HEIGHT = 380.dp
 @Composable
 fun DetailScreen(
     onBack: () -> Unit,
-    onNavigateToFanCard: (() -> Unit)? = null,
+    onNavigateToFanCard: ((apiId: String, mediaType: MediaType, rating: Int?) -> Unit)? = null,
     viewModel: DetailViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -95,17 +95,18 @@ fun DetailScreen(
         when {
             state.isLoading -> DetailScreenSkeleton()
             state.error != null -> ErrorState(state.error ?: stringResource(R.string.error_unknown))
-        state.item != null -> DetailContent(
-            state = state,
-            onBack = onBack,
-            onStatusSelected = viewModel::onStatusSelected,
-            onRemoveFromList = viewModel::onRemoveFromList,
-            onToggleFavorite = viewModel::onToggleFavorite,
-            onRatingChanged = viewModel::onRatingChanged,
-            onNotesChanged = viewModel::onNotesChanged,
-            onSeasonEpisodeChanged = viewModel::onSeasonEpisodeChanged,
-            onPageProgressChanged = viewModel::onPageProgressChanged,
-        )
+            state.item != null -> DetailContent(
+                state = state,
+                onBack = onBack,
+                onStatusSelected = viewModel::onStatusSelected,
+                onRemoveFromList = viewModel::onRemoveFromList,
+                onToggleFavorite = viewModel::onToggleFavorite,
+                onRatingChanged = viewModel::onRatingChanged,
+                onNotesChanged = viewModel::onNotesChanged,
+                onSeasonEpisodeChanged = viewModel::onSeasonEpisodeChanged,
+                onPageProgressChanged = viewModel::onPageProgressChanged,
+                onEpisodeToggle = viewModel::onEpisodeToggle,
+            )
         }
 
     if (showRatingCardPrompt && onNavigateToFanCard != null) {
@@ -116,7 +117,10 @@ fun DetailScreen(
             action = {
                 TextButton(onClick = {
                     showRatingCardPrompt = false
-                    onNavigateToFanCard()
+                    val userItem = state.userItem
+                    if (userItem != null) {
+                        onNavigateToFanCard(userItem.apiId, userItem.mediaType, userItem.userRating)
+                    }
                 }) { Text(stringResource(R.string.fancard_share), color = fanColors.gradientAccent.first()) }
             },
             dismissAction = {
@@ -194,6 +198,7 @@ private fun DetailContent(
     onNotesChanged: (String) -> Unit,
     onSeasonEpisodeChanged: (Int?, Int?) -> Unit,
     onPageProgressChanged: (Int?, Int?) -> Unit,
+    onEpisodeToggle: (Int, Int) -> Unit,
 ) {
     val item = state.item ?: return
     val userItem = state.userItem
@@ -328,6 +333,23 @@ private fun DetailContent(
                     episode = userItem.currentEpisode,
                     onChanged = onSeasonEpisodeChanged,
                 )
+
+                val currentSeason = userItem.currentSeason ?: 1
+                val numberOfEpisodes = item.extraData?.get("numberOfEpisodes")?.toIntOrNull()
+                val numberOfSeasons = item.extraData?.get("numberOfSeasons")?.toIntOrNull()
+                val epsPerSeason = if (numberOfEpisodes != null && numberOfSeasons != null && numberOfSeasons > 0) {
+                    numberOfEpisodes / numberOfSeasons
+                } else null
+                val seasonWatched = userItem.watchedEpisodes[currentSeason] ?: emptyList()
+
+                if (epsPerSeason != null && epsPerSeason > 0) {
+                    EpisodeTracker(
+                        season = currentSeason,
+                        numberOfEpisodes = epsPerSeason,
+                        watchedEpisodes = seasonWatched,
+                        onEpisodeToggle = { ep -> onEpisodeToggle(currentSeason, ep) },
+                    )
+                }
             }
 
             if (userItem != null && item.mediaType == MediaType.BOOK && userItem.status == ItemStatus.IN_PROGRESS) {
@@ -657,9 +679,10 @@ private fun DetailContentPreview() {
             onToggleFavorite = {},
             onRatingChanged = {},
             onNotesChanged = {},
-            onSeasonEpisodeChanged = { _, _ -> },
+    onSeasonEpisodeChanged = { _, _ -> },
     onPageProgressChanged = { _, _ -> },
-        )
+    onEpisodeToggle = { _, _ -> },
+)
     }
 }
 

@@ -208,6 +208,8 @@
     <string name="detail_tracking">Temporada / Episodio</string>
     <string name="detail_season">Temporada</string>
     <string name="detail_episode">Episodio</string>
+    <string name="detail_season_episodes">T%1$d Episodios</string>
+    <string name="detail_episode_progress">%1$d%% (%2$d/%3$d)</string>
 
     <!-- Seguimiento de páginas -->
     <string name="detail_page_tracking">Progreso de lectura</string>
@@ -233,3 +235,4 @@
     <string name="stats_total_tracked">Completados por tipo</string>
     <string name="fancard_type_stats">Estadísticas</string>
     <string name="fancard_stats_title">Mis estadísticas</string>
+</resources>

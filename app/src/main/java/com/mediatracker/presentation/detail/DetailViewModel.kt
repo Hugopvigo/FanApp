@@ -17,6 +17,7 @@ import com.mediatracker.domain.usecase.UpdateUserRatingUseCase
 import com.mediatracker.domain.usecase.UpdateUserNotesUseCase
 import com.mediatracker.domain.usecase.UpdateSeasonEpisodeUseCase
 import com.mediatracker.domain.usecase.UpdatePageProgressUseCase
+import com.mediatracker.domain.usecase.UpdateWatchedEpisodesUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -49,6 +50,7 @@ class DetailViewModel @Inject constructor(
     private val updateUserNotesUseCase: UpdateUserNotesUseCase,
     private val updateSeasonEpisodeUseCase: UpdateSeasonEpisodeUseCase,
     private val updatePageProgressUseCase: UpdatePageProgressUseCase,
+    private val updateWatchedEpisodesUseCase: UpdateWatchedEpisodesUseCase,
 ) : ViewModel() {
 
     private val apiId: String = savedStateHandle["apiId"] ?: ""
@@ -94,16 +96,24 @@ class DetailViewModel @Inject constructor(
         val currentItem = _state.value.item // capture at click time, not inside coroutine
         viewModelScope.launch {
             _state.update { it.copy(isUpdating = true) }
-            if (currentUserItem == null) {
+            val userItemId = if (currentUserItem == null) {
                 addUserItemUseCase(
                     mediaType = mediaType,
                     apiId = apiId,
                     title = currentItem?.title ?: "",
                     posterUrl = currentItem?.posterUrl,
                     status = status,
-                )
+                ).getOrNull()?.id
             } else {
                 updateItemStatusUseCase(currentUserItem.id, status)
+                currentUserItem.id
+            }
+            if (status == ItemStatus.IN_PROGRESS && mediaType == MediaType.BOOK && userItemId != null) {
+                val pageCount = currentItem?.extraData?.get("pageCount")?.toIntOrNull()
+                val existingTotal = currentUserItem?.totalPages
+                if (pageCount != null && pageCount > 0 && existingTotal == null) {
+                    updatePageProgressUseCase(userItemId, currentUserItem?.currentPage, pageCount)
+                }
             }
             _state.update { it.copy(isUpdating = false) }
         }
@@ -208,5 +218,58 @@ class DetailViewModel @Inject constructor(
 
     fun onDismissSeriesComplete() {
         _state.update { it.copy(suggestSeriesComplete = false) }
+    }
+
+    fun onEpisodeToggle(season: Int, episode: Int) {
+        val currentUserItem = _state.value.userItem ?: return
+        val watched = currentUserItem.watchedEpisodes.toMutableMap()
+        val seasonEps = watched[season]?.toMutableList() ?: mutableListOf()
+        val isCurrentSeason = season == (currentUserItem.currentSeason ?: 1)
+
+        if (episode in seasonEps) {
+            seasonEps.remove(episode)
+        } else {
+            seasonEps.add(episode)
+            seasonEps.sort()
+        }
+
+        if (seasonEps.isEmpty()) {
+            watched.remove(season)
+        } else {
+            watched[season] = seasonEps
+        }
+
+        val isNowWatched = episode in seasonEps
+        val newEpisode = if (isCurrentSeason) {
+            if (isNowWatched) maxOf(episode, currentUserItem.currentEpisode ?: 1)
+            else seasonEps.maxOrNull() ?: 1
+        } else {
+            currentUserItem.currentEpisode ?: 1
+        }
+
+        viewModelScope.launch {
+            updateWatchedEpisodesUseCase(currentUserItem.id, watched)
+            if (isCurrentSeason && newEpisode != currentUserItem.currentEpisode) {
+                updateSeasonEpisodeUseCase(currentUserItem.id, season, newEpisode)
+            }
+
+            val item = _state.value.item ?: return@launch
+            val numberOfSeasons = item.extraData?.get("numberOfSeasons")?.toIntOrNull()
+            val numberOfEpisodes = item.extraData?.get("numberOfEpisodes")?.toIntOrNull()
+            val epsPerSeason = if (numberOfSeasons != null && numberOfEpisodes != null && numberOfSeasons > 0) {
+                numberOfEpisodes / numberOfSeasons
+            } else 0
+
+            val allSeasonWatched = epsPerSeason > 0 && (1..epsPerSeason).all { it in seasonEps }
+            if (allSeasonWatched) {
+                if (numberOfSeasons != null && season >= numberOfSeasons) {
+                    _state.update { it.copy(suggestSeriesComplete = true) }
+                } else {
+                    _state.update { it.copy(suggestSeasonAdvance = true) }
+                }
+            } else {
+                _state.update { it.copy(suggestSeasonAdvance = false, suggestSeriesComplete = false) }
+            }
+        }
     }
 }

@@ -156,7 +156,7 @@ fun FanCardScreen(
                 FanCardType.RATING -> RatingFanCard(
                     graphicsLayer = graphicsLayer,
                     userName = state.userName,
-                    item = state.topCompleted.firstOrNull(),
+                    item = state.ratingData?.item,
                     fanColors = fanColors,
                 )
                 FanCardType.TOP_MONTH -> TopMonthFanCard(

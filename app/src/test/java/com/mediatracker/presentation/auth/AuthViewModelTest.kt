@@ -39,7 +39,7 @@ class AuthViewModelTest {
         every { authDataSource.getUserEmail() } returns null
         every { authDataSource.getUserName() } returns null
         every { authDataSource.authStateFlow() } returns flowOf(AuthResult())
-        viewModel = AuthViewModel(authDataSource)
+        viewModel = AuthViewModel(authDataSource, mockk(relaxed = true))
     }
 
     @After

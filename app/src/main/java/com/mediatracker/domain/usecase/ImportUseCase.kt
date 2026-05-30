@@ -21,6 +21,7 @@ enum class ImportSource { LETTERBOXD, GOODREADS }
 class ImportUseCase @Inject constructor(
     private val mediaRepository: MediaRepository,
     private val userRepository: UserRepository,
+    private val checkAchievementsUseCase: CheckAchievementsUseCase,
 ) {
     suspend fun preview(inputStream: InputStream, source: ImportSource): ImportPreview =
         withContext(Dispatchers.IO) {
@@ -96,6 +97,8 @@ class ImportUseCase @Inject constructor(
                     Timber.e(e, "Import failed for item: ${item.title}")
                 }
             }
+
+            checkAchievementsUseCase()
 
             ImportResult(
                 totalAttempted = items.size,

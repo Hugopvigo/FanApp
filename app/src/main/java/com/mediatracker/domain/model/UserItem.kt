@@ -16,6 +16,7 @@ data class UserItem(
     val currentEpisode: Int? = null,
     val currentPage: Int? = null,
     val totalPages: Int? = null,
+    val watchedEpisodes: Map<Int, List<Int>> = emptyMap(),
 )
 
 data class MediaItemWithUserStatus(

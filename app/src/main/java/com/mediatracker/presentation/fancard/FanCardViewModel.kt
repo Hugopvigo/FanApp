@@ -1,5 +1,6 @@
 package com.mediatracker.presentation.fancard
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mediatracker.data.auth.AuthDataSource
@@ -43,11 +44,17 @@ data class FanCardUiState(
 
 @HiltViewModel
 class FanCardViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
     getUserStatsUseCase: GetUserStatsUseCase,
     getDetailedStatsUseCase: GetDetailedStatsUseCase,
     getUserItemsUseCase: GetUserItemsUseCase,
     private val authDataSource: AuthDataSource,
 ) : ViewModel() {
+
+    private val ratingApiId: String? = savedStateHandle["ratingApiId"]
+    private val ratingMediaType: MediaType? = savedStateHandle.get<String>("ratingMediaType")
+        ?.let { runCatching { MediaType.valueOf(it) }.getOrNull() }
+    private val ratingValueFallback: Int? = savedStateHandle["ratingValue"]
 
     private val _userName = MutableStateFlow(authDataSource.getUserName() ?: "Usuario")
     val userName: StateFlow<String> = _userName.asStateFlow()
@@ -71,10 +78,25 @@ class FanCardViewModel @Inject constructor(
             .sortedByDescending { it.userRating ?: 0 }
         val rated = completed.filter { it.userRating != null }
         val avg = if (rated.isNotEmpty()) rated.map { it.userRating!!.toFloat() }.average().toFloat() else 0f
+        val ratingItem = if (ratingApiId != null && ratingMediaType != null) {
+            items.find { it.apiId == ratingApiId && it.mediaType == ratingMediaType }
+        } else {
+            rated.firstOrNull()
+        }
+        val ratingStars = ratingItem?.userRating ?: ratingValueFallback
+        val ratingData = if (ratingItem != null && ratingStars != null) {
+            FanCardRatingData(
+                item = ratingItem,
+                mediaTitle = ratingItem.title,
+                mediaPosterUrl = ratingItem.posterUrl,
+                rating = ratingStars,
+            )
+        } else null
         FanCardUiState(
             stats = stats,
             detailedStats = detailed,
             topCompleted = completed.take(5),
+            ratingData = ratingData,
             avgRating = avg,
             userName = name,
         )

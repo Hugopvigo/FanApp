@@ -141,6 +141,9 @@ class FirestoreDataSource @Inject constructor(
         displayName: String,
         avatarId: String?,
         totalCompleted: Int,
+        seriesCompleted: Int,
+        moviesCompleted: Int,
+        booksCompleted: Int,
         xp: Int,
         level: Int,
     ): Result<Unit> = runCatching {
@@ -152,6 +155,9 @@ class FirestoreDataSource @Inject constructor(
             "displayName" to displayName,
             "avatarId" to (avatarId ?: ""),
             "totalCompleted" to totalCompleted,
+            "seriesCompleted" to seriesCompleted,
+            "moviesCompleted" to moviesCompleted,
+            "booksCompleted" to booksCompleted,
             "xp" to xp,
             "level" to level,
             "updatedAt" to System.currentTimeMillis(),
@@ -164,15 +170,18 @@ class FirestoreDataSource @Inject constructor(
         val db = firestore ?: throw IllegalStateException("Firestore not configured")
         val path = when (category) {
             "yearly" -> "/rankings/yearly/${java.time.Year.now().value}/users"
-            "series", "movies", "books" -> "/rankings/all_time/users"
             else -> "/rankings/all_time/users"
         }
-        val snapshot = db.collection(path)
-            .orderBy("xp", com.google.firebase.firestore.Query.Direction.DESCENDING)
-            .limit(limit.toLong())
-            .get()
-            .await()
-        snapshot.documents.mapIndexed { index, doc ->
+        val query = db.collection(path).let { col ->
+            if (category in listOf("series", "movies", "books")) {
+                col.limit(500L)
+            } else {
+                col.orderBy("xp", com.google.firebase.firestore.Query.Direction.DESCENDING)
+                    .limit(limit.toLong())
+            }
+        }
+        val snapshot = query.get().await()
+        snapshot.documents.map { doc ->
             Ranking(
                 id = doc.id,
                 userId = doc.getString("userId") ?: doc.id,
@@ -181,23 +190,26 @@ class FirestoreDataSource @Inject constructor(
                 xp = doc.getLong("xp")?.toInt() ?: 0,
                 level = doc.getLong("level")?.toInt() ?: 1,
                 totalCompleted = doc.getLong("totalCompleted")?.toInt() ?: 0,
-                rank = index + 1,
+                seriesCompleted = doc.getLong("seriesCompleted")?.toInt() ?: 0,
+                moviesCompleted = doc.getLong("moviesCompleted")?.toInt() ?: 0,
+                booksCompleted = doc.getLong("booksCompleted")?.toInt() ?: 0,
+                rank = 0,
             )
+        }.sortedByDescending {
+            when (category) {
+                "series" -> it.seriesCompleted
+                "movies" -> it.moviesCompleted
+                "books" -> it.booksCompleted
+                else -> it.xp
+            }
+        }.take(limit).mapIndexed { index, ranking ->
+            ranking.copy(rank = index + 1)
         }
     }
 
     suspend fun getUserRank(category: String): Result<Int?> = runCatching {
-        val db = firestore ?: throw IllegalStateException("Firestore not configured")
         val uid = authProvider.userId ?: throw IllegalStateException("User not logged in")
-        val path = when (category) {
-            "yearly" -> "/rankings/yearly/${java.time.Year.now().value}/users"
-            else -> "/rankings/all_time/users"
-        }
-        val snapshot = db.collection(path)
-            .orderBy("xp", com.google.firebase.firestore.Query.Direction.DESCENDING)
-            .get()
-            .await()
-        snapshot.documents.indexOfFirst { it.id == uid }.takeIf { it >= 0 }?.plus(1)
+        getLeaderboard(category).getOrThrow().find { it.userId == uid }?.rank
     }
 }
 

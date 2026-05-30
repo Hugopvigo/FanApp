@@ -1,6 +1,7 @@
 package com.mediatracker.domain.usecase
 
 import com.mediatracker.data.local.AchievementDao
+import com.mediatracker.data.local.StreakDao
 import com.mediatracker.domain.model.ACHIEVEMENT_DEFS
 import com.mediatracker.domain.model.Achievement
 import com.mediatracker.domain.model.AchievementCondition
@@ -15,6 +16,7 @@ import javax.inject.Inject
 
 class GetAchievementsUseCase @Inject constructor(
     private val achievementDao: AchievementDao,
+    private val streakDao: StreakDao,
     private val userRepository: UserRepository,
 ) {
     operator fun invoke(): Flow<List<Achievement>> = combine(
@@ -32,13 +34,14 @@ class GetAchievementsUseCase @Inject constructor(
         val hasMovies = activeItems.any { it.mediaType == MediaType.MOVIE }
         val hasBooks = activeItems.any { it.mediaType == MediaType.BOOK }
         val distinctTypes = listOf(hasSeries, hasMovies, hasBooks).count { it }
+        val currentStreak = streakDao.get()?.currentStreak ?: 0
 
         ACHIEVEMENT_DEFS.map { def ->
             val entity = entities.find { it.id == def.id }
             val (progress, target) = computeProgress(def, totalItems = activeItems.size,
                 totalCompleted = totalCompleted, seriesCompleted = seriesCompleted,
                 moviesCompleted = moviesCompleted, booksCompleted = booksCompleted,
-                favorites = favorites, distinctTypes = distinctTypes)
+                favorites = favorites, distinctTypes = distinctTypes, currentStreak = currentStreak)
             Achievement(
                 id = def.id,
                 title = def.title,
@@ -61,6 +64,7 @@ class GetAchievementsUseCase @Inject constructor(
         booksCompleted: Int,
         favorites: Int,
         distinctTypes: Int,
+        currentStreak: Int,
     ): Pair<Int, Int> = when (def.condition) {
         AchievementCondition.FIRST_ADD -> minOf(totalItems, def.target) to def.target
         AchievementCondition.FIRST_COMPLETE -> minOf(totalCompleted, def.target) to def.target
@@ -72,7 +76,7 @@ class GetAchievementsUseCase @Inject constructor(
         AchievementCondition.EXPLORER -> minOf(distinctTypes, def.target) to def.target
         AchievementCondition.CURATOR -> minOf(favorites, def.target) to def.target
         AchievementCondition.DIVERSE -> minOf(minOf(seriesCompleted, moviesCompleted, booksCompleted), def.target) to def.target
-        AchievementCondition.STREAK_7 -> 0 to def.target
-        AchievementCondition.STREAK_30 -> 0 to def.target
+        AchievementCondition.STREAK_7 -> minOf(currentStreak, def.target) to def.target
+        AchievementCondition.STREAK_30 -> minOf(currentStreak, def.target) to def.target
     }
 }

@@ -128,7 +128,26 @@ fun LibraryItemCard(
                     val tp = userItem.totalPages
                     if (tp != null && tp > 0 && cp > 0) cp.toFloat() / tp.toFloat() else 0f
                 }
-                MediaType.SERIES -> 0f
+                MediaType.SERIES -> {
+                    val watchedCount = userItem.watchedEpisodes.values.sumOf { it.size }
+                    if (watchedCount > 0) {
+                        val maxSeason = userItem.watchedEpisodes.keys.maxOrNull()
+                            ?: userItem.currentSeason ?: 1
+                        val maxEp = userItem.watchedEpisodes.values.maxOfOrNull { it.maxOrNull() ?: 0 }
+                            ?: userItem.currentEpisode ?: 0
+                        val totalEstimate = (maxSeason * maxOf(maxEp, 10)).coerceAtLeast(watchedCount)
+                        watchedCount.toFloat() / totalEstimate
+                    } else {
+                        val season = userItem.currentSeason ?: 0
+                        val episode = userItem.currentEpisode ?: 0
+                        if (season > 0 && episode > 0) {
+                            val totalEstimate = season * 10
+                            ((season - 1) * 10 + episode).toFloat() / totalEstimate
+                        } else {
+                            0f
+                        }
+                    }
+                }
                 else -> 0f
             }
         if (progress > 0f) {

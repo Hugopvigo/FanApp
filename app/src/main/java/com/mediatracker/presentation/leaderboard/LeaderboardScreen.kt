@@ -130,6 +130,8 @@ fun LeaderboardScreen(
                 LeaderboardList(
                     rankings = state.rankings,
                     userRank = state.userRank,
+                    userEntry = state.userEntry,
+                    currentUserId = state.currentUserId,
                 )
             }
         }
@@ -140,9 +142,10 @@ fun LeaderboardScreen(
 private fun LeaderboardList(
     rankings: List<Ranking>,
     userRank: Int?,
+    userEntry: Ranking?,
+    currentUserId: String?,
 ) {
     val fanColors = MaterialTheme.fanAppColors
-    val currentUserId = "" // We'll rely on userRank to highlight
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -152,24 +155,15 @@ private fun LeaderboardList(
         ),
     ) {
         items(rankings, key = { it.id }) { ranking ->
-            val isCurrentUser = ranking.rank == userRank
+            val isCurrentUser = currentUserId != null && ranking.userId == currentUserId
             RankingRow(ranking = ranking, isHighlighted = isCurrentUser)
         }
 
-        if (userRank != null && userRank > rankings.size) {
+        if (userRank != null && userEntry != null && rankings.none { it.userId == currentUserId }) {
             item {
                 Spacer(Modifier.height(12.dp))
                 RankingRow(
-                    ranking = Ranking(
-                        id = "you",
-                        userId = "you",
-                        displayName = stringResource(R.string.lb_you),
-                        avatarId = null,
-                        xp = 0,
-                        level = 1,
-                        totalCompleted = 0,
-                        rank = userRank,
-                    ),
+                    ranking = userEntry.copy(rank = userRank),
                     isHighlighted = true,
                 )
             }

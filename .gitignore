@@ -49,3 +49,6 @@ DerivedData/
 *.md
 !README.md
 !CHANGELOG.md
+
+# Antigravity CLI tooling
+.antigravitycli/
