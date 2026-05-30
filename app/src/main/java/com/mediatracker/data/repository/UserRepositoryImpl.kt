@@ -46,10 +46,10 @@ class UserRepositoryImpl @Inject constructor(
         firestoreDataSource.getUserItems().onSuccess { items ->
             items.forEach { item ->
                 val existing = userItemDao.getById(item.id)
-                if (existing == null || existing.updatedAt < item.updatedAt) {
-                    // Preserve existing posterUrl from Room if Firestore has none
-                    val mergedPosterUrl = item.posterUrl ?: existing?.posterUrl
-                    userItemDao.insert(item.copy(posterUrl = mergedPosterUrl).toEntity())
+                if (existing == null) {
+                    userItemDao.insert(item.toEntity())
+                } else if (existing.updatedAt < item.updatedAt) {
+                    userItemDao.insert(item.copy(posterUrl = item.posterUrl ?: existing.posterUrl).toEntity())
                 }
             }
         }.onFailure { Timber.w(it, "Firestore sync failed, using local data") }
