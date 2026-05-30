@@ -46,24 +46,16 @@ Olvídate de tener 3 apps distintas. Todo tu contenido, un solo sitio.
 
 ## 📱 Screenshots
 
-<table>
-  <tr>
-    <td align="center"><b>🏠 Home</b></td>
-    <td align="center"><b>🔍 Discover</b></td>
-  </tr>
-  <tr>
-    <td><img src="docs/screenshot_home.jpg" width="240"/></td>
-    <td><img src="docs/screenshot_discover.jpg" width="240"/></td>
-  </tr>
-  <tr>
-    <td align="center"><b>📚 Library</b></td>
-    <td align="center"><b>👤 Profile</b></td>
-  </tr>
-  <tr>
-    <td><img src="docs/screenshot_library.jpg" width="240"/></td>
-    <td><img src="docs/screenshot_profile.jpg" width="240"/></td>
-  </tr>
-</table>
+<div align="center">
+
+| | |
+|:---:|:---:|
+| **🏠 Home** | **🔍 Discover** |
+| <img src="docs/screenshot_home.jpg" width="220"/> | <img src="docs/screenshot_discover.jpg" width="220"/> |
+| **📚 Library** | **👤 Profile** |
+| <img src="docs/screenshot_library.jpg" width="220"/> | <img src="docs/screenshot_profile.jpg" width="220"/> |
+
+</div>
 
 ---
 
@@ -191,10 +183,8 @@ GOOGLE_BOOKS_API_KEY=tu_key
 
 <div align="center">
 
-**FanApp MediaTracker** — Unifica lo que consumes.
+Hecho con ❤️ para Denisa
 
-🚧 En Desarrollo • MVP en construcción • 2026
-
-Hecho por Hugo Perez-Vigo @hugopvigo
+**[Hugo Perez-Vigo](https://hugopvigo.es/)** · [@hugopvigo](http://twitter.com/hugopvigo)
 
 </div>
