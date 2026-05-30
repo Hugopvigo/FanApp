@@ -15,6 +15,7 @@ import com.mediatracker.domain.usecase.UpdatePageProgressUseCase
 import com.mediatracker.domain.usecase.UpdateSeasonEpisodeUseCase
 import com.mediatracker.domain.usecase.UpdateUserNotesUseCase
 import com.mediatracker.domain.usecase.UpdateUserRatingUseCase
+import com.mediatracker.domain.usecase.GetTvSeasonEpisodeCountUseCase
 import com.mediatracker.domain.usecase.UpdateWatchedEpisodesUseCase
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -51,6 +52,7 @@ class DetailViewModelTest {
     private lateinit var getUserItemsUseCase: GetUserItemsUseCase
     private lateinit var updateWatchedEpisodesUseCase: UpdateWatchedEpisodesUseCase
     private lateinit var updateSeasonEpisodeUseCase: UpdateSeasonEpisodeUseCase
+    private lateinit var getTvSeasonEpisodeCountUseCase: GetTvSeasonEpisodeCountUseCase
     private lateinit var itemsFlow: MutableStateFlow<List<UserItem>>
 
     @Before
@@ -60,6 +62,8 @@ class DetailViewModelTest {
         getUserItemsUseCase = mockk()
         updateWatchedEpisodesUseCase = mockk()
         updateSeasonEpisodeUseCase = mockk()
+        getTvSeasonEpisodeCountUseCase = mockk()
+        coEvery { getTvSeasonEpisodeCountUseCase(any(), any()) } returns Result.success(10)
     }
 
     @After
@@ -124,6 +128,7 @@ class DetailViewModelTest {
             updateSeasonEpisodeUseCase = updateSeasonEpisodeUseCase,
             updatePageProgressUseCase = updatePageProgressUseCase,
             updateWatchedEpisodesUseCase = updateWatchedEpisodesUseCase,
+            getTvSeasonEpisodeCountUseCase = getTvSeasonEpisodeCountUseCase,
         )
     }
 
