@@ -11,6 +11,7 @@ import com.mediatracker.domain.model.UserStreak
 import com.mediatracker.domain.usecase.GetMediaDetailUseCase
 import com.mediatracker.domain.usecase.GetTrendingUseCase
 import com.mediatracker.domain.usecase.GetUserItemsUseCase
+import com.mediatracker.domain.usecase.CheckAchievementsUseCase
 import com.mediatracker.domain.usecase.UpdateStreakUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -39,6 +40,7 @@ class HomeViewModel @Inject constructor(
     private val getMediaDetailUseCase: GetMediaDetailUseCase,
     private val authDataSource: AuthDataSource,
     private val updateStreakUseCase: UpdateStreakUseCase,
+    private val checkAchievementsUseCase: CheckAchievementsUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(HomeUiState())
@@ -55,6 +57,7 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             val streak = updateStreakUseCase()
             _state.update { it.copy(currentStreak = streak.currentStreak) }
+            checkAchievementsUseCase()
         }
     }
 
