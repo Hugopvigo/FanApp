@@ -181,10 +181,14 @@ GOOGLE_BOOKS_API_KEY=tu_key
 
 ---
 
+---
+
 <div align="center">
 
 Hecho con ❤️ para Denisa
 
-**[Hugo Perez-Vigo](https://hugopvigo.es/)** · [@hugopvigo](http://twitter.com/hugopvigo)
+**Desarrollado por [Hugo Perez-Vigo](https://hugopvigo.es)** · [@hugopvigo](https://x.com/hugopvigo)
+
+[![GitHub](https://img.shields.io/badge/GitHub-Hugopvigo-181717?style=for-the-badge&logo=github)](https://github.com/Hugopvigo)
 
 </div>
