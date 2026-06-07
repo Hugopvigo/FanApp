@@ -292,4 +292,9 @@
     <string name="stats_total_tracked">Completados por tipo</string>
     <string name="fancard_type_stats">Estadísticas</string>
     <string name="fancard_stats_title">Mis estadísticas</string>
+
+    <!-- Widget -->
+    <string name="widget_description">Muestra tu item en progreso actual</string>
+    <string name="widget_empty_title">Sin items en progreso</string>
+    <string name="widget_empty_body">Añade algo a tu lista de en progreso</string>
 </resources>

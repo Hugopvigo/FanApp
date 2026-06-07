@@ -43,6 +43,7 @@ class MainActivity : ComponentActivity() {
         themeRepository.migrateFromSharedPreferences()
         lifecycleScope.launch { localeRepository.applyStoredLocales() }
         parseDetailDeepLink(intent)?.let { pendingDetail = it }
+        parseWidgetExtras(intent)?.let { pendingDetail = it }
 
         var appTheme by mutableStateOf(AppTheme.Fantasy)
         var useSystemTheme by mutableStateOf(false)
@@ -95,6 +96,7 @@ class MainActivity : ComponentActivity() {
         super.onNewIntent(intent)
         setIntent(intent)
         parseDetailDeepLink(intent)?.let { pendingDetail = it }
+        parseWidgetExtras(intent)?.let { pendingDetail = it }
     }
 
     private fun parseDetailDeepLink(intent: Intent?): DetailDeepLink? {
@@ -105,6 +107,13 @@ class MainActivity : ComponentActivity() {
         val mediaType = runCatching { MediaType.valueOf(segments[0].uppercase()) }.getOrNull() ?: return null
         val apiId = Uri.decode(segments[1])
         if (apiId.isBlank()) return null
+        return DetailDeepLink(apiId = apiId, mediaType = mediaType)
+    }
+
+    private fun parseWidgetExtras(intent: Intent?): DetailDeepLink? {
+        val apiId = intent?.getStringExtra("deep_link_api_id") ?: return null
+        val mediaTypeName = intent.getStringExtra("deep_link_media_type") ?: return null
+        val mediaType = runCatching { MediaType.valueOf(mediaTypeName) }.getOrNull() ?: return null
         return DetailDeepLink(apiId = apiId, mediaType = mediaType)
     }
 }
