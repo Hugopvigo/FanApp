@@ -15,11 +15,39 @@
     kotlinx.serialization.KSerializer serializer(...);
 }
 
+# Keep @Serializable classes in data.remote (DTOs)
 -keep,includedescriptorclasses class com.mediatracker.data.remote.**$$serializer { *; }
 -keepclassmembers class com.mediatracker.data.remote.** {
     *** Companion;
 }
 -keepclasseswithmembers class com.mediatracker.data.remote.** {
+    kotlinx.serialization.KSerializer serializer(...);
+}
+
+# Keep @Serializable navigation route classes (type-safe args)
+-keep,includedescriptorclasses class com.mediatracker.presentation.navigation.**$$serializer { *; }
+-keepclassmembers class com.mediatracker.presentation.navigation.** {
+    *** Companion;
+}
+-keepclasseswithmembers class com.mediatracker.presentation.navigation.** {
+    kotlinx.serialization.KSerializer serializer(...);
+}
+
+# Keep @Serializable CSV import models
+-keep,includedescriptorclasses class com.mediatracker.data.csvimport.**$$serializer { *; }
+-keepclassmembers class com.mediatracker.data.csvimport.** {
+    *** Companion;
+}
+-keepclasseswithmembers class com.mediatracker.data.csvimport.** {
+    kotlinx.serialization.KSerializer serializer(...);
+}
+
+# Keep @Serializable domain enums used in navigation args
+-keep,includedescriptorclasses class com.mediatracker.domain.model.**$$serializer { *; }
+-keepclassmembers class com.mediatracker.domain.model.** {
+    *** Companion;
+}
+-keepclasseswithmembers class com.mediatracker.domain.model.** {
     kotlinx.serialization.KSerializer serializer(...);
 }
 
@@ -37,9 +65,10 @@
 -keep,allowobfuscation,allowshrinking class kotlin.coroutines.Continuation
 
 # Keep OkHttp
--dontwarn okhttp3.**
--dontwarn okio.**
--keep class okhttp3.** { *; }
+-dontwarn okhttp3.internal.platform.**
+-dontwarn org.conscrypt.**
+-dontwarn org.bouncycastle.**
+-dontwarn org.openjsse.**
 
 # Keep Glance widgets
 -keep class androidx.glance.** { *; }

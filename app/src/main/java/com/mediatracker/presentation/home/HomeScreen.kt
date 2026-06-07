@@ -86,8 +86,8 @@ fun HomeScreen(
         contract = ActivityResultContracts.RequestPermission(),
     ) { notificationPermissionAsked = true }
 
-    LaunchedEffect(state.currentStreak) {
-        if (notificationPermissionAsked || state.currentStreak < 7) return@LaunchedEffect
+    LaunchedEffect(Unit) {
+        if (notificationPermissionAsked) return@LaunchedEffect
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             val granted = ContextCompat.checkSelfPermission(
                 context,
@@ -96,6 +96,8 @@ fun HomeScreen(
             if (!granted) {
                 notificationPermissionAsked = true
                 notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            } else {
+                notificationPermissionAsked = true
             }
         }
     }

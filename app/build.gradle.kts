@@ -146,11 +146,11 @@ dependencies {
     implementation(libs.glance.appwidget)
     implementation(libs.glance.material3)
 
-    // WorkManager
-    implementation(libs.work.runtime)
-
     // Firebase Storage
     implementation(libs.firebase.storage)
+
+    // WorkManager (kept for WidgetWorker fallback)
+    implementation(libs.work.runtime)
 
     // Testing
     testImplementation("junit:junit:4.13.2")
@@ -159,5 +159,4 @@ dependencies {
     testImplementation("app.cash.turbine:turbine:1.2.0")
     androidTestImplementation(platform(libs.compose.bom))
     androidTestImplementation(libs.compose.ui.test)
-    debugImplementation(libs.compose.ui.manifest)
 }

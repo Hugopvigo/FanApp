@@ -1,6 +1,7 @@
 package com.mediatracker.data.local
 
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "media_items")
@@ -38,7 +39,10 @@ data class UserItemEntity(
     val watchedEpisodes: String = "",
 )
 
-@Entity(tableName = "notifications")
+@Entity(
+    tableName = "notifications",
+    indices = [Index("isRead"), Index("createdAt")],
+)
 data class NotificationEntity(
     @PrimaryKey val id: String,
     val type: String,

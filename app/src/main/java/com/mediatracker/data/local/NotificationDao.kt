@@ -12,7 +12,7 @@ interface NotificationDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(notification: NotificationEntity)
 
-    @Query("SELECT * FROM notifications ORDER BY createdAt DESC")
+    @Query("SELECT * FROM notifications ORDER BY createdAt DESC LIMIT 200")
     fun getAll(): Flow<List<NotificationEntity>>
 
     @Query("SELECT * FROM notifications WHERE isRead = 0 ORDER BY createdAt DESC")

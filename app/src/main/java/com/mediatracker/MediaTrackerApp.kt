@@ -7,7 +7,6 @@ import android.content.Context
 import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseOptions
 import com.mediatracker.BuildConfig
-import com.mediatracker.presentation.widget.WidgetWorker
 import dagger.hilt.android.HiltAndroidApp
 import timber.log.Timber
 
@@ -20,7 +19,6 @@ class MediaTrackerApp : Application() {
         }
         initializeFirebaseIfNeeded()
         createNotificationChannels()
-        WidgetWorker.schedule(this)
     }
 
     private fun createNotificationChannels() {

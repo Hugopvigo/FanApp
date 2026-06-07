@@ -83,7 +83,7 @@ private fun EmptyState() {
 @OptIn(ExperimentalGlanceApi::class)
 @androidx.compose.runtime.Composable
 private fun ItemContent(item: WidgetItem) {
-    val deepLinkUri = Uri.parse("mediatracker://detail/${item.apiId}")
+    val deepLinkUri = Uri.parse("mediatracker://detail/${item.mediaType.name.lowercase(java.util.Locale.US)}/${Uri.encode(item.apiId)}")
     val intent = Intent(Intent.ACTION_VIEW, deepLinkUri).apply {
         setPackage("com.mediatracker")
         flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
