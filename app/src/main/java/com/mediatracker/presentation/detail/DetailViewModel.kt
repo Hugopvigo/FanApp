@@ -19,6 +19,7 @@ import com.mediatracker.domain.usecase.UpdateSeasonEpisodeUseCase
 import com.mediatracker.domain.usecase.UpdatePageProgressUseCase
 import com.mediatracker.domain.usecase.GetTvSeasonEpisodeCountUseCase
 import com.mediatracker.domain.usecase.UpdateWatchedEpisodesUseCase
+import com.mediatracker.data.analytics.AnalyticsHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -55,6 +56,7 @@ class DetailViewModel @Inject constructor(
     private val updatePageProgressUseCase: UpdatePageProgressUseCase,
     private val updateWatchedEpisodesUseCase: UpdateWatchedEpisodesUseCase,
     private val getTvSeasonEpisodeCountUseCase: GetTvSeasonEpisodeCountUseCase,
+    private val analytics: AnalyticsHelper,
 ) : ViewModel() {
 
     private var watchedBackfillDone = false
@@ -236,6 +238,9 @@ class DetailViewModel @Inject constructor(
         viewModelScope.launch {
             updatePageProgressUseCase(currentUserItem.id, currentPage, totalPages)
             val tp = totalPages ?: _state.value.item?.extraData?.get("pageCount")?.toIntOrNull()
+            if (tp != null && tp > 0 && currentPage != null) {
+                analytics.logPageProgress((currentPage * 100 / tp))
+            }
             if (tp != null && tp > 0 && currentPage != null && currentPage >= tp) {
                 _state.update { it.copy(suggestBookComplete = true) }
             }
@@ -338,6 +343,7 @@ class DetailViewModel @Inject constructor(
             if (isCurrentSeason && newEpisode != currentUserItem.currentEpisode) {
                 updateSeasonEpisodeUseCase(currentUserItem.id, season, newEpisode)
             }
+            analytics.logEpisodeToggle(currentUserItem.mediaType.name)
 
             val item = _state.value.item ?: return@launch
             val numberOfSeasons = item.extraData?.get("numberOfSeasons")?.toIntOrNull()

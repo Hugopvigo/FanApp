@@ -68,6 +68,10 @@ android {
         compose = true
         buildConfig = true
     }
+
+    testOptions {
+        unitTests.isReturnDefaultValues = true
+    }
 }
 
 dependencies {
@@ -107,6 +111,7 @@ dependencies {
     implementation(libs.firebase.auth.ktx)
     implementation(libs.firebase.firestore.ktx)
     implementation(libs.firebase.messaging)
+    implementation(libs.firebase.analytics)
 
     // Room
     implementation(libs.room.runtime)
@@ -140,6 +145,9 @@ dependencies {
     // Glance Widget
     implementation(libs.glance.appwidget)
     implementation(libs.glance.material3)
+
+    // WorkManager
+    implementation(libs.work.runtime)
 
     // Firebase Storage
     implementation(libs.firebase.storage)
