@@ -8,6 +8,7 @@ import androidx.core.app.NotificationCompat
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.mediatracker.MainActivity
+import com.mediatracker.MediaTrackerApp
 import com.mediatracker.R
 import com.mediatracker.data.fcm.FcmTokenRepository
 import com.mediatracker.data.local.NotificationDao
@@ -109,7 +110,7 @@ class FanAppMessagingService : FirebaseMessagingService() {
     }
 
     companion object {
-        const val CHANNEL_ID = "fanapp_push"
+        const val CHANNEL_ID = MediaTrackerApp.CHANNEL_PUSH
         const val CHANNEL_NAME = "FanApp Notifications"
     }
 }

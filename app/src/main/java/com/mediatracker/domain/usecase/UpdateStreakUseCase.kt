@@ -1,18 +1,30 @@
 package com.mediatracker.domain.usecase
 
+import android.app.NotificationManager
+import android.app.PendingIntent
+import android.content.Context
+import android.content.Intent
+import androidx.core.app.NotificationCompat
+import com.mediatracker.MainActivity
+import com.mediatracker.MediaTrackerApp
+import com.mediatracker.R
+import com.mediatracker.data.analytics.AnalyticsHelper
 import com.mediatracker.data.local.NotificationDao
 import com.mediatracker.data.local.NotificationEntity
 import com.mediatracker.data.local.StreakDao
 import com.mediatracker.data.local.StreakEntity
 import com.mediatracker.domain.model.UserStreak
+import dagger.hilt.android.qualifiers.ApplicationContext
 import timber.log.Timber
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
 class UpdateStreakUseCase @Inject constructor(
+    @ApplicationContext private val context: Context,
     private val streakDao: StreakDao,
     private val notificationDao: NotificationDao,
+    private val analytics: AnalyticsHelper,
 ) {
     private val formatter = DateTimeFormatter.ISO_LOCAL_DATE
 
@@ -59,6 +71,8 @@ class UpdateStreakUseCase @Inject constructor(
                         createdAt = now,
                     )
                 )
+                showStreakNotification(milestone.label, milestone.days, milestone.xp)
+                analytics.logStreakMilestone(milestone.days)
                 Timber.i("Streak milestone hit: ${milestone.days} days, +${milestone.xp} XP")
             }
         }
@@ -80,5 +94,31 @@ class UpdateStreakUseCase @Inject constructor(
     suspend fun getStreak(): UserStreak {
         val entity = streakDao.get() ?: return UserStreak(0, 0, "", 0)
         return UserStreak(entity.currentStreak, entity.longestStreak, entity.lastActiveDate, entity.bonusXp)
+    }
+
+    private fun showStreakNotification(label: String, days: Int, xp: Int) {
+        try {
+            val intent = Intent(context, MainActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
+            }
+            val pendingIntent = PendingIntent.getActivity(
+                context, label.hashCode(), intent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+            )
+            val body = "¡$days días consecutivos! +$xp XP bonus"
+            val notification = NotificationCompat.Builder(context, MediaTrackerApp.CHANNEL_STREAKS)
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setContentTitle("🔥 $label")
+                .setContentText(body)
+                .setStyle(NotificationCompat.BigTextStyle().bigText(body))
+                .setAutoCancel(true)
+                .setContentIntent(pendingIntent)
+                .build()
+
+            val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            manager.notify(label.hashCode(), notification)
+        } catch (e: Exception) {
+            Timber.w(e, "Failed to show streak notification")
+        }
     }
 }

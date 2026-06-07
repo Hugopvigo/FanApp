@@ -1,5 +1,14 @@
 package com.mediatracker.domain.usecase
 
+import android.app.NotificationManager
+import android.app.PendingIntent
+import android.content.Context
+import android.content.Intent
+import androidx.core.app.NotificationCompat
+import com.mediatracker.MainActivity
+import com.mediatracker.MediaTrackerApp
+import com.mediatracker.R
+import com.mediatracker.data.analytics.AnalyticsHelper
 import com.mediatracker.data.local.AchievementDao
 import com.mediatracker.data.local.AchievementEntity
 import com.mediatracker.data.local.NotificationDao
@@ -10,15 +19,18 @@ import com.mediatracker.domain.model.AchievementCondition
 import com.mediatracker.domain.model.ItemStatus
 import com.mediatracker.domain.model.MediaType
 import com.mediatracker.domain.repository.UserRepository
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.first
 import timber.log.Timber
 import javax.inject.Inject
 
 class CheckAchievementsUseCase @Inject constructor(
+    @ApplicationContext private val context: Context,
     private val userRepository: UserRepository,
     private val achievementDao: AchievementDao,
     private val notificationDao: NotificationDao,
     private val streakDao: StreakDao,
+    private val analytics: AnalyticsHelper,
 ) {
     suspend operator fun invoke() {
         val items = try {
@@ -77,6 +89,8 @@ class CheckAchievementsUseCase @Inject constructor(
                         createdAt = now,
                     )
                 )
+                showAchievementNotification(def.icon, def.title, def.description)
+                analytics.logAchievementUnlocked(def.id)
                 Timber.i("Achievement unlocked: ${def.id}")
             } else if (existing == null) {
                 achievementDao.insert(
@@ -117,5 +131,30 @@ class CheckAchievementsUseCase @Inject constructor(
         }
         AchievementCondition.STREAK_7 -> (currentStreak >= target) to minOf(currentStreak, target)
         AchievementCondition.STREAK_30 -> (currentStreak >= target) to minOf(currentStreak, target)
+    }
+
+    private fun showAchievementNotification(icon: String, title: String, description: String) {
+        try {
+            val intent = Intent(context, MainActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
+            }
+            val pendingIntent = PendingIntent.getActivity(
+                context, title.hashCode(), intent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+            )
+            val notification = NotificationCompat.Builder(context, MediaTrackerApp.CHANNEL_ACHIEVEMENTS)
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setContentTitle("$icon $title")
+                .setContentText(description)
+                .setStyle(NotificationCompat.BigTextStyle().bigText(description))
+                .setAutoCancel(true)
+                .setContentIntent(pendingIntent)
+                .build()
+
+            val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            manager.notify(title.hashCode(), notification)
+        } catch (e: Exception) {
+            Timber.w(e, "Failed to show achievement notification")
+        }
     }
 }
