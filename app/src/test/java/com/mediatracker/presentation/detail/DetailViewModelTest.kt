@@ -17,6 +17,7 @@ import com.mediatracker.domain.usecase.UpdateUserNotesUseCase
 import com.mediatracker.domain.usecase.UpdateUserRatingUseCase
 import com.mediatracker.domain.usecase.GetTvSeasonEpisodeCountUseCase
 import com.mediatracker.domain.usecase.UpdateWatchedEpisodesUseCase
+import com.mediatracker.data.analytics.AnalyticsHelper
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
@@ -47,6 +48,7 @@ class DetailViewModelTest {
     private val updateUserRatingUseCase = mockk<UpdateUserRatingUseCase>(relaxed = true)
     private val updateUserNotesUseCase = mockk<UpdateUserNotesUseCase>(relaxed = true)
     private val updatePageProgressUseCase = mockk<UpdatePageProgressUseCase>(relaxed = true)
+    private val analytics = mockk<AnalyticsHelper>(relaxed = true)
 
     private lateinit var getMediaDetailUseCase: GetMediaDetailUseCase
     private lateinit var getUserItemsUseCase: GetUserItemsUseCase
@@ -129,6 +131,7 @@ class DetailViewModelTest {
             updatePageProgressUseCase = updatePageProgressUseCase,
             updateWatchedEpisodesUseCase = updateWatchedEpisodesUseCase,
             getTvSeasonEpisodeCountUseCase = getTvSeasonEpisodeCountUseCase,
+            analytics = analytics,
         )
     }
 
