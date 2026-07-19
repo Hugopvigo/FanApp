@@ -18,21 +18,14 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -46,11 +39,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.ui.res.stringResource
+import com.mediatracker.R
+import com.mediatracker.presentation.components.GlassBackHeader
 import com.mediatracker.domain.usecase.ImportSource
 import com.mediatracker.presentation.theme.DisplayFontFamily
 import com.mediatracker.presentation.theme.fanAppColors
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ImportScreen(
     onBack: () -> Unit,
@@ -69,24 +64,10 @@ fun ImportScreen(
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background),
     ) {
-        TopAppBar(
-            title = {
-                Text(
-                    "Importar",
-                    style = MaterialTheme.typography.titleLarge.copy(
-                        fontFamily = DisplayFontFamily,
-                        fontWeight = FontWeight.Normal,
-                        letterSpacing = (-0.3).sp,
-                    ),
-                )
-            },
-            navigationIcon = {
-                IconButton(onClick = onBack) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
-                }
-            },
-            colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
-            modifier = Modifier.statusBarsPadding(),
+        Spacer(Modifier.statusBarsPadding())
+        GlassBackHeader(
+            title = stringResource(R.string.import_title),
+            onBack = onBack,
         )
 
         when (state.step) {
