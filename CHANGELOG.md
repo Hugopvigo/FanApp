@@ -1,5 +1,13 @@
 # Changelog
 
+## Fase 2+3 — Coherencia glass y animaciones (2026-07-19)
+
+### Changed
+- Notificaciones, Tema, Privacidad, Cambiar contraseña e Importar migradas al estilo glass iOS26 (GlassBackHeader, sin TopAppBar Material).
+- Ficha de detalle: valoración/notas, tracking de series, progreso de libro y sinopsis agrupados en cards glass.
+- MediaCard: animación de escala al pulsar y póster fluido 2:3 que llena la celda en las rejillas.
+- Descubrir: eliminado el "Ver más" hardcodeado y no funcional.
+
 ## Fase 1 — Arreglos rápidos (2026-07-19)
 
 ### Fixed
