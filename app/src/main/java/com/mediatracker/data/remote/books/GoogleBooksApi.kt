@@ -10,6 +10,7 @@ interface GoogleBooksApi {
     suspend fun searchBooks(
         @Query("q") query: String,
         @Query("langRestrict") langRestrict: String,
+        @Query("orderBy") orderBy: String = "relevance",
         @Query("maxResults") maxResults: Int = 20,
         @Query("startIndex") startIndex: Int = 0,
         @Query("printType") printType: String = "books",

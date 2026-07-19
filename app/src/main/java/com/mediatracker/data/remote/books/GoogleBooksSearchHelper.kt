@@ -3,11 +3,9 @@ package com.mediatracker.data.remote.books
 /**
  * Builds a smarter Google Books search query from raw user input.
  *
- * Detects ISBNs, author names, and general queries to construct
- * the most effective [q] parameter using Google Books advanced syntax:
- *   intitle:   → search only in titles
- *   inauthor:  → search only in authors
- *   isbn:      → exact ISBN match
+ * Detects ISBNs to construct the most effective [q] parameter using
+ * Google Books advanced syntax (isbn: → exact ISBN match); everything
+ * else relies on Google Books full-text relevance.
  */
 fun buildGoogleBooksQuery(rawQuery: String): String {
     val trimmed = rawQuery.trim()
@@ -26,23 +24,11 @@ fun buildGoogleBooksQuery(rawQuery: String): String {
         return "isbn:$isbnPart"
     }
 
-    // 3. Author-like queries: short (≤3 words), each word starts with uppercase
-    //    e.g. "Tolkien", "Gabriel García Márquez", "Stephen King"
-    val words = trimmed.split(" ")
-    val looksLikeAuthor = words.size <= 4 &&
-        words.all { w ->
-            w.isNotEmpty() && w.first().isUpperCase() &&
-            w.none { it.isDigit() }
-        }
-
-    // 4. Use the raw query as-is — Google Books handles full-text search well.
-    //    For author-like queries we boost with inauthor: to improve precision.
-    return if (looksLikeAuthor) {
-        // Try exact title match first, fall back to author + title broad search
-        "\"$trimmed\""
-    } else {
-        trimmed
-    }
+    // 3. General query: send as-is. Google Books full-text relevance handles
+    //    authors and titles well; forcing an exact phrase ("Stephen King")
+    //    restricted results, and no heuristic can tell an author name from a
+    //    capitalized title ("La Sombra Del Viento").
+    return trimmed
 }
 
 /**
