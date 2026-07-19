@@ -156,7 +156,6 @@ private fun DiscoverScreenContent(
                 // ── Trending top section ──────────────────────────────────────
                 SectionRow(
                     title = stringResource(R.string.discover_top_trending),
-                    action = "Ver más",
                 )
                 Spacer(Modifier.height(10.dp))
                 when {
