@@ -38,15 +38,22 @@ funciones ni enviar correo al registrarse).
   refresco inmediato. Se mantiene el botón de reenviar.
 
 ### 1c. Relevancia de búsqueda de libros
-- `buildGoogleBooksQuery`: las consultas tipo autor ("Stephen King") usan
-  `inauthor:"..."` en vez de frase exacta.
-- `MediaRepositoryImpl.searchBooks`: deduplicación por ISBN cuando exista, si
-  no por (título normalizado + primer autor). `orderBy=relevance` explícito.
+- `buildGoogleBooksQuery`: se elimina la conversión a frase exacta de las
+  consultas "tipo autor" — el heurístico no puede distinguir "Stephen King" de
+  "La Sombra Del Viento" y la frase exacta restringe resultados. La consulta se
+  envía tal cual (la relevancia full-text de Google Books gestiona bien autores
+  y títulos). Se mantiene la detección de ISBN.
+- `MediaRepositoryImpl.searchBooks`: deduplicación por (título normalizado +
+  primer autor) — la proyección `lite` no incluye ISBN. `orderBy=relevance`
+  explícito en la API de búsqueda.
 
 ### 1d. Trending real de libros
 - `getTrendingBooks`: Open Library `trending/daily` como fuente primaria
-  (hoy es fallback). Complemento de portadas vía Google Books si faltan.
-  Se eliminan las `BOOKS_TRENDING_QUERIES` rotatorias.
+  (hoy es fallback; su mapper ya descarta items sin portada). Google Books
+  (`subject:fiction`) queda como complemento/fallback si Open Library falla o
+  devuelve pocos resultados. Se eliminan las `BOOKS_TRENDING_QUERIES`
+  rotatorias. Trade-off aceptado: el trending de Open Library es global
+  (mayoría en inglés).
 
 ### Tests Fase 1
 - Unit tests: query builder (autor/ISBN/genérico) y deduplicación.
