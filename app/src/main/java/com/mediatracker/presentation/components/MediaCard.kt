@@ -1,8 +1,14 @@
 package com.mediatracker.presentation.components
 
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,9 +22,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -33,7 +42,6 @@ import com.mediatracker.domain.model.MediaType
 import com.mediatracker.presentation.theme.DisplayFontFamily
 import com.mediatracker.presentation.theme.AppTheme
 import com.mediatracker.presentation.theme.MediaTrackerTheme
-import com.mediatracker.presentation.theme.fanAppColors
 
 private val POSTER_GRADIENTS = listOf(
     listOf(Color(0xFFFFB3D1), Color(0xFFF06292)),
@@ -164,21 +172,38 @@ fun MediaCard(
     modifier: Modifier = Modifier,
     showFavBadge: Boolean = false,
 ) {
-    val fanColors = MaterialTheme.fanAppColors
+    val interactionSource = remember { MutableInteractionSource() }
+    val pressed by interactionSource.collectIsPressedAsState()
+    val scale by animateFloatAsState(
+        targetValue = if (pressed) 0.95f else 1f,
+        animationSpec = spring(stiffness = Spring.StiffnessMediumLow),
+        label = "cardPressScale",
+    )
 
     Column(
         modifier = modifier
             .width(120.dp)
-            .clickable(onClick = onClick),
+            .graphicsLayer {
+                scaleX = scale
+                scaleY = scale
+            }
+            .clickable(
+                interactionSource = interactionSource,
+                indication = null,
+                onClick = onClick,
+            ),
         verticalArrangement = Arrangement.spacedBy(5.dp),
     ) {
         Box {
+            // fillMaxWidth + ratio 2:3: en LazyRow mide 120x180; en rejillas con
+            // weight llena la celda en cualquier tamaño de pantalla
             if (item.posterUrl.isNotBlank()) {
                 AsyncImage(
                     model = item.posterUrl,
                     contentDescription = item.title,
                     modifier = Modifier
-                        .size(width = 120.dp, height = 180.dp)
+                        .fillMaxWidth()
+                        .aspectRatio(2f / 3f)
                         .clip(RoundedCornerShape(14.dp)),
                     contentScale = ContentScale.Crop,
                 )
@@ -187,7 +212,9 @@ fun MediaCard(
                     title = item.title,
                     kind = item.mediaType,
                     rating = item.rating,
-                    modifier = Modifier.size(width = 120.dp, height = 180.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .aspectRatio(2f / 3f),
                 )
             }
             // Fav sparkle badge
