@@ -68,6 +68,7 @@ import com.mediatracker.domain.model.displayLabel
 import com.mediatracker.presentation.components.DetailScreenSkeleton
 import com.mediatracker.presentation.components.ErrorState
 import com.mediatracker.presentation.components.FavoriteToggle
+import com.mediatracker.presentation.components.GlassSurface
 import com.mediatracker.presentation.components.StatusChip
 import com.mediatracker.presentation.theme.AppTheme
 import com.mediatracker.presentation.theme.DisplayFontFamily
@@ -320,73 +321,93 @@ private fun DetailContent(
                 }
 
                 if (userItem != null) {
-                    FavoriteToggle(
-                        isFavorite = userItem.favorite,
-                        onToggle = onToggleFavorite,
-                        enabled = userItem.status != ItemStatus.ABANDONED,
-                    )
-                }
-
-                if (userItem != null) {
-                    StarRatingBar(
-                        rating = userItem.userRating,
-                        onRatingChanged = onRatingChanged,
-                    )
-                }
-
-                if (userItem != null) {
-                    NotesField(
-                        notes = userItem.notes.orEmpty(),
-                        onNotesChanged = onNotesChanged,
-                    )
+                    GlassSurface(modifier = Modifier.fillMaxWidth(), radius = 18.dp) {
+                        Column(
+                            modifier = Modifier.padding(14.dp),
+                            verticalArrangement = Arrangement.spacedBy(14.dp),
+                        ) {
+                            FavoriteToggle(
+                                isFavorite = userItem.favorite,
+                                onToggle = onToggleFavorite,
+                                enabled = userItem.status != ItemStatus.ABANDONED,
+                            )
+                            StarRatingBar(
+                                rating = userItem.userRating,
+                                onRatingChanged = onRatingChanged,
+                            )
+                            NotesField(
+                                notes = userItem.notes.orEmpty(),
+                                onNotesChanged = onNotesChanged,
+                            )
+                        }
+                    }
                 }
 
                 if (userItem != null && item.mediaType == MediaType.SERIES && userItem.status == ItemStatus.IN_PROGRESS) {
-                    SeasonEpisodeStepper(
-                        season = userItem.currentSeason,
-                        episode = userItem.currentEpisode,
-                        onChanged = onSeasonEpisodeChanged,
-                    )
+                    GlassSurface(modifier = Modifier.fillMaxWidth(), radius = 18.dp) {
+                        Column(
+                            modifier = Modifier.padding(14.dp),
+                            verticalArrangement = Arrangement.spacedBy(14.dp),
+                        ) {
+                            SeasonEpisodeStepper(
+                                season = userItem.currentSeason,
+                                episode = userItem.currentEpisode,
+                                onChanged = onSeasonEpisodeChanged,
+                            )
 
-                    val currentSeason = userItem.currentSeason ?: 1
-                    val numberOfEpisodes = item.extraData?.get("numberOfEpisodes")?.toIntOrNull()
-                    val numberOfSeasons = item.extraData?.get("numberOfSeasons")?.toIntOrNull()
-                    val epsPerSeason = state.seasonEpisodeCount
-                        ?: if (numberOfEpisodes != null && numberOfSeasons != null && numberOfSeasons > 0) {
-                            numberOfEpisodes / numberOfSeasons
-                        } else null
-                    val seasonWatched = userItem.watchedEpisodes[currentSeason] ?: emptyList()
+                            val currentSeason = userItem.currentSeason ?: 1
+                            val numberOfEpisodes = item.extraData?.get("numberOfEpisodes")?.toIntOrNull()
+                            val numberOfSeasons = item.extraData?.get("numberOfSeasons")?.toIntOrNull()
+                            val epsPerSeason = state.seasonEpisodeCount
+                                ?: if (numberOfEpisodes != null && numberOfSeasons != null && numberOfSeasons > 0) {
+                                    numberOfEpisodes / numberOfSeasons
+                                } else null
+                            val seasonWatched = userItem.watchedEpisodes[currentSeason] ?: emptyList()
 
-                    if (epsPerSeason != null && epsPerSeason > 0) {
-                        EpisodeTracker(
-                            season = currentSeason,
-                            numberOfEpisodes = epsPerSeason,
-                            watchedEpisodes = seasonWatched,
-                            onEpisodeToggle = { ep -> onEpisodeToggle(currentSeason, ep) },
-                        )
+                            if (epsPerSeason != null && epsPerSeason > 0) {
+                                EpisodeTracker(
+                                    season = currentSeason,
+                                    numberOfEpisodes = epsPerSeason,
+                                    watchedEpisodes = seasonWatched,
+                                    onEpisodeToggle = { ep -> onEpisodeToggle(currentSeason, ep) },
+                                )
+                            }
+                        }
                     }
                 }
 
                 if (userItem != null && item.mediaType == MediaType.BOOK && userItem.status == ItemStatus.IN_PROGRESS) {
-                    PageProgressStepper(
-                        currentPage = userItem.currentPage,
-                        totalPages = userItem.totalPages,
-                        apiPageCount = item.extraData?.get("pageCount")?.toIntOrNull(),
-                        onChanged = onPageProgressChanged,
-                        onGoToPageClick = onOpenGoToPageDialog,
-                    )
+                    GlassSurface(modifier = Modifier.fillMaxWidth(), radius = 18.dp) {
+                        Column(modifier = Modifier.padding(14.dp)) {
+                            PageProgressStepper(
+                                currentPage = userItem.currentPage,
+                                totalPages = userItem.totalPages,
+                                apiPageCount = item.extraData?.get("pageCount")?.toIntOrNull(),
+                                onChanged = onPageProgressChanged,
+                                onGoToPageClick = onOpenGoToPageDialog,
+                            )
+                        }
+                    }
                 }
 
-                if (item.overview.isNotBlank()) {
-                    Text(
-                        text = item.overview,
-                        style = MaterialTheme.typography.bodyMedium,
-                        maxLines = 10,
-                        overflow = TextOverflow.Ellipsis,
-                    )
+                if (item.overview.isNotBlank() || item.extraData != null) {
+                    GlassSurface(modifier = Modifier.fillMaxWidth(), radius = 18.dp) {
+                        Column(
+                            modifier = Modifier.padding(14.dp),
+                            verticalArrangement = Arrangement.spacedBy(10.dp),
+                        ) {
+                            if (item.overview.isNotBlank()) {
+                                Text(
+                                    text = item.overview,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    maxLines = 10,
+                                    overflow = TextOverflow.Ellipsis,
+                                )
+                            }
+                            item.extraData?.let { ExtraInfo(extra = it, mediaType = item.mediaType) }
+                        }
+                    }
                 }
-
-                item.extraData?.let { ExtraInfo(extra = it, mediaType = item.mediaType) }
 
                 Spacer(Modifier.height(16.dp))
             }
