@@ -5,7 +5,6 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -164,9 +163,9 @@ private fun DiscoverScreenContent(
                     state.isLoadingTrending -> MediaRowSkeleton()
                     state.error != null -> ErrorState(state.error ?: stringResource(R.string.error_unknown))
                     state.trending.isEmpty() -> EmptyState(stringResource(R.string.discover_no_trending))
-                    else -> AdaptiveGrid(
+                    else -> MediaGrid(
                         items = state.trending.take(10),
-                        minCardWidth = 150.dp,
+                        columns = 3,
                         horizontalPadding = 16.dp,
                         spacing = 12.dp,
                         onItemClick = onItemClick,
@@ -176,9 +175,9 @@ private fun DiscoverScreenContent(
             }
             else -> {
                 // ── Search results grid ───────────────────────────────────────
-                AdaptiveGrid(
+                MediaGrid(
                     items = state.searchResults,
-                    minCardWidth = 150.dp,
+                    columns = 3,
                     horizontalPadding = 16.dp,
                     spacing = 12.dp,
                     onItemClick = onItemClick,
@@ -288,36 +287,32 @@ private fun GlassChip(
     }
 }
 
-// ─── Adaptive grid ────────────────────────────────────────────────────────────
+// ─── Fixed-column grid ────────────────────────────────────────────────────────
 @Composable
-private fun AdaptiveGrid(
+private fun MediaGrid(
     items: List<MediaItem>,
-    minCardWidth: Dp,
+    columns: Int,
     horizontalPadding: Dp,
     spacing: Dp,
     onItemClick: (MediaItem) -> Unit,
 ) {
-    BoxWithConstraints {
-        val availableWidth = maxWidth - horizontalPadding * 2
-        val columns = maxOf(1, (availableWidth / (minCardWidth + spacing)).toInt())
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = horizontalPadding),
-            verticalArrangement = Arrangement.spacedBy(spacing),
-        ) {
-            items.chunked(columns).forEach { rowItems ->
-                Row(horizontalArrangement = Arrangement.spacedBy(spacing)) {
-                    rowItems.forEach { item ->
-                        MediaCard(
-                            item = item,
-                            onClick = { onItemClick(item) },
-                            modifier = Modifier.weight(1f),
-                        )
-                    }
-                    repeat(columns - rowItems.size) {
-                        Spacer(Modifier.weight(1f))
-                    }
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = horizontalPadding),
+        verticalArrangement = Arrangement.spacedBy(spacing),
+    ) {
+        items.chunked(columns).forEach { rowItems ->
+            Row(horizontalArrangement = Arrangement.spacedBy(spacing)) {
+                rowItems.forEach { item ->
+                    MediaCard(
+                        item = item,
+                        onClick = { onItemClick(item) },
+                        modifier = Modifier.weight(1f),
+                    )
+                }
+                repeat(columns - rowItems.size) {
+                    Spacer(Modifier.weight(1f))
                 }
             }
         }
