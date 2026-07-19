@@ -8,6 +8,7 @@ import com.mediatracker.data.local.toEntity
 import com.mediatracker.data.remote.books.GoogleBooksApi
 import com.mediatracker.data.remote.books.OpenLibraryApi
 import com.mediatracker.data.remote.books.buildGoogleBooksQuery
+import com.mediatracker.data.remote.books.dedupeBooks
 import com.mediatracker.data.remote.books.filterQualityBooks
 
 import com.mediatracker.data.remote.books.toMediaItem
@@ -124,6 +125,7 @@ class MediaRepositoryImpl @Inject constructor(
                 key = BuildConfig.GOOGLE_BOOKS_API_KEY,
             ).items.filterQualityBooks()
                 .map { it.toMediaItem() }
+                .dedupeBooks()
 
             if (googleItems.size >= MIN_BOOKS_THRESHOLD) {
                 googleItems
@@ -131,7 +133,7 @@ class MediaRepositoryImpl @Inject constructor(
                 Timber.d("Google Books search below threshold (${googleItems.size}), complementing with Open Library")
                 val olItems = openLibraryApi.searchBooks(query = query).docs.toMediaItems()
                 (googleItems + olItems)
-                    .distinctBy { it.title.lowercase() }
+                    .dedupeBooks()
                     .take(20)
             }
         } catch (e: Exception) {

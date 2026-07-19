@@ -79,3 +79,17 @@ fun List<BookItemDto>.filterQualityBooks(minYear: Int? = null): List<BookItemDto
         } ?: true
         hasCover && yearOk
     }
+
+/**
+ * Deduplicates book results: the same work often appears as several editions
+ * (reissues, publishers, Google Books + Open Library). Key: normalized title
+ * plus first author. extraData is nullable in MediaItem.
+ */
+fun List<MediaItem>.dedupeBooks(): List<MediaItem> =
+    distinctBy { item ->
+        val title = item.title.trim().lowercase()
+        val firstAuthor = item.extraData?.get("authors")
+            ?.substringBefore(",")?.trim()?.lowercase()
+            .orEmpty()
+        "$title|$firstAuthor"
+    }
