@@ -35,21 +35,6 @@ class MediaRepositoryImpl @Inject constructor(
         private const val TTL_DETAIL_MS = 24 * 60 * 60 * 1000L
         private const val MIN_BOOK_PUBLICATION_YEAR = 2015
         private const val MIN_BOOKS_THRESHOLD = 5
-
-        private val BOOKS_TRENDING_QUERIES = listOf(
-            "subject:fiction",
-            "subject:fantasy",
-            "subject:\"science fiction\"",
-            "subject:romance",
-            "subject:thriller",
-            "subject:mystery",
-            "subject:biography",
-        )
-
-        private fun trendingBooksQuery(): String {
-            val dayOfYear = java.util.Calendar.getInstance().get(java.util.Calendar.DAY_OF_YEAR)
-            return BOOKS_TRENDING_QUERIES[dayOfYear % BOOKS_TRENDING_QUERIES.size]
-        }
     }
 
     private suspend fun tmdbLang(): String =
@@ -87,33 +72,26 @@ class MediaRepositoryImpl @Inject constructor(
     // ── Books helpers ─────────────────────────────────────────────────────────
 
     private suspend fun getTrendingBooks(): List<MediaItem> {
-        val lang = localeRepository.googleBooksLang(localeRepository.getLanguageCode())
-        return try {
-            val googleItems = googleBooksApi.getPopularBooks(
-                query = trendingBooksQuery(),
+        val olItems = try {
+            openLibraryApi.getTrendingBooks().works.toMediaItems()
+        } catch (e: Exception) {
+            Timber.w(e, "Open Library trending failed, falling back to Google Books")
+            emptyList()
+        }
+        if (olItems.size >= MIN_BOOKS_THRESHOLD) return olItems.take(20)
+
+        val googleItems = try {
+            val lang = localeRepository.googleBooksLang(localeRepository.getLanguageCode())
+            googleBooksApi.getPopularBooks(
                 langRestrict = lang,
                 key = BuildConfig.GOOGLE_BOOKS_API_KEY,
             ).items.filterQualityBooks(minYear = MIN_BOOK_PUBLICATION_YEAR)
                 .map { it.toMediaItem() }
-
-            if (googleItems.size >= MIN_BOOKS_THRESHOLD) {
-                googleItems
-            } else {
-                Timber.d("Google Books trending below threshold (${googleItems.size}), complementing with Open Library")
-                val olItems = openLibraryApi.getTrendingBooks().works.toMediaItems()
-                (googleItems + olItems)
-                    .distinctBy { it.title.lowercase() }
-                    .take(20)
-            }
         } catch (e: Exception) {
-            Timber.w(e, "Google Books trending failed, falling back to Open Library")
-            try {
-                openLibraryApi.getTrendingBooks().works.toMediaItems()
-            } catch (e2: Exception) {
-                Timber.e(e2, "Open Library trending also failed")
-                emptyList()
-            }
+            Timber.e(e, "Google Books trending also failed")
+            emptyList()
         }
+        return (olItems + googleItems).dedupeBooks().take(20)
     }
 
     private suspend fun searchBooks(query: String): List<MediaItem> {
