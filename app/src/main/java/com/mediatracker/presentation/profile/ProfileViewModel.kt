@@ -84,7 +84,9 @@ class ProfileViewModel @Inject constructor(
     }
 
     fun refreshEmailVerificationStatus() {
-        _isEmailVerified.value = authDataSource.isEmailVerified()
+        viewModelScope.launch {
+            _isEmailVerified.value = authDataSource.refreshEmailVerified()
+        }
     }
 
     fun sendVerificationEmail() {

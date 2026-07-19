@@ -132,6 +132,15 @@ class AuthDataSource @Inject constructor(
 
     fun isEmailVerified(): Boolean = auth?.currentUser?.isEmailVerified ?: false
 
+    suspend fun refreshEmailVerified(): Boolean {
+        val firebaseAuth = auth ?: return false
+        val user = firebaseAuth.currentUser ?: return false
+        // reload() puede fallar sin red; en ese caso devolvemos el flag cacheado
+        runCatching { user.reload().await() }
+            .onFailure { Timber.w(it, "Email verification reload failed") }
+        return firebaseAuth.currentUser?.isEmailVerified ?: false
+    }
+
     fun logout() {
         auth?.signOut()
     }

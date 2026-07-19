@@ -297,32 +297,43 @@ fun ProfileScreen(
                     .padding(horizontal = 16.dp),
                 radius = 18.dp,
             ) {
-                Row(
-                    modifier = Modifier.padding(14.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(10.dp),
-                ) {
-                    Text("⚠️", fontSize = 20.sp)
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = stringResource(R.string.profile_verify_email_title),
-                            style = MaterialTheme.typography.bodyMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSurface,
-                        )
-                        Text(
-                            text = if (emailVerificationSent) stringResource(R.string.profile_verify_email_sent)
-                                   else stringResource(R.string.profile_verify_email_subtitle),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
+                Column(modifier = Modifier.padding(14.dp)) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    ) {
+                        Text("⚠️", fontSize = 20.sp)
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = stringResource(R.string.profile_verify_email_title),
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSurface,
+                            )
+                            Text(
+                                text = if (emailVerificationSent) stringResource(R.string.profile_verify_email_sent)
+                                       else stringResource(R.string.profile_verify_email_subtitle),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
                     }
-                    if (!emailVerificationSent) {
-                        OutlinedButton(
-                            onClick = { viewModel.sendVerificationEmail() },
-                            shape = RoundedCornerShape(12.dp),
-                        ) {
-                            Text(stringResource(R.string.profile_verify_email_button))
+                    Spacer(Modifier.height(8.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        TextButton(onClick = { viewModel.refreshEmailVerificationStatus() }) {
+                            Text(stringResource(R.string.profile_verify_email_check))
+                        }
+                        if (!emailVerificationSent) {
+                            OutlinedButton(
+                                onClick = { viewModel.sendVerificationEmail() },
+                                shape = RoundedCornerShape(12.dp),
+                            ) {
+                                Text(stringResource(R.string.profile_verify_email_button))
+                            }
                         }
                     }
                 }

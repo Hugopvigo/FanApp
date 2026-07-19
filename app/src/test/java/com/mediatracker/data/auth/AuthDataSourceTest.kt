@@ -1,11 +1,15 @@
 package com.mediatracker.data.auth
 
+import com.google.android.gms.tasks.Tasks
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException
+import com.google.firebase.auth.FirebaseUser
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.verify
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
@@ -51,6 +55,36 @@ class AuthDataSourceTest {
         every { auth.currentUser } returns null
 
         assertNull(dataSource.getUserName())
+    }
+
+    @Test
+    fun `refreshEmailVerified returns false when no user`() = runTest {
+        every { auth.currentUser } returns null
+
+        assertFalse(dataSource.refreshEmailVerified())
+    }
+
+    @Test
+    fun `refreshEmailVerified reloads user and returns fresh flag`() = runTest {
+        val user: FirebaseUser = mockk {
+            every { reload() } returns Tasks.forResult(null)
+            every { isEmailVerified } returns true
+        }
+        every { auth.currentUser } returns user
+
+        assertTrue(dataSource.refreshEmailVerified())
+        verify { user.reload() }
+    }
+
+    @Test
+    fun `refreshEmailVerified survives reload failure and returns cached flag`() = runTest {
+        val user: FirebaseUser = mockk {
+            every { reload() } returns Tasks.forException(RuntimeException("network"))
+            every { isEmailVerified } returns false
+        }
+        every { auth.currentUser } returns user
+
+        assertFalse(dataSource.refreshEmailVerified())
     }
 
     @Test

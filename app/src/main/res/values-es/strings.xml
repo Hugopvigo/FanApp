@@ -271,6 +271,7 @@
     <string name="profile_verify_email_subtitle">Confirma tu dirección de email para asegurar tu cuenta</string>
     <string name="profile_verify_email_button">Enviar verificación</string>
     <string name="profile_verify_email_sent">¡Email de verificación enviado! Revisa tu bandeja de entrada.</string>
+    <string name="profile_verify_email_check">Ya lo he verificado</string>
 
     <!-- Profile fallbacks & labels -->
     <string name="profile_default_name">Usuario</string>
