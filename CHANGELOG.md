@@ -1,5 +1,16 @@
 # Changelog
 
+## Fase 1 — Arreglos rápidos (2026-07-19)
+
+### Fixed
+- El aviso "Verifica tu email" desaparece tras verificar (reload de Firebase) y añade botón "Ya lo he verificado".
+- Búsqueda de libros: sin frase exacta forzada, orden por relevancia y deduplicación de ediciones por título + primer autor.
+
+### Changed
+- Descubrir: rejilla de 3 columnas (igual que Inicio y Biblioteca).
+- Libros populares: Open Library trending/daily en vez de consultas rotatorias por género.
+
+
 ## Sprint 8 — Progreso Detallado (T1–T3 completados, 2026-05-29–30)
 
 > Objetivo del sprint: progreso granular en libros/series, logros expandidos, niveles avanzados y retos.
