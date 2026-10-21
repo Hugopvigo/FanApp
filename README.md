@@ -89,15 +89,17 @@ GOOGLE_BOOKS_API_KEY=tu_clave
 FIREBASE_PROJECT_ID=tu_proyecto
 ```
 
-Añade tu `google-services.json` en `app/` (no se versiona) y compila:
+Añade tu `google-services.json` en `app/` (no se versiona; tienes una
+plantilla en `app/google-services.json.example`) y compila:
 
 ```bash
 ./gradlew assembleDebug
 ./gradlew testDebugUnitTest    # 93 tests
 ```
 
-Sin `google-services.json` la app arranca, pero el registro con Firebase
-—y con él el guardado en la nube— no funciona.
+El plugin de Google Services necesita ese fichero: sin él la build falla.
+Sin claves de TMDB ni de Google Books la app arranca, pero las búsquedas
+vuelven vacío.
 
 ## Con qué está hecha
 
@@ -107,7 +109,7 @@ Sin `google-services.json` la app arranca, pero el registro con Firebase
 | Arquitectura | Clean Architecture + MVVM, organizada en capas |
 | Inyección de dependencias | Hilt |
 | Base de datos local | Room (offline-first) |
-| Nube | Firebase Auth, Firestore, Messaging, Storage |
+| Nube | Firebase Auth, Firestore y Messaging |
 | Red | Retrofit + OkHttp + kotlinx.serialization |
 | Imágenes | Coil |
 | Gráficos | Vico |
@@ -123,8 +125,7 @@ fanapp/
 │   ├── domain/        modelos, interfaces y casos de uso
 │   ├── presentation/  pantallas, ViewModels, componentes, tema
 │   ├── di/            módulos de Hilt
-│   ├── service/       receptor de mensajes de Firebase
-│   └── core/          utilidades transversales
+│   └── service/       receptor de mensajes de Firebase
 ├── app/src/test/      14 ficheros de tests unitarios
 ├── docs/              logo y capturas
 ├── gradle/            catálogo de versiones
