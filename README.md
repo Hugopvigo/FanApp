@@ -1,3 +1,7 @@
+<meta property="og:title" content="FANAPP">
+<meta property="og:description" content="Una app Android para llevar el seguimiento de series, películas y libros en un solo sitio.">
+<meta property="og:image" content="https://raw.githubusercontent.com/Hugopvigo/FanApp/main/docs/capturas/og.png">
+
 <p align="center">
   <img src="docs/capturas/00-cabecera.png" alt="FanApp MediaTracker — series, películas y libros en una sola app" width="100%">
 </p>
