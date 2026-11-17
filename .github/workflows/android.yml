@@ -18,9 +18,6 @@ jobs:
           distribution: temurin
           java-version: '21'
 
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
-
       - name: Generate google-services.json for CI
         run: cp app/google-services.json.example app/google-services.json
 
