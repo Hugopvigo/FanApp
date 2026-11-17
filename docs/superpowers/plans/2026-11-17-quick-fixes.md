@@ -57,51 +57,73 @@ git commit -m "fix(firebase): elimina init manual redundante y incompleto"
 
 **Interfaces:**
 - Consumes: `GoogleBooksApi.searchBooks(...)` (suspend, lanza `retrofit2.HttpException` en 429).
-- Produces: `internal suspend fun <T> withBooksRetry(onRetry: (Int) -> Unit, block: suspend () -> T): T` en `MediaRepositoryImpl.kt`; reintenta hasta 3 veces con `delay(2000L shl (attempt - 1))`.
+- Produces: `internal suspend fun <T> withBooksRetry(delayMs: Long = 2_000L, maxAttempts: Int = 3, block: suspend () -> T): T` en `MediaRepositoryImpl.kt`; reintenta `maxAttempts` veces con `delay(delayMs shl attempt)`. El parametro `delayMs` existe para que los tests usen 0 sin esperar.
 
 - [ ] **Step 1: Escribir el test que falla**
 
 ```kotlin
 package com.mediatracker.data.remote.books
 
+import com.mediatracker.data.repository.withBooksRetry
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import retrofit2.HttpException
+import retrofit2.Response
 
 class BooksRetryTest {
+    private fun http429(): HttpException =
+        HttpException(Response.error<Any>(429, okhttp3.ResponseBody.create(null, "")))
+
     @Test
     fun `reintenta tras 429 y devuelve el resultado`() = runTest {
         var attempts = 0
-        val result = withBooksRetryNoDelay {
+        val result = withBooksRetry(delayMs = 0) {
             attempts++
-            if (attempts < 3) throw RuntimeException("429") else "ok"
+            if (attempts < 3) throw http429() else "ok"
         }
         assertEquals("ok", result)
         assertEquals(3, attempts)
     }
+
+    @Test
+    fun `no reintenta errores que no son 429`() = runTest {
+        var attempts = 0
+        try {
+            withBooksRetry(delayMs = 0) {
+                attempts++
+                throw http429().let { HttpException(Response.error<Any>(500, okhttp3.ResponseBody.create(null, ""))) }
+            }
+        } catch (_: HttpException) {
+            // esperado
+        }
+        assertEquals(1, attempts)
+    }
 }
 ```
-
-Nota: la primera version usa un helper sin `delay` para que el test sea rapido; el helper real con `delay` se prueba con `runTest` + `advanceTimeBy`.
 
 - [ ] **Step 2: Verificar que falla**
 
 Run: `./gradlew :app:testDebugUnitTest --tests '*BooksRetryTest'`
-Expected: FAIL de compilacion — `Unresolved reference: withBooksRetryNoDelay`.
+Expected: FAIL de compilacion — `Unresolved reference: withBooksRetry`.
 
 - [ ] **Step 3: Implementar el helper**
 
 En `MediaRepositoryImpl.kt`, anadir al final del fichero:
 
 ```kotlin
-internal suspend fun <T> withBooksRetry(block: suspend () -> T): T {
+internal suspend fun <T> withBooksRetry(
+    delayMs: Long = 2_000L,
+    maxAttempts: Int = 3,
+    block: suspend () -> T,
+): T {
     var attempt = 0
     while (true) {
         try {
             return block()
         } catch (e: retrofit2.HttpException) {
-            if (e.code() != 429 || attempt >= 3) throw e
-            kotlinx.coroutines.delay(2_000L shl attempt)
+            if (e.code() != 429 || attempt >= maxAttempts) throw e
+            kotlinx.coroutines.delay(delayMs shl attempt)
             attempt++
         }
     }
@@ -119,7 +141,7 @@ Envolver la llamada de `searchBooks()` (linea 100) con `withBooksRetry { ... }`.
 - [ ] **Step 4: Verificar**
 
 Run: `./gradlew :app:testDebugUnitTest --tests '*BooksRetryTest' && ./gradlew :app:compileDebugKotlin :app:testDebugUnitTest`
-Expected: tests PASS y suite 99/99.
+Expected: tests PASS y suite 100/100 (98 + 2 nuevos).
 
 - [ ] **Step 5: Commit**
 
