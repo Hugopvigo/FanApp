@@ -13,8 +13,11 @@
 ### Documentación
 - Auditoría visual con hallazgos P1/P2 en `docs/design-audit-2026-11-17.md`. Las capturas en dispositivo de los 4 temas quedan pendientes (no había dispositivo conectado).
 
+### Fixed (revisión final)
+- El interceptor de `Cache-Control` se registra como *network* interceptor en los 3 clientes HTTP. Como *application* interceptor se ejecutaba después de `CacheInterceptor` y la cabecera nunca llegaba al índice de caché: la caché no servía respuestas sin conexión. Test de regresión añadido.
+
 ### Verificación
-- `./gradlew :app:compileDebugKotlin :app:testDebugUnitTest :app:lint` en verde: 97/97 tests, 0 errores de lint, 99 avisos (igual que la línea base).
+- `./gradlew :app:compileDebugKotlin :app:testDebugUnitTest :app:lint` en verde: 98/98 tests, 0 errores de lint, 99 avisos (igual que la línea base).
 
 ## Pulido de código (2026-11-17)
 
@@ -33,7 +36,7 @@
 - `DetailScreen` (776 → 489 líneas), `ProfileScreen` (612 → 142) y `HomeScreen` (622 → 219) extraen sus componentes a paquetes `components/` sin cambiar comportamiento.
 
 ### Tests
-- 93 → 97 tests unitarios, 0 fallos. `compileDebugKotlin`, `testDebugUnitTest` y `lint` en verde.
+- 93 → 98 tests unitarios, 0 fallos. `compileDebugKotlin`, `testDebugUnitTest` y `lint` en verde.
 - Línea base documentada en `docs/quality-baseline-2026-11-17.md`.
 
 ## Fase 2+3 — Coherencia glass y animaciones (2026-07-19)
