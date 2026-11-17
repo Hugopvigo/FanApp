@@ -39,8 +39,8 @@ por:
 ```kotlin
 androidTestImplementation(libs.compose.ui.test.junit4)
 androidTestImplementation(libs.compose.ui.test.manifest)
-androidTestImplementation("androidx.test:runner:1.6.2")
-androidTestImplementation("androidx.test.espresso:espresso-core:3.7.0")
+androidTestImplementation(libs.androidx.test.runner)
+androidTestImplementation(libs.espresso.core)
 androidTestImplementation("androidx.test:rules:1.6.2")
 ```
 
@@ -51,7 +51,7 @@ compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4
 compose-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 ```
 
-(prefijar con `androidx-compose-...` si el catalog ya usa ese estilo; mantener coherencia).
+Además, en `[versions]` añadir `testRunner = "1.7.0"` y `espresso = "3.7.0"`, y en `[libraries]` los alias `androidx-test-runner` y `espresso-core` con esas versiones. Espresso se fija explícitamente porque la versión transitiva falla en HyperOS.
 
 - [ ] **Step 2: Verificar**
 
