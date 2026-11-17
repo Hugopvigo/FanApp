@@ -18,6 +18,7 @@
 
 ### Changed
 - Eliminadas 4 fotos JPG sueltas en `app/src/`. Los 30 avisos `UnusedResources` quedan documentados en la línea base, sin borrar recursos que podrían usarse por reflexión o desde el widget.
+- Google Books ya no aplica el espaciado proactivo de 2 s entre peticiones: solo reintenta ante 429. En ráfagas de búsqueda puede aparecer un 429 antes de recuperarse; se prefiere no bloquear hilos del dispatcher.
 
 ## CI y Crashlytics (2026-11-17)
 
