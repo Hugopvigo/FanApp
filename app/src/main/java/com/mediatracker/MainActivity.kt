@@ -6,11 +6,14 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.lifecycleScope
 import com.mediatracker.data.local.LocaleRepository
@@ -46,7 +49,7 @@ class MainActivity : ComponentActivity() {
 
         var appTheme by mutableStateOf(AppTheme.Fantasy)
         var useSystemTheme by mutableStateOf(false)
-        var onboardingNeeded by mutableStateOf(false)
+        var onboardingNeeded by mutableStateOf<Boolean?>(null)
 
         lifecycleScope.launch {
             onboardingNeeded = !onboardingRepository.isOnboardingCompleted()
@@ -63,29 +66,38 @@ class MainActivity : ComponentActivity() {
         setContent {
             MediaTrackerTheme(appTheme = appTheme, useSystemTheme = useSystemTheme) {
                 Surface(modifier = Modifier.fillMaxSize()) {
-                    AppNavGraph(
-                        onThemeChange = { theme ->
-                            appTheme = theme
-                            lifecycleScope.launch {
-                                themeRepository.setAppTheme(theme)
-                            }
-                        },
-                        useSystemTheme = useSystemTheme,
-                        onUseSystemThemeChange = { enabled ->
-                            useSystemTheme = enabled
-                            lifecycleScope.launch {
-                                themeRepository.setUseSystemTheme(enabled)
-                            }
-                        },
-                        pendingDetailDeepLink = pendingDetail,
-                        onDetailDeepLinkConsumed = { pendingDetail = null },
-                        onboardingNeeded = onboardingNeeded,
-                        onOnboardingComplete = {
-                            lifecycleScope.launch {
-                                onboardingRepository.markOnboardingCompleted()
-                            }
-                        },
-                    )
+                    if (onboardingNeeded == null) {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            CircularProgressIndicator()
+                        }
+                    } else {
+                        AppNavGraph(
+                            onThemeChange = { theme ->
+                                appTheme = theme
+                                lifecycleScope.launch {
+                                    themeRepository.setAppTheme(theme)
+                                }
+                            },
+                            useSystemTheme = useSystemTheme,
+                            onUseSystemThemeChange = { enabled ->
+                                useSystemTheme = enabled
+                                lifecycleScope.launch {
+                                    themeRepository.setUseSystemTheme(enabled)
+                                }
+                            },
+                            pendingDetailDeepLink = pendingDetail,
+                            onDetailDeepLinkConsumed = { pendingDetail = null },
+                            onboardingNeeded = onboardingNeeded ?: false,
+                            onOnboardingComplete = {
+                                lifecycleScope.launch {
+                                    onboardingRepository.markOnboardingCompleted()
+                                }
+                            },
+                        )
+                    }
                 }
             }
         }
