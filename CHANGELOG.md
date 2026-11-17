@@ -1,5 +1,15 @@
 # Changelog
 
+## CI y Crashlytics (2026-11-17)
+
+### Added
+- Firebase Crashlytics (plugin Gradle 3.0.6 + dependencia `firebase-crashlytics`, sin el módulo KTX deprecated). Recolección activada en builds debug.
+- GitHub Actions `.github/workflows/android.yml`: en cada PR y push a `main` corre `lint + testDebugUnitTest + assembleDebug` y sube la APK como artifact. El `google-services.json` de CI se genera desde el fichero de ejemplo (el real nunca se sube al repo).
+
+### Verificación
+- Los tres comandos del workflow pasan en un worktree limpio con el JSON de ejemplo (BUILD SUCCESSFUL).
+- `FirebaseCrashlytics` presente en el dex de la APK de debug.
+
 ## Pulido de diseño (2026-11-17)
 
 > Fase B del plan [2026-11-17-code-diseno-polish](docs/superpowers/plans/2026-11-17-code-diseno-polish.md).
