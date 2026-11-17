@@ -4,6 +4,7 @@ import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
+import android.os.StrictMode
 import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseOptions
 import com.mediatracker.BuildConfig
@@ -15,6 +16,13 @@ class MediaTrackerApp : Application() {
     override fun onCreate() {
         super.onCreate()
         if (BuildConfig.DEBUG) {
+            StrictMode.setThreadPolicy(
+                StrictMode.ThreadPolicy.Builder()
+                    .detectDiskReads()
+                    .detectDiskWrites()
+                    .penaltyLog()
+                    .build(),
+            )
             Timber.plant(Timber.DebugTree())
         }
         initializeFirebaseIfNeeded()

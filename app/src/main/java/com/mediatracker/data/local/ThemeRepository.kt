@@ -57,13 +57,14 @@ class ThemeRepository @Inject constructor(
     private val migrationScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     fun migrateFromSharedPreferences() {
-        val legacy = context.getSharedPreferences(PREFS_LEGACY, Context.MODE_PRIVATE)
-        val saved = legacy.getString(KEY_LEGACY, null) ?: return
-        val theme = AppTheme.entries.find { it.name == saved } ?: return
-        legacy.edit().remove(KEY_LEGACY).apply()
         migrationScope.launch {
-            runCatching { setAppTheme(theme) }
-                .onFailure { Timber.e(it, "Theme migration failed") }
+            runCatching {
+                val legacy = context.getSharedPreferences(PREFS_LEGACY, Context.MODE_PRIVATE)
+                val saved = legacy.getString(KEY_LEGACY, null) ?: return@launch
+                val theme = AppTheme.entries.find { it.name == saved } ?: return@launch
+                legacy.edit().remove(KEY_LEGACY).apply()
+                setAppTheme(theme)
+            }.onFailure { Timber.e(it, "Theme migration failed") }
         }
     }
 }
