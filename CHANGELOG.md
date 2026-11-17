@@ -1,5 +1,15 @@
 # Changelog
 
+## Arreglos rápidos (2026-11-17)
+
+### Fixed
+- Eliminado el init manual de Firebase: era redundante (Google Services ya inicializa) y construía `FirebaseOptions` sin API key. Arranque verificado en dispositivo.
+- Google Books: los reintentos por 429 usan `delay` en corrutina en vez de `Thread.sleep` en el interceptor de OkHttp (antes bloqueaba hasta 14 s un hilo del dispatcher). 2 tests nuevos.
+- Onboarding: se muestra un indicador de carga hasta conocer el estado guardado, evitando que aparezca Home antes que Onboarding en una instalación limpia.
+
+### Changed
+- Eliminadas 4 fotos JPG sueltas en `app/src/`. Los 30 avisos `UnusedResources` quedan documentados en la línea base, sin borrar recursos que podrían usarse por reflexión o desde el widget.
+
 ## CI y Crashlytics (2026-11-17)
 
 ### Added
