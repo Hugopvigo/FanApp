@@ -82,10 +82,12 @@ class MediaRepositoryImpl @Inject constructor(
 
         val googleItems = try {
             val lang = localeRepository.googleBooksLang(localeRepository.getLanguageCode())
-            googleBooksApi.getPopularBooks(
-                langRestrict = lang,
-                key = BuildConfig.GOOGLE_BOOKS_API_KEY,
-            ).items.filterQualityBooks(minYear = MIN_BOOK_PUBLICATION_YEAR)
+            withBooksRetry {
+                googleBooksApi.getPopularBooks(
+                    langRestrict = lang,
+                    key = BuildConfig.GOOGLE_BOOKS_API_KEY,
+                )
+            }.items.filterQualityBooks(minYear = MIN_BOOK_PUBLICATION_YEAR)
                 .map { it.toMediaItem() }
         } catch (e: Exception) {
             Timber.e(e, "Google Books trending also failed")
@@ -97,11 +99,13 @@ class MediaRepositoryImpl @Inject constructor(
     private suspend fun searchBooks(query: String): List<MediaItem> {
         val lang = localeRepository.googleBooksLang(localeRepository.getLanguageCode())
         return try {
-            val googleItems = googleBooksApi.searchBooks(
-                query = buildGoogleBooksQuery(query),
-                langRestrict = lang,
-                key = BuildConfig.GOOGLE_BOOKS_API_KEY,
-            ).items.filterQualityBooks()
+            val googleItems = withBooksRetry {
+                googleBooksApi.searchBooks(
+                    query = buildGoogleBooksQuery(query),
+                    langRestrict = lang,
+                    key = BuildConfig.GOOGLE_BOOKS_API_KEY,
+                )
+            }.items.filterQualityBooks()
                 .map { it.toMediaItem() }
                 .dedupeBooks()
 
@@ -148,7 +152,9 @@ class MediaRepositoryImpl @Inject constructor(
                     mediaItemDao.getById(id)?.toDomain()
                         ?: throw IllegalStateException("Open Library book not in cache: $id")
                 } else {
-                    googleBooksApi.getBookDetail(apiId, key = BuildConfig.GOOGLE_BOOKS_API_KEY).toMediaItem()
+                    withBooksRetry {
+                        googleBooksApi.getBookDetail(apiId, key = BuildConfig.GOOGLE_BOOKS_API_KEY)
+                    }.toMediaItem()
                 }
             }
         }
@@ -173,4 +179,21 @@ class MediaRepositoryImpl @Inject constructor(
 
     private fun isExpired(cachedAt: Long, ttlMs: Long): Boolean =
         System.currentTimeMillis() - cachedAt > ttlMs
+}
+
+internal suspend fun <T> withBooksRetry(
+    delayMs: Long = 2_000L,
+    maxAttempts: Int = 3,
+    block: suspend () -> T,
+): T {
+    var attempt = 0
+    while (true) {
+        try {
+            return block()
+        } catch (e: retrofit2.HttpException) {
+            if (e.code() != 429 || attempt >= maxAttempts) throw e
+            kotlinx.coroutines.delay(delayMs shl attempt)
+            attempt++
+        }
+    }
 }
