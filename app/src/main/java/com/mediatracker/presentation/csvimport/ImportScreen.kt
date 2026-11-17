@@ -340,7 +340,7 @@ private fun DoneStep(
                     .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
                     .padding(8.dp),
             ) {
-                items(result.errors) { error ->
+                items(result.errors, key = { it }) { error ->
                     Text(
                         error,
                         style = MaterialTheme.typography.bodySmall,

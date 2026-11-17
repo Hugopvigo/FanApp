@@ -5,6 +5,10 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.os.StrictMode
+import coil.ImageLoader
+import coil.ImageLoaderFactory
+import coil.disk.DiskCache
+import coil.memory.MemoryCache
 import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseOptions
 import com.mediatracker.BuildConfig
@@ -12,7 +16,7 @@ import dagger.hilt.android.HiltAndroidApp
 import timber.log.Timber
 
 @HiltAndroidApp
-class MediaTrackerApp : Application() {
+class MediaTrackerApp : Application(), ImageLoaderFactory {
     override fun onCreate() {
         super.onCreate()
         if (BuildConfig.DEBUG) {
@@ -28,6 +32,17 @@ class MediaTrackerApp : Application() {
         initializeFirebaseIfNeeded()
         createNotificationChannels()
     }
+
+    override fun newImageLoader(): ImageLoader = ImageLoader.Builder(this)
+        .crossfade(true)
+        .memoryCache { MemoryCache.Builder(this).maxSizePercent(0.25).build() }
+        .diskCache {
+            DiskCache.Builder()
+                .directory(cacheDir.resolve("image_cache"))
+                .maxSizeBytes(64L * 1024 * 1024)
+                .build()
+        }
+        .build()
 
     private fun createNotificationChannels() {
         val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager

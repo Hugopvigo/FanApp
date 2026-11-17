@@ -471,7 +471,7 @@ fun ProfileScreen(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
-                    items(AVATARS) { emoji ->
+                    items(AVATARS, key = { it }) { emoji ->
                         Box(
                             modifier = Modifier
                                 .size(56.dp)
