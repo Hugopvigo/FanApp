@@ -1,5 +1,14 @@
 # Changelog
 
+## Calidad visual y UI tests (2026-11-17)
+
+### Fixed
+- Detalle: los chips de estado usan `FlowRow` para que «Completado» no se parta a mitad de palabra en pantallas estrechas. Verificado en dispositivo.
+
+### Added
+- 2 tests instrumentados (MediaCard y StatusChip) ejecutados en dispositivo. Se fijó `espresso-core:3.7.0` porque la versión transitiva fallaba en HyperOS al inicializar `InputManager`.
+- Capturas de Home y Perfil en los 4 temas (Fantasy, Light, Purple, Dark) más detalle en Dark, en `docs/capturas/2026-11-17-*`. Sin regresiones de contraste.
+
 ## Arreglos rápidos (2026-11-17)
 
 ### Fixed

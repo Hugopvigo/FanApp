@@ -40,6 +40,24 @@ Inventario de inconsistencias de diseño previo a las tareas B2–B4 del plan
 - El literal `"›"` en `ImportScreen.kt:196` y `ProfileSections.kt` es un separador
   visual, no contenido localizable.
 
+## Verificación en dispositivo (2026-11-17, 13:40)
+
+Dispositivo `d4b3345`. Capturas en `docs/capturas/2026-11-17-<tema>-<pantalla>.png`.
+
+| Tema | Home | Perfil | Resultado |
+|---|---|---|---|
+| Fantasy | ✅ | ✅ | Paleta rosa/lavanda coherente, buen contraste |
+| Light | ✅ | ✅ | Acentos azules, texto legible, nav flotante correcto |
+| Purple | ✅ | ✅ | Fondo oscuro morado, chips y ajustes legibles |
+| Dark | ✅ | ✅ | Fondo negro, acentos azules, sin pérdida de contraste |
+
+Detalle (Dark): ✅ hero con gradiente, badges y sinopsis en glass card.
+
+**Hallazgo P1-6 (corregido):** `DetailScreen.kt` — los chips de estado estaban en
+una `Row` y el tercero («Completado») hacía *word wrap* a mitad de palabra
+(«Completad / o»). Corregido con `FlowRow`: en pantallas estrechas los chips pasan
+a la siguiente línea sin recortes. Verificado en `docs/capturas/2026-11-17-dark-detail-fixed.png`.
+
 ## Coherencia confirmada
 
 - Los 4 temas (Fantasy, Light, Purple, Dark) siguen presentes en `Theme.kt`, cada
