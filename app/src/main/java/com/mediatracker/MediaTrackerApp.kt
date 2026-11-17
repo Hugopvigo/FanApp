@@ -11,6 +11,7 @@ import coil.disk.DiskCache
 import coil.memory.MemoryCache
 import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseOptions
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.mediatracker.BuildConfig
 import dagger.hilt.android.HiltAndroidApp
 import timber.log.Timber
@@ -28,6 +29,7 @@ class MediaTrackerApp : Application(), ImageLoaderFactory {
                     .build(),
             )
             Timber.plant(Timber.DebugTree())
+            FirebaseCrashlytics.getInstance().isCrashlyticsCollectionEnabled = true
         }
         initializeFirebaseIfNeeded()
         createNotificationChannels()
