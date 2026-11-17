@@ -1,5 +1,6 @@
 package com.mediatracker.di
 
+import android.content.Context
 import com.mediatracker.BuildConfig
 import com.mediatracker.data.remote.books.GoogleBooksApi
 import com.mediatracker.data.remote.books.GoogleBooksRateLimiter
@@ -8,14 +9,17 @@ import com.mediatracker.data.remote.tmdb.TmdbApi
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.serialization.json.Json
+import okhttp3.Cache
 import okhttp3.Interceptor
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
+import java.io.File
 import java.util.concurrent.TimeUnit
 import javax.inject.Named
 import javax.inject.Singleton
@@ -27,6 +31,29 @@ object NetworkModule {
     private const val TMDB_BASE_URL = "https://api.themoviedb.org/3/"
     private const val GOOGLE_BOOKS_BASE_URL = "https://www.googleapis.com/books/v1/"
     private const val OPEN_LIBRARY_BASE_URL = "https://openlibrary.org/"
+
+    const val CACHE_SIZE_BYTES = 10L * 1024 * 1024
+
+    fun buildCache(directory: File): Cache = Cache(directory, CACHE_SIZE_BYTES)
+
+    @Provides
+    @Singleton
+    fun provideHttpCache(@ApplicationContext context: Context): Cache =
+        buildCache(context.cacheDir.resolve("http_cache"))
+
+    private val cacheControlInterceptor = Interceptor { chain ->
+        val response = chain.proceed(chain.request())
+        if (chain.request().method == "GET" &&
+            response.code == 200 &&
+            response.header("Cache-Control") == null
+        ) {
+            response.newBuilder()
+                .header("Cache-Control", "public, max-age=3600")
+                .build()
+        } else {
+            response
+        }
+    }
 
     @Provides
     @Singleton
@@ -66,9 +93,12 @@ object NetworkModule {
     fun provideTmdbOkHttpClient(
         loggingInterceptor: HttpLoggingInterceptor,
         @Named("tmdb_api_key") apiKeyInterceptor: Interceptor,
+        cache: Cache,
     ): OkHttpClient = OkHttpClient.Builder()
         .addInterceptor(apiKeyInterceptor)
         .addInterceptor(loggingInterceptor)
+        .addInterceptor(cacheControlInterceptor)
+        .cache(cache)
         .connectTimeout(15, TimeUnit.SECONDS)
         .readTimeout(15, TimeUnit.SECONDS)
         .build()
@@ -78,9 +108,12 @@ object NetworkModule {
     @Singleton
     fun provideBooksOkHttpClient(
         loggingInterceptor: HttpLoggingInterceptor,
+        cache: Cache,
     ): OkHttpClient = OkHttpClient.Builder()
         .addInterceptor(loggingInterceptor)
         .addInterceptor(GoogleBooksRateLimiter())
+        .addInterceptor(cacheControlInterceptor)
+        .cache(cache)
         .connectTimeout(15, TimeUnit.SECONDS)
         .readTimeout(15, TimeUnit.SECONDS)
         .build()
@@ -114,8 +147,11 @@ object NetworkModule {
     @Singleton
     fun provideOpenLibraryOkHttpClient(
         loggingInterceptor: HttpLoggingInterceptor,
+        cache: Cache,
     ): OkHttpClient = OkHttpClient.Builder()
         .addInterceptor(loggingInterceptor)
+        .addInterceptor(cacheControlInterceptor)
+        .cache(cache)
         .connectTimeout(15, TimeUnit.SECONDS)
         .readTimeout(15, TimeUnit.SECONDS)
         .build()
