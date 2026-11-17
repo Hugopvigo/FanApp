@@ -50,11 +50,7 @@ internal fun FloatingBottomNav(
     val fanColors = MaterialTheme.fanAppColors
     val pillShape = RoundedCornerShape(26.dp)
 
-    val shadowColor = if (fanColors.isDark) {
-        Color(0x80000000)
-    } else {
-        Color(0x2E503078)
-    }
+    val shadowColor = fanColors.navScrim
 
     Box(
         modifier = modifier

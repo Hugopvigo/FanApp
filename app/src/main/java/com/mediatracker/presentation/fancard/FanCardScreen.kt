@@ -529,7 +529,7 @@ private fun RatingFanCard(
                             else Icons.Filled.StarBorder,
                             contentDescription = null,
                             modifier = Modifier.size(28.dp),
-                            tint = if (star <= rating) Color(0xFFFFC107)
+                            tint = if (star <= rating) MaterialTheme.fanAppColors.gradientAccent.first()
                             else Color.White.copy(alpha = 0.3f),
                         )
                     }
@@ -553,7 +553,7 @@ private fun MiniStars(rating: Int, fanColors: FanAppColors) {
                 imageVector = if (star <= rating) Icons.Filled.Star else Icons.Filled.StarBorder,
                 contentDescription = null,
                 modifier = Modifier.size(12.dp),
-                tint = if (star <= rating) Color(0xFFFFC107)
+                tint = if (star <= rating) MaterialTheme.fanAppColors.gradientAccent.first()
                 else Color.White.copy(alpha = 0.3f),
             )
         }

@@ -102,3 +102,23 @@ val DarkSparkle          = Color(0xFF6D92FF)
 val DarkNavBar           = Color(0xFF0A0B0E)
 val DarkSurfContainer    = Color(0xFF12141A)
 val DarkSurfVariant      = Color(0xFF1C2030)
+
+/** Paleta de gradientes para los pósters sin imagen (mismo juego en los 4 temas). */
+val FanPosterGradients: List<List<Color>> = listOf(
+    listOf(Color(0xFFFFB3D1), Color(0xFFF06292)),
+    listOf(Color(0xFFFCC1D4), Color(0xFFC875B0)),
+    listOf(Color(0xFFC9B1EF), Color(0xFF7C4DFF)),
+    listOf(Color(0xFFB39DDB), Color(0xFF5E35B1)),
+    listOf(Color(0xFFFFD5A6), Color(0xFFEF7C80)),
+    listOf(Color(0xFFFFC1B3), Color(0xFFD65F8E)),
+    listOf(Color(0xFFA4C7F0), Color(0xFF7C5FDB)),
+    listOf(Color(0xFF7BAEF0), Color(0xFF3A4DBB)),
+    listOf(Color(0xFFA9E0C1), Color(0xFF4A9D7A)),
+    listOf(Color(0xFFF4A3A3), Color(0xFFA04060)),
+    listOf(Color(0xFF5A4080), Color(0xFF1F1438)),
+    listOf(Color(0xFFC1F0D4), Color(0xFF5DC88E)),
+)
+
+/** Sombra de la nav flotante: oscura en temas claros, negra en temas oscuros. */
+val FanNavScrimLight = Color(0x2E503078)
+val FanNavScrimDark = Color(0x80000000)
