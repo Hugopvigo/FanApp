@@ -1,5 +1,21 @@
 # Changelog
 
+## Pulido de diseño (2026-11-17)
+
+> Fase B del plan [2026-11-17-code-diseno-polish](docs/superpowers/plans/2026-11-17-code-diseno-polish.md).
+> Inventario detallado en [design-audit-2026-11-17](docs/design-audit-2026-11-17.md).
+
+### Changed
+- Los 16 colores RGB literales fuera del tema pasan a tokens (`posterGradients`, `navScrim` + reutilización de `gradientAccent`): ya no hay `Color(0x…)` fuera de `presentation/theme`.
+- Botón atrás de las sub-pantallas de 38 → 48 dp e icono de 20 → 24 dp; chips de estado con altura mínima de 48 dp.
+- Importar: textos en español hardcodeados sustituidos por recursos EN/ES, con plural para el contador de items.
+
+### Documentación
+- Auditoría visual con hallazgos P1/P2 en `docs/design-audit-2026-11-17.md`. Las capturas en dispositivo de los 4 temas quedan pendientes (no había dispositivo conectado).
+
+### Verificación
+- `./gradlew :app:compileDebugKotlin :app:testDebugUnitTest :app:lint` en verde: 97/97 tests, 0 errores de lint, 99 avisos (igual que la línea base).
+
 ## Pulido de código (2026-11-17)
 
 > Fase A del plan [2026-11-17-code-diseno-polish](docs/superpowers/plans/2026-11-17-code-diseno-polish.md).

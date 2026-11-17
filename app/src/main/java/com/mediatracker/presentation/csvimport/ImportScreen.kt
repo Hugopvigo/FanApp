@@ -39,6 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import com.mediatracker.R
 import com.mediatracker.presentation.components.GlassBackHeader
@@ -249,7 +250,7 @@ private fun PreviewStep(
                 modifier = Modifier.weight(1f),
                 shape = RoundedCornerShape(12.dp),
             ) {
-                Text(stringResource(R.string.import_import_items, preview.totalItems))
+                Text(pluralStringResource(R.plurals.import_items, preview.totalItems, preview.totalItems))
             }
         }
     }
