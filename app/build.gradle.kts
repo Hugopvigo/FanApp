@@ -161,4 +161,6 @@ dependencies {
     testImplementation("app.cash.turbine:turbine:1.2.0")
     androidTestImplementation(platform(libs.compose.bom))
     androidTestImplementation(libs.compose.ui.test)
+    androidTestImplementation(libs.compose.ui.manifest)
+    androidTestImplementation("androidx.test:runner:1.6.2")
 }
