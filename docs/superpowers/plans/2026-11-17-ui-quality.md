@@ -40,6 +40,7 @@ por:
 androidTestImplementation(libs.compose.ui.test.junit4)
 androidTestImplementation(libs.compose.ui.test.manifest)
 androidTestImplementation("androidx.test:runner:1.6.2")
+androidTestImplementation("androidx.test.espresso:espresso-core:3.7.0")
 androidTestImplementation("androidx.test:rules:1.6.2")
 ```
 
