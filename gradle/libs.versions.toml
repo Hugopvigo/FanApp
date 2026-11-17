@@ -18,6 +18,7 @@ serialization = "1.11.0"
 activityCompose = "1.13.0"
 coreKtx = "1.18.0"
 googleServices = "4.4.2"
+crashlyticsGradle = "3.0.6"
 dataStore = "1.1.7"
 playServicesAuth = "21.3.0"
 vico = "2.1.2"
@@ -61,6 +62,7 @@ firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore
 firebase-firestore-ktx = { group = "com.google.firebase", name = "firebase-firestore" }
 firebase-messaging = { group = "com.google.firebase", name = "firebase-messaging" }
 firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics" }
+firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashlytics" }
 
 # Room
 room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
@@ -113,3 +115,4 @@ kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", versi
 hilt-android = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 google-services = { id = "com.google.gms.google-services", version.ref = "googleServices" }
+firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "crashlyticsGradle" }
