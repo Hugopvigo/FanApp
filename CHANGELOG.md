@@ -3,7 +3,7 @@
 ## CI y Crashlytics (2026-11-17)
 
 ### Added
-- Firebase Crashlytics (plugin Gradle 3.0.6 + dependencia `firebase-crashlytics`, sin el módulo KTX deprecated). Recolección activada en builds debug.
+- Firebase Crashlytics (plugin Gradle 3.0.8 + dependencia `firebase-crashlytics`, sin el módulo KTX deprecated). Recolección activada en builds debug.
 - GitHub Actions `.github/workflows/android.yml`: en cada PR y push a `main` corre `lint + testDebugUnitTest + assembleDebug` y sube la APK como artifact. El `google-services.json` de CI se genera desde el fichero de ejemplo (el real nunca se sube al repo).
 
 ### Verificación

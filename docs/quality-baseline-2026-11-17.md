@@ -65,3 +65,18 @@ Tras cada tarea, `./gradlew :app:compileDebugKotlin :app:testDebugUnitTest` debe
 seguir en verde con **al menos** los mismos 93 tests. En el cierre de Fase A se
 comprueba que no aparezcan errores de lint **nuevos**; los 12 de arriba son el
 punto de partida y se abordan en A10.
+
+## Revisión de `UnusedResources` (2026-11-17, tarea Q4)
+
+Los 30 avisos de `UnusedResources` son recursos legacy que ya no se referencian
+desde código. Se documentan pero **no se eliminan**: varios (`R.color.media_*`,
+`R.string.profile_movies_short`) podrían ser usados por layouts del widget Glance
+o por reflexión, y borrarlos a ciegas no aporta al objetivo de esta tanda.
+
+Ejemplos confirmados como no referenciados por `grep` en `app/src/main`:
+`R.color.media_blue`, `media_blue_dark`, `media_green`, `media_orange`, `media_red`,
+`R.string.home_title`, `home_subtitle`, `discover_top_series`, `discover_top_movies`,
+`discover_top_books` y `profile_movies_short`.
+
+Además se eliminaron 4 fotos JPG sueltas en `app/src/` (`photo_2026-05-30_*`) que
+no estaban referenciadas desde código ni resources.

@@ -6,7 +6,7 @@
 
 **Architecture:** Un workflow de GitHub Actions genera un `google-services.json` de ejemplo (el real esta ignorado), corre las tres comprobaciones y sube la APK como artifact. En paralelo, el version catalog anade el plugin de Crashlytics y la dependencia no-KTX; Firebase sigue inicializandose automaticamente via el plugin de Google Services.
 
-**Tech Stack:** GitHub Actions, Gradle 9.5.1, AGP 9.2.1, Kotlin 2.3.21, Firebase BoM 34.13.0, Crashlytics Gradle plugin 3.0.6.
+**Tech Stack:** GitHub Actions, Gradle 9.5.1, AGP 9.2.1, Kotlin 2.3.21, Firebase BoM 34.13.0, Crashlytics Gradle plugin 3.0.8.
 
 **Spec:** `docs/superpowers/specs/2026-11-17-next-improvements.md`
 
@@ -39,7 +39,7 @@
 
 - [ ] **Step 1: Anadir version y alias**
 
-En `[versions]` de `gradle/libs.versions.toml`, anadir `crashlyticsGradle = "3.0.6"`.
+En `[versions]` de `gradle/libs.versions.toml`, anadir `crashlyticsGradle = "3.0.8"`.
 En `[plugins]`, anadir:
 
 ```toml
