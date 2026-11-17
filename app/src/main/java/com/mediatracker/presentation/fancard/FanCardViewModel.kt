@@ -77,7 +77,7 @@ class FanCardViewModel @Inject constructor(
             .filter { it.status == ItemStatus.COMPLETED }
             .sortedByDescending { it.userRating ?: 0 }
         val rated = completed.filter { it.userRating != null }
-        val avg = if (rated.isNotEmpty()) rated.map { it.userRating!!.toFloat() }.average().toFloat() else 0f
+        val avg = averageRating(completed)
         val ratingItem = if (ratingApiId != null && ratingMediaType != null) {
             items.find { it.apiId == ratingApiId && it.mediaType == ratingMediaType }
         } else {
@@ -102,3 +102,10 @@ class FanCardViewModel @Inject constructor(
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), FanCardUiState())
 }
+
+internal fun averageRating(items: List<UserItem>): Float =
+    items.mapNotNull { it.userRating }
+        .takeIf { it.isNotEmpty() }
+        ?.average()
+        ?.toFloat()
+        ?: 0f
