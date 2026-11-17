@@ -9,8 +9,6 @@ import coil.ImageLoader
 import coil.ImageLoaderFactory
 import coil.disk.DiskCache
 import coil.memory.MemoryCache
-import com.google.firebase.FirebaseApp
-import com.google.firebase.FirebaseOptions
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.mediatracker.BuildConfig
 import dagger.hilt.android.HiltAndroidApp
@@ -31,7 +29,6 @@ class MediaTrackerApp : Application(), ImageLoaderFactory {
             Timber.plant(Timber.DebugTree())
             FirebaseCrashlytics.getInstance().isCrashlyticsCollectionEnabled = true
         }
-        initializeFirebaseIfNeeded()
         createNotificationChannels()
     }
 
@@ -93,27 +90,5 @@ class MediaTrackerApp : Application(), ImageLoaderFactory {
         const val CHANNEL_ACHIEVEMENTS = "fanapp_achievements"
         const val CHANNEL_STREAKS = "fanapp_streaks"
         const val CHANNEL_SYSTEM = "fanapp_system"
-    }
-
-    private fun initializeFirebaseIfNeeded() {
-        try {
-            FirebaseApp.getInstance()
-            Timber.d("Firebase already initialized")
-        } catch (_: IllegalStateException) {
-            if (BuildConfig.TMDB_API_KEY.isBlank()) {
-                Timber.w("No Firebase config found and no API keys — running in demo mode")
-                return
-            }
-            try {
-                val options = FirebaseOptions.Builder()
-                    .setApplicationId(BuildConfig.APPLICATION_ID)
-                    .setProjectId(BuildConfig.FIREBASE_PROJECT_ID)
-                    .build()
-                FirebaseApp.initializeApp(this, options)
-                Timber.d("Firebase initialized with manual config")
-            } catch (e: Exception) {
-                Timber.e(e, "Failed to initialize Firebase — cloud features disabled")
-            }
-        }
     }
 }
