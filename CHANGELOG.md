@@ -1,5 +1,25 @@
 # Changelog
 
+## Pulido de código (2026-11-17)
+
+> Fase A del plan [2026-11-17-code-diseno-polish](docs/superpowers/plans/2026-11-17-code-diseno-polish.md).
+> Spec: [2026-11-17-code-diseno-polish](docs/superpowers/specs/2026-11-17-code-diseno-polish.md).
+
+### Fixed
+- Los 12 errores de lint preexistentes quedan corregidos (widget Glance, `stringResource` en Login y padding del `Scaffold`). `./gradlew :app:lint` en verde.
+- `FanCardViewModel`: eliminado el único `!!` del proyecto mediante `averageRating()` con 3 tests.
+- Migración del tema desde `SharedPreferences` movida a `Dispatchers.IO` (antes bloqueaba el hilo principal en el primer arranque).
+
+### Changed
+- StrictMode activado en builds debug para detectar acceso a disco en el hilo principal.
+- Caché HTTP de 10 MiB compartida por TMDB, Google Books y Open Library, con `Cache-Control` para GETs sin cabecera.
+- Coil usa un `ImageLoaderFactory` global (25 % memoria, 64 MiB disco) y las listas dinámicas tienen keys estables.
+- `DetailScreen` (776 → 489 líneas), `ProfileScreen` (612 → 142) y `HomeScreen` (622 → 219) extraen sus componentes a paquetes `components/` sin cambiar comportamiento.
+
+### Tests
+- 93 → 97 tests unitarios, 0 fallos. `compileDebugKotlin`, `testDebugUnitTest` y `lint` en verde.
+- Línea base documentada en `docs/quality-baseline-2026-11-17.md`.
+
 ## Fase 2+3 — Coherencia glass y animaciones (2026-07-19)
 
 ### Changed
