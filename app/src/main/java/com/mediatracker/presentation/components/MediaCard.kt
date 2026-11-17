@@ -42,26 +42,12 @@ import com.mediatracker.domain.model.MediaType
 import com.mediatracker.presentation.theme.DisplayFontFamily
 import com.mediatracker.presentation.theme.AppTheme
 import com.mediatracker.presentation.theme.MediaTrackerTheme
+import com.mediatracker.presentation.theme.fanAppColors
 
-private val POSTER_GRADIENTS = listOf(
-    listOf(Color(0xFFFFB3D1), Color(0xFFF06292)),
-    listOf(Color(0xFFFCC1D4), Color(0xFFC875B0)),
-    listOf(Color(0xFFC9B1EF), Color(0xFF7C4DFF)),
-    listOf(Color(0xFFB39DDB), Color(0xFF5E35B1)),
-    listOf(Color(0xFFFFD5A6), Color(0xFFEF7C80)),
-    listOf(Color(0xFFFFC1B3), Color(0xFFD65F8E)),
-    listOf(Color(0xFFA4C7F0), Color(0xFF7C5FDB)),
-    listOf(Color(0xFF7BAEF0), Color(0xFF3A4DBB)),
-    listOf(Color(0xFFA9E0C1), Color(0xFF4A9D7A)),
-    listOf(Color(0xFFF4A3A3), Color(0xFFA04060)),
-    listOf(Color(0xFF5A4080), Color(0xFF1F1438)),
-    listOf(Color(0xFFC1F0D4), Color(0xFF5DC88E)),
-)
-
-private fun titleGradientIndex(title: String): Int {
+private fun titleGradientIndex(title: String, size: Int): Int {
     var h = 0
     for (c in title) h = (h * 31 + c.code) and 0xFFFF
-    return h % POSTER_GRADIENTS.size
+    return h % size
 }
 
 @Composable
@@ -71,8 +57,9 @@ fun GradientPoster(
     modifier: Modifier = Modifier,
     rating: Float = 0f,
 ) {
-    val idx = titleGradientIndex(title)
-    val colors = POSTER_GRADIENTS[idx]
+    val gradients = MaterialTheme.fanAppColors.posterGradients
+    val idx = titleGradientIndex(title, gradients.size)
+    val colors = gradients[idx]
     val brush = Brush.linearGradient(colors, start = androidx.compose.ui.geometry.Offset(0f, 0f), end = androidx.compose.ui.geometry.Offset(Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY))
     val shape = RoundedCornerShape(14.dp)
     val isBook = kind == MediaType.BOOK

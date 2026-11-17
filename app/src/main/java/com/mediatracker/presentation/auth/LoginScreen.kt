@@ -279,10 +279,11 @@ fun LoginScreen(
 
                 Spacer(Modifier.height(16.dp))
 
+        val webClientId = stringResource(R.string.default_web_client_id)
         OutlinedButton(
             onClick = {
                 val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                    .requestIdToken(context.getString(R.string.default_web_client_id))
+                    .requestIdToken(webClientId)
                     .requestEmail()
                     .build()
                 val client = GoogleSignIn.getClient(context, gso)

@@ -39,6 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import com.mediatracker.R
 import com.mediatracker.presentation.components.GlassBackHeader
@@ -113,7 +114,7 @@ fun ImportScreen(
                 ) {
                     Text(text = error, color = MaterialTheme.colorScheme.onErrorContainer, modifier = Modifier.weight(1f))
                     TextButton(onClick = { viewModel.clearError() }) {
-                        Text("OK")
+                        Text(stringResource(R.string.common_ok))
                     }
                 }
             }
@@ -242,14 +243,14 @@ private fun PreviewStep(
                 modifier = Modifier.weight(1f),
                 shape = RoundedCornerShape(12.dp),
             ) {
-                Text("Cancelar")
+                Text(stringResource(R.string.import_cancel))
             }
             Button(
                 onClick = onConfirm,
                 modifier = Modifier.weight(1f),
                 shape = RoundedCornerShape(12.dp),
             ) {
-                Text("Importar ${preview.totalItems} items")
+                Text(pluralStringResource(R.plurals.import_items, preview.totalItems, preview.totalItems))
             }
         }
     }
@@ -340,7 +341,7 @@ private fun DoneStep(
                     .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
                     .padding(8.dp),
             ) {
-                items(result.errors) { error ->
+                items(result.errors, key = { it }) { error ->
                     Text(
                         error,
                         style = MaterialTheme.typography.bodySmall,
@@ -362,14 +363,14 @@ private fun DoneStep(
                 modifier = Modifier.weight(1f),
                 shape = RoundedCornerShape(12.dp),
             ) {
-                Text("Importar mas")
+                Text(stringResource(R.string.import_more))
             }
             Button(
                 onClick = onDone,
                 modifier = Modifier.weight(1f),
                 shape = RoundedCornerShape(12.dp),
             ) {
-                Text("Hecho")
+                Text(stringResource(R.string.import_done))
             }
         }
     }

@@ -1,5 +1,44 @@
 # Changelog
 
+## Pulido de diseño (2026-11-17)
+
+> Fase B del plan [2026-11-17-code-diseno-polish](docs/superpowers/plans/2026-11-17-code-diseno-polish.md).
+> Inventario detallado en [design-audit-2026-11-17](docs/design-audit-2026-11-17.md).
+
+### Changed
+- Los 16 colores RGB literales fuera del tema pasan a tokens (`posterGradients`, `navScrim` + reutilización de `gradientAccent`): ya no hay `Color(0x…)` fuera de `presentation/theme`.
+- Botón atrás de las sub-pantallas de 38 → 48 dp e icono de 20 → 24 dp; chips de estado con altura mínima de 48 dp.
+- Importar: textos en español hardcodeados sustituidos por recursos EN/ES, con plural para el contador de items.
+
+### Documentación
+- Auditoría visual con hallazgos P1/P2 en `docs/design-audit-2026-11-17.md`. Las capturas en dispositivo de los 4 temas quedan pendientes (no había dispositivo conectado).
+
+### Fixed (revisión final)
+- El interceptor de `Cache-Control` se registra como *network* interceptor en los 3 clientes HTTP. Como *application* interceptor se ejecutaba después de `CacheInterceptor` y la cabecera nunca llegaba al índice de caché: la caché no servía respuestas sin conexión. Test de regresión añadido.
+
+### Verificación
+- `./gradlew :app:compileDebugKotlin :app:testDebugUnitTest :app:lint` en verde: 98/98 tests, 0 errores de lint, 99 avisos (igual que la línea base).
+
+## Pulido de código (2026-11-17)
+
+> Fase A del plan [2026-11-17-code-diseno-polish](docs/superpowers/plans/2026-11-17-code-diseno-polish.md).
+> Spec: [2026-11-17-code-diseno-polish](docs/superpowers/specs/2026-11-17-code-diseno-polish.md).
+
+### Fixed
+- Los 12 errores de lint preexistentes quedan corregidos (widget Glance, `stringResource` en Login y padding del `Scaffold`). `./gradlew :app:lint` en verde.
+- `FanCardViewModel`: eliminado el único `!!` del proyecto mediante `averageRating()` con 3 tests.
+- Migración del tema desde `SharedPreferences` movida a `Dispatchers.IO` (antes bloqueaba el hilo principal en el primer arranque).
+
+### Changed
+- StrictMode activado en builds debug para detectar acceso a disco en el hilo principal.
+- Caché HTTP de 10 MiB compartida por TMDB, Google Books y Open Library, con `Cache-Control` para GETs sin cabecera.
+- Coil usa un `ImageLoaderFactory` global (25 % memoria, 64 MiB disco) y las listas dinámicas tienen keys estables.
+- `DetailScreen` (776 → 489 líneas), `ProfileScreen` (612 → 142) y `HomeScreen` (622 → 219) extraen sus componentes a paquetes `components/` sin cambiar comportamiento.
+
+### Tests
+- 93 → 98 tests unitarios, 0 fallos. `compileDebugKotlin`, `testDebugUnitTest` y `lint` en verde.
+- Línea base documentada en `docs/quality-baseline-2026-11-17.md`.
+
 ## Fase 2+3 — Coherencia glass y animaciones (2026-07-19)
 
 ### Changed

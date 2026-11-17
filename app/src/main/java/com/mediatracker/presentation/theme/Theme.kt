@@ -46,6 +46,8 @@ data class FanAppColors(
     val gradient1: List<Color>,
     val gradient2: List<Color>,
     val gradientAccent: List<Color>,
+    val posterGradients: List<List<Color>>,
+    val navScrim: Color,
     val isDark: Boolean,
 )
 
@@ -69,6 +71,8 @@ val LocalFanAppColors = staticCompositionLocalOf {
         gradient1        = listOf(Color(0xFFFFD6EC), Color(0xFFE8B8F8)),
         gradient2        = listOf(Color(0xFF7C3AED), Color(0xFFDB2777)), // violet-600 → pink-600 (texto blanco legible)
         gradientAccent   = listOf(Color(0xFFA855F7), Color(0xFFF43F8E)),
+        posterGradients  = FanPosterGradients,
+        navScrim         = FanNavScrimLight,
         isDark           = false,
     )
 }
@@ -200,6 +204,8 @@ private val FantasyFanAppColors = FanAppColors(
     gradient1        = listOf(Color(0xFFFFD6EC), Color(0xFFE8B8F8)), // rosa → lavanda
     gradient2        = listOf(Color(0xFF7C3AED), Color(0xFFDB2777)), // violet-600 → pink-600 (texto blanco legible)
     gradientAccent   = listOf(Color(0xFFA855F7), Color(0xFFF43F8E)), // violet → hot pink
+    posterGradients  = FanPosterGradients,
+    navScrim         = FanNavScrimLight,
     isDark           = false,
 )
 
@@ -222,6 +228,8 @@ private val LightFanAppColors = FanAppColors(
     gradient1        = listOf(Color(0xFFDBEAFE), Color(0xFFEEF3FF)), // blue-100 → azul muy claro
     gradient2        = listOf(Color(0xFF1D4ED8), Color(0xFF0284C7)), // blue-700 → sky-600 (texto blanco legible)
     gradientAccent   = listOf(Color(0xFF2563EB), Color(0xFF0EA5E9)), // blue → sky
+    posterGradients  = FanPosterGradients,
+    navScrim         = FanNavScrimLight,
     isDark           = false,
 )
 
@@ -244,6 +252,8 @@ private val PurpleFanAppColors = FanAppColors(
     gradient1        = listOf(Color(0xFF4A2D7A), Color(0xFF7D3A6F)),
     gradient2        = listOf(Color(0xFF5D4080), Color(0xFF8D4D7D)),
     gradientAccent   = listOf(Color(0xFFB794F6), Color(0xFFEC7EB1)),
+    posterGradients  = FanPosterGradients,
+    navScrim         = FanNavScrimDark,
     isDark           = true,
 )
 
@@ -266,6 +276,8 @@ private val DarkFanAppColors = FanAppColors(
     gradient1        = listOf(Color(0xFF1A2238), Color(0xFF2A2018)),
     gradient2        = listOf(Color(0xFF1F2229), Color(0xFF2A2D36)),
     gradientAccent   = listOf(Color(0xFF4A6CD4), Color(0xFF6D92FF)),
+    posterGradients  = FanPosterGradients,
+    navScrim         = FanNavScrimDark,
     isDark           = true,
 )
 

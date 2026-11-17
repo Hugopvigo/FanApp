@@ -1,9 +1,11 @@
 package com.mediatracker.presentation.widget
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
+import androidx.compose.ui.unit.dp
 import androidx.glance.ExperimentalGlanceApi
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
@@ -55,11 +57,12 @@ private fun WidgetContent(items: List<WidgetItem>) {
     }
 }
 
+@SuppressLint("RestrictedApi", "ResourceType")
 @OptIn(ExperimentalGlanceApi::class)
 @androidx.compose.runtime.Composable
 private fun EmptyState() {
     Column(
-        modifier = GlanceModifier.fillMaxSize().padding(16),
+        modifier = GlanceModifier.fillMaxSize().padding(16.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
@@ -69,7 +72,7 @@ private fun EmptyState() {
                 fontSize = TextUnit(32f, TextUnitType.Sp),
             ),
         )
-        Spacer(modifier = GlanceModifier.height(8))
+        Spacer(modifier = GlanceModifier.height(8.dp))
         Text(
             text = "No items in progress",
             style = TextDefaults.defaultTextStyle.copy(
@@ -80,6 +83,7 @@ private fun EmptyState() {
     }
 }
 
+@SuppressLint("RestrictedApi", "ResourceType")
 @OptIn(ExperimentalGlanceApi::class)
 @androidx.compose.runtime.Composable
 private fun ItemContent(item: WidgetItem) {
@@ -92,7 +96,7 @@ private fun ItemContent(item: WidgetItem) {
     Column(
         modifier = GlanceModifier
             .fillMaxSize()
-            .padding(12)
+            .padding(12.dp)
             .clickable(actionStartActivity(intent)),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -102,7 +106,7 @@ private fun ItemContent(item: WidgetItem) {
                 fontSize = TextUnit(28f, TextUnitType.Sp),
             ),
         )
-        Spacer(modifier = GlanceModifier.height(6))
+        Spacer(modifier = GlanceModifier.height(6.dp))
         Text(
             text = item.title,
             style = TextDefaults.defaultTextStyle.copy(
@@ -113,7 +117,7 @@ private fun ItemContent(item: WidgetItem) {
             maxLines = 2,
         )
         if (item.progressLabel != null) {
-            Spacer(modifier = GlanceModifier.height(4))
+            Spacer(modifier = GlanceModifier.height(4.dp))
             Text(
                 text = item.progressLabel,
                 style = TextDefaults.defaultTextStyle.copy(

@@ -298,4 +298,12 @@
     <string name="widget_description">Shows your current in-progress item</string>
     <string name="widget_empty_title">No items in progress</string>
     <string name="widget_empty_body">Add something to your in-progress list</string>
+    <string name="common_ok">OK</string>
+    <string name="import_cancel">Cancel</string>
+    <string name="import_more">Import more</string>
+    <string name="import_done">Done</string>
+    <plurals name="import_items">
+        <item quantity="one">Import %1$d item</item>
+        <item quantity="other">Import %1$d items</item>
+    </plurals>
 </resources>

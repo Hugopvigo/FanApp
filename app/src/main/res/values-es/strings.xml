@@ -298,4 +298,13 @@
     <string name="widget_description">Muestra tu item en progreso actual</string>
     <string name="widget_empty_title">Sin items en progreso</string>
     <string name="widget_empty_body">Añade algo a tu lista de en progreso</string>
+    <string name="common_ok">OK</string>
+    <string name="import_cancel">Cancelar</string>
+    <string name="import_more">Importar más</string>
+    <string name="import_done">Hecho</string>
+    <plurals name="import_items">
+        <item quantity="one">Importar %1$d item</item>
+        <item quantity="many">Importar %1$d items</item>
+        <item quantity="other">Importar %1$d items</item>
+    </plurals>
 </resources>
